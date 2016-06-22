@@ -28,7 +28,7 @@ Config["page"] = {
           "subplots": {
 	      "title": "CPU details",
 	      "plots": [
-                  { "type": "CPU/overivew" }
+                  { "type": "CPU/overview" }
 	      ]
           }
         },

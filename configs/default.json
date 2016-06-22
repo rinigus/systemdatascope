@@ -1,0 +1,40 @@
+{
+   "variables": {
+      "COLOR_ARROW": "#000000FF", 
+      "COLOR_AXIS": "#000000FF", 
+      "COLOR_LINE_1": "#0000FF", 
+      "COLOR_BACKGROUND": "#00000000", 
+      "COLOR_FONT": "#000000FF"
+   }, 
+   "page": {
+      "plots": [
+         {
+            "type": "CPU/overview", 
+            "subplots": {
+               "plots": [
+                  {
+                     "type": "CPU/overview"
+                  }
+               ], 
+               "title": "CPU details"
+            }
+         }
+      ], 
+      "title": "Overview"
+   }, 
+   "types": {
+      "CPU/overview": {
+         "files": [
+            "cpu/percent-wait.rrd", 
+            "cpu/percent-user.rrd", 
+            "cpu/percent-system.rrd", 
+            "cpu/percent-steal.rrd", 
+            "cpu/percent-softirq.rrd", 
+            "cpu/percent-nice.rrd", 
+            "cpu/percent-interrupt.rrd", 
+            "cpu/percent-idle.rrd"
+         ], 
+         "command": "-t \"CPU usage overview\" --upper-limit 100 --lower-limit 0 --rigid --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:wait=cpu/percent-wait.rrd:value:AVERAGE DEF:user=cpu/percent-user.rrd:value:AVERAGE DEF:system=cpu/percent-system.rrd:value:AVERAGE DEF:steal=cpu/percent-steal.rrd:value:AVERAGE DEF:softirq=cpu/percent-softirq.rrd:value:AVERAGE DEF:nice=cpu/percent-nice.rrd:value:AVERAGE DEF:interrupt=cpu/percent-interrupt.rrd:value:AVERAGE DEF:idle=cpu/percent-idle.rrd:value:AVERAGE LINE:wait$COLOR_LINE_1$:\"wait\\l\" LINE:user$COLOR_LINE_1$:\"user\\l\":STACK LINE:system$COLOR_LINE_1$:\"system\\l\":STACK LINE:steal$COLOR_LINE_1$:\"steal\\l\":STACK LINE:softirq$COLOR_LINE_1$:\"softirq\\l\":STACK LINE:nice$COLOR_LINE_1$:\"nice\\l\":STACK LINE:interrupt$COLOR_LINE_1$:\"interrupt\\l\":STACK LINE:idle$COLOR_LINE_1$:\"idle\\l\":STACK "
+      }
+   }
+}
