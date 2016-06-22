@@ -33,6 +33,8 @@ public:
 
     Q_INVOKABLE void setImageCacheTimeout(double timeout);
 
+    Q_INVOKABLE void checkCache(); ///< Call to check cache periodically
+
     /// \brief Suggests a directory with collectd databases
     ///
     /// @param temp set true if the directory should be suggested in /tmp or similar location
@@ -76,7 +78,7 @@ protected:
     void commandRun(); ///< Execute next command if RRDTOOL is ready
     void readFromProcess();
 
-    virtual void timerEvent(QTimerEvent *event);
+    //virtual void timerEvent(QTimerEvent *event);
 
     /// \brief Called when image is ready as a callback function
     ///
@@ -111,7 +113,7 @@ protected:
     size_t m_next_image_index = 0;
 
     double m_timeout = 120; ///< Time to keep images in cache
-    int m_timer_id = 0;
+    //int m_timer_id = 0;
 };
 
 }

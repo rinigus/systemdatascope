@@ -111,7 +111,9 @@ ApplicationWindowPL {
         running: true
         repeat: true
         onTriggered: {
-            console.log("Timer")
+            var now = new Date()
+            console.log("Timer at " + now.toTimeString())
+            grapher.checkCache();
             appWindow.updateGraphs()
         }
     }

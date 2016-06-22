@@ -400,12 +400,11 @@ void Generator::setImageCacheTimeout(double timeout)
 {
     m_timeout = timeout;
 
-    if ( m_timer_id != 0 ) killTimer(m_timer_id);
-    m_timer_id = startTimer( m_timeout * 1000 );
+    //    if ( m_timer_id != 0 ) killTimer(m_timer_id);
+    //    m_timer_id = startTimer( m_timeout * 1000 );
 }
 
-
-void Generator::timerEvent(QTimerEvent *)
+void Generator::checkCache()
 {
     QDateTime now = QDateTime::currentDateTimeUtc();
     for (bool erased = true; erased; )
@@ -422,6 +421,24 @@ void Generator::timerEvent(QTimerEvent *)
         }
     }
 }
+
+//void Generator::timerEvent(QTimerEvent *)
+//{
+//    QDateTime now = QDateTime::currentDateTimeUtc();
+//    for (bool erased = true; erased; )
+//    {
+//        erased = false;
+//        for (auto i = m_image_cache.begin(); i != m_image_cache.end(); ++i)
+//        {
+//            if (i.value().secsTo(now) > m_timeout)
+//            {
+//                m_image_cache.erase(i);
+//                erased = true;
+//                break; // get out of inner loop and work through the cache again
+//            }
+//        }
+//    }
+//}
 
 
 ////////////////////////////////////////////////////////
