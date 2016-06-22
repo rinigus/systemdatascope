@@ -22,3 +22,12 @@ My current development will focus on polishing Sailfish OS interface and generat
 Everyone are welcome to join. As mentioned, RRDtool commands for graph generation are missing. Linux desktop/Sailfish interface both require polishing.
 
 For developing interface, please choose PRO(ject) file that corresponds to the platform you want to develop for. Before loading PRO file into Qt Creator, make a symbolic link qml/Platform that points to corresponding platform specification (qml/Platform.silica or qml/Platform.qtcontrols, for example). Try to separate program logic from some specific platform GUI and position the code either in cross-platform (qml or src) or Platform sections, respectively.
+
+
+## Used software and Acknowledgments
+
+* collectd: https://collectd.org
+
+* RRDtool: http://oss.oetiker.ch/rrdtool
+
+Cross-platform approach similar to Universal Components https://github.com/M4rtinK/universal-components
