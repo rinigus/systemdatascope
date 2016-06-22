@@ -298,8 +298,8 @@ void Generator::setExtraVariable(QString name, QString value)
 
 void Generator::setExtraVariable(QString name, QColor value)
 {
-    QString v = value.name(QColor::HexRgb); // This implementation ignores ALPHA channel!
-    m_extra_variables[ name ] = v;
+    QString v = value.name(QColor::HexArgb);
+    m_extra_variables[ name ] = "#" + v.mid(3) + v.mid(1,2);
 }
 
 

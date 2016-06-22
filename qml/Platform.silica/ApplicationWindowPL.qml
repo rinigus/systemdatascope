@@ -68,9 +68,9 @@ ApplicationWindow {
 
         extraVariables = {
             "COLOR_BACKGROUND": "#00000000",
-            "COLOR_FONT": Theme.primaryColor,
-            "COLOR_AXIS": Theme.primaryColor,
-            "COLOR_ARROW": Theme.primaryColor
+            "COLOR_FONT": Theme.secondaryColor,
+            "COLOR_AXIS": Theme.secondaryColor,
+            "COLOR_ARROW": Theme.secondaryColor
         }
 
         statusUpdate()
