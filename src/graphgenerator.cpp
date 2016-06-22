@@ -284,11 +284,22 @@ void Generator::dropAllImageTypes()
 }
 
 /////////////////////////////////////////////////////////////////////////
-/// Set font options
+/// Set font options and extra variables
 ///
 void Generator::setFontSize(QString type, int size)
 {
     m_font_options[ type + " SIZE"] = "--font " + type + ":" + QString::number(size, 10) + ":.";
+}
+
+void Generator::setExtraVariable(QString name, QString value)
+{
+    m_extra_variables[ name ] = value;
+}
+
+void Generator::setExtraVariable(QString name, QColor value)
+{
+    QString v = value.name(QColor::HexRgb); // This implementation ignores ALPHA channel!
+    m_extra_variables[ name ] = v;
 }
 
 
@@ -462,14 +473,41 @@ QString Generator::setConfig(QString config)
             {
                 QString varName = iterVar.key();
                 QString varValue = iterVar.value().toString();
-                curr_str.replace("$" + varName +"$", varValue);
+
+                // perform replacement only if the variable is NOT in m_extra_variables
+                if ( !m_extra_variables.contains(varName) )
+                    curr_str.replace("$" + varName +"$", varValue);
             }
 
             QJsonDocument curr_after( QJsonDocument::fromJson( curr_str.toLatin1() ) );
             init[curr] = curr_after.object();
-
         }
     }
+
+    // Replace all extra variables
+    if ( m_extra_variables.size() > 0 )
+    {
+        QStringList work;
+        work.append("types");
+        work.append("page");
+
+        foreach (QString curr, work)
+        {
+            QJsonDocument curr_doc(init[curr].toObject());
+            QString curr_str = curr_doc.toJson();
+
+            QHashIterator<QString, QString> iter(m_extra_variables);
+            while (iter.hasNext())
+            {
+                iter.next();
+                curr_str.replace("$" + iter.key() +"$", iter.value());
+            }
+
+            QJsonDocument curr_after( QJsonDocument::fromJson( curr_str.toLatin1() ) );
+            init[curr] = curr_after.object();
+        }
+    }
+
 
     QJsonDocument result( init );
 

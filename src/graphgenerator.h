@@ -7,6 +7,8 @@
 #include <QTemporaryDir>
 #include <QSize>
 #include <QHash>
+#include <QColor>
+
 #include <functional>
 
 #include "imagefile.h"
@@ -50,6 +52,10 @@ public:
 
     Q_INVOKABLE void setFontSize(QString type, int size);  ///< Sets font size for RRDTOOL. Use type as a FONTTAG in the manual
 
+    Q_INVOKABLE void setExtraVariable(QString name, QString value);    ///< Sets variable by GUI allowing to override or complement variables provided by JSON configuration
+
+    Q_INVOKABLE void setExtraVariable(QString name, QColor value);    ///< Sets variable by GUI allowing to override or complement variables provided by JSON configuration. An overrided function
+
     /// \brief Asks for a new image
     ///
     /// @param caller pointer to the calling QML object. This object property image_name will be changed when the image is ready
@@ -91,6 +97,7 @@ protected:
     QHash< QString, int > m_image_type_size;        ///< Keeps full image sizes for each type separately
 
     QHash< QString, QString > m_font_options;       ///< Font options used in the construction of all images
+    QHash< QString, QString > m_extra_variables;       ///< Variables overriding or complementing JSON variables
 
     QProcess *m_rrdtool = NULL;    ///< pointer to RRDTOOL process
     bool m_ready = false;

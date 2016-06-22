@@ -12,7 +12,11 @@ os.chdir(Root)
 Config = {}
 
 Config["variables"] = {
-	"COLOR_LINE_1": "#0000FF"
+    "COLOR_BACKGROUND": "#00000000",
+    "COLOR_FONT": "#000000FF",
+    "COLOR_AXIS": "#000000FF",
+    "COLOR_ARROW": "#000000FF",
+    "COLOR_LINE_1": "#0000FF"
     }
 
 Config["page"] = {
@@ -22,16 +26,19 @@ Config["page"] = {
         { "type": "CPU/overview",
 	  
           "subplots": {
-	      "title": "Details $COLOR_LINE_1$",
+	      "title": "CPU details",
 	      "plots": [
-                  { "type": "CPU/system" }
+                  { "type": "CPU/overivew" }
 	      ]
           }
         },
 	
-        { "type": "CPU/user" }
+        #{ "type": "CPU/user" }
     ]
 }
+
+defColors = "--color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color FONT$COLOR_FONT$ "
+defColors += "--color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ "
 
 class Stack:
     def __init__(self, t = "LINE"):
@@ -55,7 +62,7 @@ class Stack:
 Config["types"] = {}
 
 # CPU overview
-command_def = "-t \"CPU usage overview\" --upper-limit 100 --lower-limit 0 --rigid "
+command_def = "-t \"CPU usage overview\" --upper-limit 100 --lower-limit 0 --rigid " + defColors
 command_line = ""
 files = []
 s = Stack()

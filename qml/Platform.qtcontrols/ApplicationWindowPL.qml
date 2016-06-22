@@ -10,6 +10,7 @@ ApplicationWindow {
     property bool stateRRDRunning: false
     property string stateLoadingUrl: ""
     property string stateLastRRDError: ""
+    property var extraVariables: { }
 
     signal appZoomIn()
     signal appZoomOut()

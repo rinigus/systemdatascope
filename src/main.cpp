@@ -68,7 +68,6 @@ int main(int argc, char *argv[])
     rootContext->setContextProperty("programName", "SystemDataScope");
     rootContext->setContextProperty("programVersion", APP_VERSION);
 
-
     // Start the application.
 #ifdef IS_SAILFISH_OS
 

@@ -9,6 +9,8 @@ ApplicationWindow {
     property string stateLoadingUrl: ""
     property string stateLastRRDError: ""
 
+    property var extraVariables: { }
+
     signal appZoomIn()
     signal appZoomOut()
     signal appTimeToNow()
@@ -63,6 +65,14 @@ ApplicationWindow {
     }
 
     Component.onCompleted: {
+
+        extraVariables = {
+            "COLOR_BACKGROUND": "#00000000",
+            "COLOR_FONT": Theme.primaryColor,
+            "COLOR_AXIS": Theme.primaryColor,
+            "COLOR_ARROW": Theme.primaryColor
+        }
+
         statusUpdate()
     }
 

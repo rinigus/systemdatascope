@@ -152,6 +152,9 @@ ApplicationWindowPL {
         // of the image is set to the moment its ready.
         grapher.setImageCacheTimeout( settings.updates_period * 0.75 )
 
+        for (var i in extraVariables)
+            grapher.setExtraVariable( i, extraVariables[i] )
+
         // parse configuration taking into account generators and variables
         var tmps = grapher.setConfig( settings.graph_definitions )
 
