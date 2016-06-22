@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/Platform/ApplicationWindowPL.qml</file>
+        <file>qml/Platform/ColumnLayoutDialog.qml</file>
+        <file>qml/Platform/FlickablePL.qml</file>
+        <file>qml/Platform/ListViewPL.qml</file>
+        <file>qml/Platform/MessageDialogPL.qml</file>
+        <file>qml/Platform/PagePL.qml</file>
+        <file>qml/Platform/SettingsPL.qml</file>
+        <file>qml/Platform/SettingsStoragePL.qml</file>
+        <file>qml/AppAbout.qml</file>
+        <file>qml/AppSettings.qml</file>
+        <file>qml/GraphList.qml</file>
+        <file>qml/main.qml</file>
+        <file>qml/Platform/MessageAboutPL.qml</file>
+    </qresource>
+</RCC>
