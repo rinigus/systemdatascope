@@ -36,9 +36,7 @@ ApplicationWindow {
     }
 
     function popAll() {
-        while (pageStack.depth > 1) {
-            pageStack.pop()
-        }
+        pageStack.clear()
     }
 
     function statusUpdate()
