@@ -13,6 +13,7 @@ ApplicationWindowPL {
     id: appWindow
 
     property var graphConfig: {}
+    property int nextId: 0
 
     // signals
     signal updateGraphs()
@@ -205,6 +206,12 @@ ApplicationWindowPL {
         popAll()
         pushPage(gList)
         updateGraphs()
+    }
+
+    // returns Callback IDs in sequence
+    function getCallbackId() {
+        nextId += 1
+        return nextId
     }
 
 

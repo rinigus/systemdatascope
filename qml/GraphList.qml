@@ -13,6 +13,7 @@ PagePL {
 
         Image {
             id: image
+            property int myCallbackId: -1
             property string image_fname: ""
             property bool update_skipped_since_invisible: false
 
@@ -22,7 +23,7 @@ PagePL {
             anchors.right: parent.right
 
             function askImage() {
-                grapher.getImage(image, graphDefs.plots[index].type, settings.timewindow_from, settings.timewindow_duration,
+                grapher.getImage(myCallbackId, graphDefs.plots[index].type, settings.timewindow_from, settings.timewindow_duration,
                                  Qt.size(width,settings.graph_base_height), false )
             }
 
@@ -31,6 +32,14 @@ PagePL {
                 onUpdateGraphs: {
                     if ( visible ) askImage()
                     else image.update_skipped_since_invisible = true
+                }
+            }
+
+            Connections {
+                target: grapher
+                onNewImage: {
+                    if (imageFor == image.myCallbackId)
+                        image_fname = fname
                 }
             }
 
@@ -43,6 +52,9 @@ PagePL {
             }
 
             Component.onCompleted: {
+                if (myCallbackId <= 0)
+                    myCallbackId = appWindow.getCallbackId()
+
                 askImage()
             }
 

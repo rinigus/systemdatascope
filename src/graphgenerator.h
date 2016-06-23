@@ -60,13 +60,14 @@ public:
 
     /// \brief Asks for a new image
     ///
-    /// @param caller pointer to the calling QML object. This object property image_name will be changed when the image is ready
+    /// @param caller QML Image Id of the calling QML object. When image is ready, this Id would be used in emitted signal
     ///
-    Q_INVOKABLE void getImage(QObject *caller, QString id, double from, double duration, QSize size, bool full_size);
+    Q_INVOKABLE void getImage(int caller, QString id, double from, double duration, QSize size, bool full_size);
 
 signals:
     void readyChanged();
     void errorRRDTool(QString error_text);
+    void newImage( int imageFor, QString fname); ///< Emitted when new image has been generated
 
 public slots:
 
@@ -82,11 +83,11 @@ protected:
 
     /// \brief Called when image is ready as a callback function
     ///
-    void imageCallback(QPointer<QObject> tocall, QString fname, QSize size, QString id);
+    void imageCallback(int tocall, QString fname, QSize size, QString id);
 
     void imageSizeTypeCallback(QString size_key, QString fname,
                                // the followin options are an arguments for getImage
-                               QObject *caller, QString type, double from, double duration,
+                               int caller, QString type, double from, double duration,
                                QSize size, bool full_size);
 
 

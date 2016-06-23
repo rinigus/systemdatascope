@@ -17,7 +17,6 @@
 #include <algorithm>
 
 #define RRDTOOL_EXE "rrdtool"
-#define IMAGE_PROPERTY_NAME "image_fname"
 
 using namespace Graph;
 
@@ -194,12 +193,10 @@ void Generator::chdir(QString dir)
 /////////////////////////////////////////////////////////////////////////
 /// Image callback
 ///
-void Generator::imageCallback(QPointer<QObject> tocall, QString fname, QSize size, QString id)
+void Generator::imageCallback(int tocall, QString fname, QSize size, QString id)
 {
-    qDebug() << "Callback for " << id << ": " << fname;
-
-    if (tocall)
-        tocall->setProperty(IMAGE_PROPERTY_NAME, "file://" + fname);
+    qDebug() << "Callback for " << tocall << " [" << id << "]: " << fname;
+    newImage(tocall, "file://" + fname);
 
     m_image_cache[id].setImage(fname, size);
 }
@@ -207,7 +204,7 @@ void Generator::imageCallback(QPointer<QObject> tocall, QString fname, QSize siz
 
 void Generator::imageSizeTypeCallback(QString size_key, QString fname,
                                       // these are arguments for getImage
-                                      QObject *caller, QString type, double from, double duration, QSize size, bool full_size
+                                      int caller, QString type, double from, double duration, QSize size, bool full_size
                                       )
 {
     QImage im(fname);
@@ -306,7 +303,7 @@ void Generator::setExtraVariable(QString name, QColor value)
 /////////////////////////////////////////////////////////////////////////
 /// Registration of image requests
 ///
-void Generator::getImage(QObject *caller, QString type, double from, double duration, QSize size, bool full_size)
+void Generator::getImage(int caller, QString type, double from, double duration, QSize size, bool full_size)
 {
     // check sanity
     if (size.width() < 1 || size.height() < 1) return; // called when initializing image, will call again soon
@@ -339,7 +336,7 @@ void Generator::getImage(QObject *caller, QString type, double from, double dura
             m_image_cache[comm.graph_id].secsTo(QDateTime::currentDateTimeUtc()) < m_timeout)
     {
         qDebug() << "Found in cache: " << comm.graph_id;
-        caller->setProperty( IMAGE_PROPERTY_NAME, "file://" + m_image_cache[comm.graph_id].getFilename() );
+        newImage(caller, "file://" + m_image_cache[comm.graph_id].getFilename() );
         return;
     }
 
@@ -361,7 +358,7 @@ void Generator::getImage(QObject *caller, QString type, double from, double dura
         else
             comm.command += " --height=" + QString::number( m_image_type_size[size_key] ) + " ";
 
-        comm.callback = std::bind(&Generator::imageCallback, this, QPointer<QObject>(caller),
+        comm.callback = std::bind(&Generator::imageCallback, this, caller,
                                   fname, size, comm.graph_id);
     }
     else // we have to make a test graph first, to determine the full height of the image
