@@ -21,6 +21,9 @@ ApplicationWindow {
     signal appSettings()
     signal appAbout()
 
+    // dummy properties/signals to ensure compatibility with Sailfish
+    signal applicationActiveChanged()
+
     toolBar: ToolBar {
         RowLayout {
             id: appToolbar
