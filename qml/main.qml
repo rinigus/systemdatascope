@@ -107,6 +107,7 @@ ApplicationWindowPL {
 
     // update timer
     Timer {
+        id: mainTimer
         interval: settings.updates_period * 1000
         running: true
         repeat: true
@@ -114,7 +115,25 @@ ApplicationWindowPL {
             var now = new Date()
             console.log("Timer at " + now.toTimeString())
             grapher.checkCache();
+            if ( Qt.application.active )
+            {
+                appWindow.updateGraphs()
+            }
+        }
+    }
+
+    onApplicationActiveChanged: {
+        console.log("Application active changed to " + Qt.application.active)
+        if ( Qt.application.active )
+        {
+            // make updates and reinstall timer
+            grapher.checkCache();
             appWindow.updateGraphs()
+            mainTimer.interval = settings.updates_period * 1000
+        }
+        else
+        {
+            mainTimer.interval = 15 * 60 * 1000
         }
     }
 
