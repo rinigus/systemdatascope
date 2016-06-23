@@ -14,15 +14,18 @@ PagePL {
         Image {
             id: image
             property int myCallbackId: -1
-            property string image_fname: ""
+            //property string image_fname: ""
             property bool update_skipped_since_invisible: false
 
-            source: image_fname
+            source: "" //image_fname
 
             anchors.left: parent.left
             anchors.right: parent.right
 
             function askImage() {
+                if (myCallbackId <= 0)
+                    myCallbackId = appWindow.getCallbackId()
+
                 grapher.getImage(myCallbackId, graphDefs.plots[index].type, settings.timewindow_from, settings.timewindow_duration,
                                  Qt.size(width,settings.graph_base_height), false )
             }
@@ -39,7 +42,10 @@ PagePL {
                 target: grapher
                 onNewImage: {
                     if (imageFor == image.myCallbackId)
-                        image_fname = fname
+                    {
+                        console.log("Image received: ", imageFor, fname)
+                        source = fname
+                    }
                 }
             }
 
@@ -52,9 +58,6 @@ PagePL {
             }
 
             Component.onCompleted: {
-                if (myCallbackId <= 0)
-                    myCallbackId = appWindow.getCallbackId()
-
                 askImage()
             }
 
