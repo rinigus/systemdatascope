@@ -126,7 +126,7 @@ ApplicationWindowPL {
     onApplicationActiveChanged: {
         var now = new Date()
         console.log(now.toTimeString() + " Application active changed to " + Qt.application.active)
-        if ( Qt.application.active )
+        if ( isActive() )
         {
             // make updates and reinstall timer
             grapher.checkCache();

@@ -25,6 +25,10 @@ ApplicationWindow {
 
     // Menu is defined in ListViewPL
 
+    function isActive() {
+        return Qt.application.active
+    }
+
     function pushPage(pageInstance, pageProperties, animate) {
         pageStack.push(pageInstance, pageProperties)
         return pageInstance
