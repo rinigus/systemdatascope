@@ -72,7 +72,8 @@ ApplicationWindow {
             "COLOR_BACKGROUND": "#00000000",
             "COLOR_FONT": Theme.secondaryColor,
             "COLOR_AXIS": Theme.secondaryColor,
-            "COLOR_ARROW": Theme.secondaryColor
+            "COLOR_ARROW": Theme.secondaryColor,
+            "COLOR_LINE_SINGLE": Theme.highlightColor
         }
 
         statusUpdate()
