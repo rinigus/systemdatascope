@@ -365,8 +365,10 @@ void Generator::getImage(int caller, QString type, double from, double duration,
     {
         // test image can be smaller in width, no need to make full image to get height
         // there is no --full-size-mode option here, we give canvas!
+        // Correction: there could be problems with long legends. So, let's keep full size
         comm.command +=
-                " --width=" + QString::number(std::min( size.width(), 100 ) ) +
+                //" --width=" + QString::number(std::min( size.width(), 100 ) ) +
+                " --width=" + QString::number( size.width() ) +
                 " --height="  + QString::number(size.height()) + " ";
 
         // callback will first register the size and later call this method again
