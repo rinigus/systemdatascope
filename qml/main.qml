@@ -114,7 +114,7 @@ ApplicationWindowPL {
         repeat: true
         onTriggered: {
             var now = new Date()
-            console.log("Timer at " + now.toTimeString())
+            console.log(now.toTimeString() + " Timer")
             grapher.checkCache();
             if ( Qt.application.active )
             {
@@ -124,7 +124,8 @@ ApplicationWindowPL {
     }
 
     onApplicationActiveChanged: {
-        console.log("Application active changed to " + Qt.application.active)
+        var now = new Date()
+        console.log(now.toTimeString() + " Application active changed to " + Qt.application.active)
         if ( Qt.application.active )
         {
             // make updates and reinstall timer

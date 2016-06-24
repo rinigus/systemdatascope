@@ -106,7 +106,7 @@ void Generator::commandRun()
 
     QString com = m_command_current.command;
 
-    qDebug() << "Sending command: " + com;
+    //qDebug() << "Sending command: " + com;
 
     m_rrdtool_busy = true;
     m_rrdtool_output = QString();
@@ -129,7 +129,7 @@ void Generator::readFromProcess()
     if ( m_rrdtool_output.count('\n') > m_rrdtool_output_skip_lines ||
          m_rrdtool_output.indexOf("ERROR") >= 0 )
     {
-        qDebug() << "RRDTOOL returned: " << m_rrdtool_output;
+        //qDebug() << "RRDTOOL returned: " << m_rrdtool_output;
 
         if (m_rrdtool_output.indexOf("OK") >= 0 && m_rrdtool_output.indexOf("ERROR") < 0 ) /// All went fine
         {
@@ -195,7 +195,7 @@ void Generator::chdir(QString dir)
 ///
 void Generator::imageCallback(int tocall, QString fname, QSize size, QString id)
 {
-    qDebug() << "Callback for " << tocall << " [" << id << "]: " << fname;
+    qDebug() << QTime::currentTime().toString("h:mm:ss") <<  " callback for " << tocall << " [" << id << "]: " << fname;
     newImage(tocall, "file://" + fname);
 
     m_image_cache[id].setImage(fname, size);
@@ -335,7 +335,7 @@ void Generator::getImage(int caller, QString type, double from, double duration,
             m_image_cache[comm.graph_id].getImageSize() == size &&
             m_image_cache[comm.graph_id].secsTo(QDateTime::currentDateTimeUtc()) < m_timeout)
     {
-        qDebug() << "Found in cache: " << comm.graph_id;
+        qDebug() << QTime::currentTime().toString("h:mm:ss") <<  " Found in cache: " << comm.graph_id;
         newImage(caller, "file://" + m_image_cache[comm.graph_id].getFilename() );
         return;
     }
