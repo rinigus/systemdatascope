@@ -116,7 +116,7 @@ ApplicationWindowPL {
             var now = new Date()
             console.log(now.toTimeString() + " Timer")
             grapher.checkCache();
-            if ( Qt.application.active )
+            if ( isActive() )
             {
                 appWindow.updateGraphs()
             }

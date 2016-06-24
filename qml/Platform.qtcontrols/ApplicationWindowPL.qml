@@ -161,6 +161,10 @@ ApplicationWindow {
         }
     }
 
+    function isActive() {
+        return true //Qt.application.state can be used, but on desktop let's update always
+    }
+
     function pushPage(pageInstance, pageProperties, animate) {
         // the Controls page stack disables animations when
         // false is passed as the third argument, but we want to
