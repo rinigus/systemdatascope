@@ -1,9 +1,13 @@
 {
    "variables": {
+      "COLOR_CANVAS": "#00000000", 
       "COLOR_ARROW": "#000000FF", 
-      "COLOR_AXIS": "#000000FF", 
-      "COLOR_LINE_1": "#0000FF", 
+      "COLOR_LINE_SINGLE_SUB": "#0000FF80", 
       "COLOR_BACKGROUND": "#00000000", 
+      "LINE_WIDTH_PRIMARY": "3", 
+      "COLOR_LINE_SINGLE": "#0000FFFF", 
+      "COLOR_AXIS": "#000000FF", 
+      "LINE_WIDTH_SECONDARY": "1", 
       "COLOR_FONT": "#000000FF"
    }, 
    "page": {
@@ -14,27 +18,179 @@
                "plots": [
                   {
                      "type": "CPU/overview"
+                  }, 
+                  {
+                     "type": "CPU/idle"
+                  }, 
+                  {
+                     "type": "CPU/nice"
+                  }, 
+                  {
+                     "type": "CPU/user"
+                  }, 
+                  {
+                     "type": "CPU/system"
+                  }, 
+                  {
+                     "type": "CPU/wait"
+                  }, 
+                  {
+                     "type": "CPU/steal"
+                  }, 
+                  {
+                     "type": "CPU/softirq"
+                  }, 
+                  {
+                     "type": "CPU/interrupt"
                   }
                ], 
                "title": "CPU details"
+            }
+         }, 
+         {
+            "type": "Battery/voltage", 
+            "subplots": {
+               "plots": [
+                  {
+                     "type": "Battery/voltage"
+                  }, 
+                  {
+                     "type": "Battery/current"
+                  }
+               ], 
+               "title": "Battery details"
+            }
+         }, 
+         {
+            "type": "Storage/root", 
+            "subplots": {
+               "plots": [
+                  {
+                     "type": "Storage/root"
+                  }
+               ], 
+               "title": "Storage details"
+            }
+         }, 
+         {
+            "type": "Context/context_switch", 
+            "subplots": {
+               "plots": [
+                  {
+                     "type": "Context/context_switch"
+                  }, 
+                  {
+                     "type": "Entropy/entropy"
+                  }, 
+                  {
+                     "type": "Uptime/uptime"
+                  }
+               ], 
+               "title": "Misc details"
             }
          }
       ], 
       "title": "Overview"
    }, 
    "types": {
+      "CPU/system": {
+         "files": [
+            "cpu/percent-system.rrd"
+         ], 
+         "command": "-t \"CPU system\" --upper-limit 100 --lower-limit 0 --rigid --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:system=cpu/percent-system.rrd:value:AVERAGE DEF:system_min=cpu/percent-system.rrd:value:MIN DEF:system_max=cpu/percent-system.rrd:value:MAX CDEF:system_max_min_delta=system_max,system_min,- LINE:system_min AREA:system_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:system$COLOR_LINE_SINGLE$:\"system\\l\" COMMENT:\\u GPRINT:system:AVERAGE:\"Avr %1.0lf\" GPRINT:system_min:MIN:\"Min %1.0lf\" GPRINT:system_max:MAX:\"Max %1.0lf\" GPRINT:system:LAST:\"Last %1.0lf\\r\"  "
+      }, 
+      "Uptime/uptime": {
+         "files": [
+            "uptime/uptime.rrd"
+         ], 
+         "command": "-t \"Uptime, days\" --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:uptime_data=uptime/uptime.rrd:value:AVERAGE CDEF:uptime=uptime_data,86400,/ LINE$LINE_WIDTH_PRIMARY$:uptime$COLOR_LINE_SINGLE$:\"uptime\\l\" COMMENT:\\u GPRINT:uptime:LAST:\"Current %0.2lf\\r\"  "
+      }, 
       "CPU/overview": {
          "files": [
-            "cpu/percent-wait.rrd", 
-            "cpu/percent-user.rrd", 
-            "cpu/percent-system.rrd", 
-            "cpu/percent-steal.rrd", 
-            "cpu/percent-softirq.rrd", 
-            "cpu/percent-nice.rrd", 
             "cpu/percent-interrupt.rrd", 
+            "cpu/percent-softirq.rrd", 
+            "cpu/percent-steal.rrd", 
+            "cpu/percent-wait.rrd", 
+            "cpu/percent-system.rrd", 
+            "cpu/percent-user.rrd", 
+            "cpu/percent-nice.rrd", 
             "cpu/percent-idle.rrd"
          ], 
-         "command": "-t \"CPU usage overview\" --upper-limit 100 --lower-limit 0 --rigid --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:wait=cpu/percent-wait.rrd:value:AVERAGE DEF:user=cpu/percent-user.rrd:value:AVERAGE DEF:system=cpu/percent-system.rrd:value:AVERAGE DEF:steal=cpu/percent-steal.rrd:value:AVERAGE DEF:softirq=cpu/percent-softirq.rrd:value:AVERAGE DEF:nice=cpu/percent-nice.rrd:value:AVERAGE DEF:interrupt=cpu/percent-interrupt.rrd:value:AVERAGE DEF:idle=cpu/percent-idle.rrd:value:AVERAGE LINE:wait$COLOR_LINE_1$:\"wait\\l\" LINE:user$COLOR_LINE_1$:\"user\\l\":STACK LINE:system$COLOR_LINE_1$:\"system\\l\":STACK LINE:steal$COLOR_LINE_1$:\"steal\\l\":STACK LINE:softirq$COLOR_LINE_1$:\"softirq\\l\":STACK LINE:nice$COLOR_LINE_1$:\"nice\\l\":STACK LINE:interrupt$COLOR_LINE_1$:\"interrupt\\l\":STACK LINE:idle$COLOR_LINE_1$:\"idle\\l\":STACK "
+         "command": "-t \"CPU usage\" --upper-limit 100 --lower-limit 0 --rigid --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:interrupt=cpu/percent-interrupt.rrd:value:AVERAGE DEF:softirq=cpu/percent-softirq.rrd:value:AVERAGE DEF:steal=cpu/percent-steal.rrd:value:AVERAGE DEF:wait=cpu/percent-wait.rrd:value:AVERAGE DEF:system=cpu/percent-system.rrd:value:AVERAGE DEF:user=cpu/percent-user.rrd:value:AVERAGE DEF:nice=cpu/percent-nice.rrd:value:AVERAGE DEF:idle=cpu/percent-idle.rrd:value:AVERAGE AREA:interrupt#E41A1CFF:\"interrupt\\l\" COMMENT:\\u GPRINT:interrupt:AVERAGE:\"Avr %2.0lf\" GPRINT:interrupt:MIN:\"Min %2.0lf\" GPRINT:interrupt:MAX:\"Max %2.0lf\" GPRINT:interrupt:LAST:\"Last %2.0lf\\r\"  AREA:softirq#377EB8FF:\"softirq\\l\":STACK COMMENT:\\u GPRINT:softirq:AVERAGE:\"Avr %2.0lf\" GPRINT:softirq:MIN:\"Min %2.0lf\" GPRINT:softirq:MAX:\"Max %2.0lf\" GPRINT:softirq:LAST:\"Last %2.0lf\\r\"  AREA:steal#4DAF4AFF:\"steal\\l\":STACK COMMENT:\\u GPRINT:steal:AVERAGE:\"Avr %2.0lf\" GPRINT:steal:MIN:\"Min %2.0lf\" GPRINT:steal:MAX:\"Max %2.0lf\" GPRINT:steal:LAST:\"Last %2.0lf\\r\"  AREA:wait#984EA3FF:\"wait\\l\":STACK COMMENT:\\u GPRINT:wait:AVERAGE:\"Avr %2.0lf\" GPRINT:wait:MIN:\"Min %2.0lf\" GPRINT:wait:MAX:\"Max %2.0lf\" GPRINT:wait:LAST:\"Last %2.0lf\\r\"  AREA:system#FF7F00FF:\"system\\l\":STACK COMMENT:\\u GPRINT:system:AVERAGE:\"Avr %2.0lf\" GPRINT:system:MIN:\"Min %2.0lf\" GPRINT:system:MAX:\"Max %2.0lf\" GPRINT:system:LAST:\"Last %2.0lf\\r\"  AREA:user#FFFF33FF:\"user\\l\":STACK COMMENT:\\u GPRINT:user:AVERAGE:\"Avr %2.0lf\" GPRINT:user:MIN:\"Min %2.0lf\" GPRINT:user:MAX:\"Max %2.0lf\" GPRINT:user:LAST:\"Last %2.0lf\\r\"  AREA:nice#A65628FF:\"nice\\l\":STACK COMMENT:\\u GPRINT:nice:AVERAGE:\"Avr %2.0lf\" GPRINT:nice:MIN:\"Min %2.0lf\" GPRINT:nice:MAX:\"Max %2.0lf\" GPRINT:nice:LAST:\"Last %2.0lf\\r\"  AREA:idle#00000000:\"idle\\l\":STACK COMMENT:\\u GPRINT:idle:AVERAGE:\"Avr %2.0lf\" GPRINT:idle:MIN:\"Min %2.0lf\" GPRINT:idle:MAX:\"Max %2.0lf\" GPRINT:idle:LAST:\"Last %2.0lf\\r\"  "
+      }, 
+      "CPU/nice": {
+         "files": [
+            "cpu/percent-nice.rrd"
+         ], 
+         "command": "-t \"CPU nice\" --upper-limit 100 --lower-limit 0 --rigid --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:nice=cpu/percent-nice.rrd:value:AVERAGE DEF:nice_min=cpu/percent-nice.rrd:value:MIN DEF:nice_max=cpu/percent-nice.rrd:value:MAX CDEF:nice_max_min_delta=nice_max,nice_min,- LINE:nice_min AREA:nice_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:nice$COLOR_LINE_SINGLE$:\"nice\\l\" COMMENT:\\u GPRINT:nice:AVERAGE:\"Avr %1.0lf\" GPRINT:nice_min:MIN:\"Min %1.0lf\" GPRINT:nice_max:MAX:\"Max %1.0lf\" GPRINT:nice:LAST:\"Last %1.0lf\\r\"  "
+      }, 
+      "CPU/interrupt": {
+         "files": [
+            "cpu/percent-interrupt.rrd"
+         ], 
+         "command": "-t \"CPU interrupt\" --upper-limit 100 --lower-limit 0 --rigid --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:interrupt=cpu/percent-interrupt.rrd:value:AVERAGE DEF:interrupt_min=cpu/percent-interrupt.rrd:value:MIN DEF:interrupt_max=cpu/percent-interrupt.rrd:value:MAX CDEF:interrupt_max_min_delta=interrupt_max,interrupt_min,- LINE:interrupt_min AREA:interrupt_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:interrupt$COLOR_LINE_SINGLE$:\"interrupt\\l\" COMMENT:\\u GPRINT:interrupt:AVERAGE:\"Avr %1.0lf\" GPRINT:interrupt_min:MIN:\"Min %1.0lf\" GPRINT:interrupt_max:MAX:\"Max %1.0lf\" GPRINT:interrupt:LAST:\"Last %1.0lf\\r\"  "
+      }, 
+      "Entropy/entropy": {
+         "files": [
+            "entropy/entropy.rrd"
+         ], 
+         "command": "-t \" Entropy\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:entropy=entropy/entropy.rrd:value:AVERAGE DEF:entropy_min=entropy/entropy.rrd:value:MIN DEF:entropy_max=entropy/entropy.rrd:value:MAX CDEF:entropy_max_min_delta=entropy_max,entropy_min,- LINE:entropy_min AREA:entropy_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:entropy$COLOR_LINE_SINGLE$:\"entropy\\l\" COMMENT:\\u GPRINT:entropy:AVERAGE:\"Avr %0.2lf\" GPRINT:entropy_min:MIN:\"Min %0.2lf\" GPRINT:entropy_max:MAX:\"Max %0.2lf\" GPRINT:entropy:LAST:\"Last %0.2lf\\r\"  "
+      }, 
+      "Storage/root": {
+         "files": [
+            "df-root/df_complex-used.rrd", 
+            "df-root/df_complex-reserved.rrd", 
+            "df-root/df_complex-free.rrd"
+         ], 
+         "command": "-t \"Storage root\" --lower-limit 0 --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:used=df-root/df_complex-used.rrd:value:AVERAGE DEF:reserved=df-root/df_complex-reserved.rrd:value:AVERAGE DEF:free=df-root/df_complex-free.rrd:value:AVERAGE AREA:used#E41A1CFF:\"used\\l\" COMMENT:\\u GPRINT:used:AVERAGE:\"Avr %2.0lf%S\" GPRINT:used:MIN:\"Min %2.0lf%S\" GPRINT:used:MAX:\"Max %2.0lf%S\" GPRINT:used:LAST:\"Last %2.0lf%S\\r\"  AREA:reserved#377EB8FF:\"reserved\\l\":STACK COMMENT:\\u GPRINT:reserved:AVERAGE:\"Avr %2.0lf%S\" GPRINT:reserved:MIN:\"Min %2.0lf%S\" GPRINT:reserved:MAX:\"Max %2.0lf%S\" GPRINT:reserved:LAST:\"Last %2.0lf%S\\r\"  AREA:free#4DAF4AFF:\"free\\l\":STACK COMMENT:\\u GPRINT:free:AVERAGE:\"Avr %2.0lf%S\" GPRINT:free:MIN:\"Min %2.0lf%S\" GPRINT:free:MAX:\"Max %2.0lf%S\" GPRINT:free:LAST:\"Last %2.0lf%S\\r\"  "
+      }, 
+      "CPU/idle": {
+         "files": [
+            "cpu/percent-idle.rrd"
+         ], 
+         "command": "-t \"CPU idle\" --upper-limit 100 --lower-limit 0 --rigid --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:idle=cpu/percent-idle.rrd:value:AVERAGE DEF:idle_min=cpu/percent-idle.rrd:value:MIN DEF:idle_max=cpu/percent-idle.rrd:value:MAX CDEF:idle_max_min_delta=idle_max,idle_min,- LINE:idle_min AREA:idle_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:idle$COLOR_LINE_SINGLE$:\"idle\\l\" COMMENT:\\u GPRINT:idle:AVERAGE:\"Avr %1.0lf\" GPRINT:idle_min:MIN:\"Min %1.0lf\" GPRINT:idle_max:MAX:\"Max %1.0lf\" GPRINT:idle:LAST:\"Last %1.0lf\\r\"  "
+      }, 
+      "Context/context_switch": {
+         "files": [
+            "contextswitch/contextswitch.rrd"
+         ], 
+         "command": "-t \" Context switch\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:context_switch=contextswitch/contextswitch.rrd:value:AVERAGE DEF:context_switch_min=contextswitch/contextswitch.rrd:value:MIN DEF:context_switch_max=contextswitch/contextswitch.rrd:value:MAX CDEF:context_switch_max_min_delta=context_switch_max,context_switch_min,- LINE:context_switch_min AREA:context_switch_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:context_switch$COLOR_LINE_SINGLE$:\"context_switch\\l\" COMMENT:\\u GPRINT:context_switch:AVERAGE:\"Avr %1.0lf%S\" GPRINT:context_switch_min:MIN:\"Min %1.0lf%S\" GPRINT:context_switch_max:MAX:\"Max %1.0lf%S\" GPRINT:context_switch:LAST:\"Last %1.0lf%S\\r\"  "
+      }, 
+      "CPU/wait": {
+         "files": [
+            "cpu/percent-wait.rrd"
+         ], 
+         "command": "-t \"CPU wait\" --upper-limit 100 --lower-limit 0 --rigid --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:wait=cpu/percent-wait.rrd:value:AVERAGE DEF:wait_min=cpu/percent-wait.rrd:value:MIN DEF:wait_max=cpu/percent-wait.rrd:value:MAX CDEF:wait_max_min_delta=wait_max,wait_min,- LINE:wait_min AREA:wait_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:wait$COLOR_LINE_SINGLE$:\"wait\\l\" COMMENT:\\u GPRINT:wait:AVERAGE:\"Avr %1.0lf\" GPRINT:wait_min:MIN:\"Min %1.0lf\" GPRINT:wait_max:MAX:\"Max %1.0lf\" GPRINT:wait:LAST:\"Last %1.0lf\\r\"  "
+      }, 
+      "Battery/voltage": {
+         "files": [
+            "battery-0/voltage.rrd"
+         ], 
+         "command": "-t \" Battery voltage, V\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:voltage=battery-0/voltage.rrd:value:AVERAGE DEF:voltage_min=battery-0/voltage.rrd:value:MIN DEF:voltage_max=battery-0/voltage.rrd:value:MAX CDEF:voltage_max_min_delta=voltage_max,voltage_min,- LINE:voltage_min AREA:voltage_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:voltage$COLOR_LINE_SINGLE$:\"voltage\\l\" COMMENT:\\u GPRINT:voltage:AVERAGE:\"Avr %1.3lf%SV\" GPRINT:voltage_min:MIN:\"Min %1.3lf%SV\" GPRINT:voltage_max:MAX:\"Max %1.3lf%SV\" GPRINT:voltage:LAST:\"Last %1.3lf%SV\\r\"  "
+      }, 
+      "CPU/user": {
+         "files": [
+            "cpu/percent-user.rrd"
+         ], 
+         "command": "-t \"CPU user\" --upper-limit 100 --lower-limit 0 --rigid --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:user=cpu/percent-user.rrd:value:AVERAGE DEF:user_min=cpu/percent-user.rrd:value:MIN DEF:user_max=cpu/percent-user.rrd:value:MAX CDEF:user_max_min_delta=user_max,user_min,- LINE:user_min AREA:user_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:user$COLOR_LINE_SINGLE$:\"user\\l\" COMMENT:\\u GPRINT:user:AVERAGE:\"Avr %1.0lf\" GPRINT:user_min:MIN:\"Min %1.0lf\" GPRINT:user_max:MAX:\"Max %1.0lf\" GPRINT:user:LAST:\"Last %1.0lf\\r\"  "
+      }, 
+      "Battery/current": {
+         "files": [
+            "battery-0/current.rrd"
+         ], 
+         "command": "-t \" Battery current, A\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:current=battery-0/current.rrd:value:AVERAGE DEF:current_min=battery-0/current.rrd:value:MIN DEF:current_max=battery-0/current.rrd:value:MAX CDEF:current_max_min_delta=current_max,current_min,- LINE:current_min AREA:current_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:current$COLOR_LINE_SINGLE$:\"current\\l\" COMMENT:\\u GPRINT:current:AVERAGE:\"Avr %1.0lf%SA\" GPRINT:current_min:MIN:\"Min %1.0lf%SA\" GPRINT:current_max:MAX:\"Max %1.0lf%SA\" GPRINT:current:LAST:\"Last %1.0lf%SA\\r\"  "
+      }, 
+      "CPU/softirq": {
+         "files": [
+            "cpu/percent-softirq.rrd"
+         ], 
+         "command": "-t \"CPU softirq\" --upper-limit 100 --lower-limit 0 --rigid --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:softirq=cpu/percent-softirq.rrd:value:AVERAGE DEF:softirq_min=cpu/percent-softirq.rrd:value:MIN DEF:softirq_max=cpu/percent-softirq.rrd:value:MAX CDEF:softirq_max_min_delta=softirq_max,softirq_min,- LINE:softirq_min AREA:softirq_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:softirq$COLOR_LINE_SINGLE$:\"softirq\\l\" COMMENT:\\u GPRINT:softirq:AVERAGE:\"Avr %1.0lf\" GPRINT:softirq_min:MIN:\"Min %1.0lf\" GPRINT:softirq_max:MAX:\"Max %1.0lf\" GPRINT:softirq:LAST:\"Last %1.0lf\\r\"  "
+      }, 
+      "CPU/steal": {
+         "files": [
+            "cpu/percent-steal.rrd"
+         ], 
+         "command": "-t \"CPU steal\" --upper-limit 100 --lower-limit 0 --rigid --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:steal=cpu/percent-steal.rrd:value:AVERAGE DEF:steal_min=cpu/percent-steal.rrd:value:MIN DEF:steal_max=cpu/percent-steal.rrd:value:MAX CDEF:steal_max_min_delta=steal_max,steal_min,- LINE:steal_min AREA:steal_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:steal$COLOR_LINE_SINGLE$:\"steal\\l\" COMMENT:\\u GPRINT:steal:AVERAGE:\"Avr %1.0lf\" GPRINT:steal_min:MIN:\"Min %1.0lf\" GPRINT:steal_max:MAX:\"Max %1.0lf\" GPRINT:steal:LAST:\"Last %1.0lf\\r\"  "
       }
    }
 }
