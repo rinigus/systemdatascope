@@ -23,11 +23,14 @@ PagePL {
             anchors.right: parent.right
 
             function askImage() {
-                if (myCallbackId <= 0)
-                    myCallbackId = appWindow.getCallbackId()
+                // continue only if we are active
+                if ( appWindow.isActive() ) {
+                    if (myCallbackId <= 0)
+                        myCallbackId = appWindow.getCallbackId()
 
-                grapher.getImage(myCallbackId, graphDefs.plots[index].type, settings.timewindow_from, settings.timewindow_duration,
-                                 Qt.size(width,settings.graph_base_height), false )
+                    grapher.getImage(myCallbackId, graphDefs.plots[index].type, settings.timewindow_from, settings.timewindow_duration,
+                                     Qt.size(width,settings.graph_base_height), false )
+                }
             }
 
             Connections {
@@ -100,19 +103,19 @@ PagePL {
             delegate: graphPlotDelegate
             header_text: pageTitle
 
-//            header: PageHeader {
-//                text: pageTitle
-//                menu : TopMenu {
-//                            MenuItem {
-//                                text : "option 1"
-//                                onClicked : {console.log("1 clicked!")}
-//                            }
-//                            MenuItem {
-//                                text : "option 2"
-//                                onClicked : {console.log("2 clicked!")}
-//                            }
-//                        }
-//            }
+            //            header: PageHeader {
+            //                text: pageTitle
+            //                menu : TopMenu {
+            //                            MenuItem {
+            //                                text : "option 1"
+            //                                onClicked : {console.log("1 clicked!")}
+            //                            }
+            //                            MenuItem {
+            //                                text : "option 2"
+            //                                onClicked : {console.log("2 clicked!")}
+            //                            }
+            //                        }
+            //            }
         }
     }
 
@@ -123,12 +126,12 @@ PagePL {
         pageTitle = graphDefs.title
 
         graphsModel = graphDefs.plots.length
-//        for (var i=0; i < graphDefs.plots.length; i++)
-//        {
-//            var o = graphDefs.plots[i]
-//            console.log(i + " " + JSON.stringify(o))
-//            graphsModel.append({command: o.command, type: o.type})
-//        }
+        //        for (var i=0; i < graphDefs.plots.length; i++)
+        //        {
+        //            var o = graphDefs.plots[i]
+        //            console.log(i + " " + JSON.stringify(o))
+        //            graphsModel.append({command: o.command, type: o.type})
+        //        }
     }
 
     onGraphDefsChanged: {
