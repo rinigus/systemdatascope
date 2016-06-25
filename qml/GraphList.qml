@@ -13,6 +13,7 @@ PagePL {
 
         Image {
             id: image
+
             property int myCallbackId: -1
             //property string image_fname: ""
             property bool update_skipped_since_invisible: false
@@ -91,29 +92,15 @@ PagePL {
     }
 
 
-    FlickablePL {
+    ListViewPL {
         anchors.fill: parent
+        model: graphsModel
+        delegate: graphPlotDelegate
+        header_text: pageTitle
 
-        ListViewPL {
-            anchors.fill: parent
-            model: graphsModel
-            delegate: graphPlotDelegate
-            header_text: pageTitle
-
-//            header: PageHeader {
-//                text: pageTitle
-//                menu : TopMenu {
-//                            MenuItem {
-//                                text : "option 1"
-//                                onClicked : {console.log("1 clicked!")}
-//                            }
-//                            MenuItem {
-//                                text : "option 2"
-//                                onClicked : {console.log("2 clicked!")}
-//                            }
-//                        }
-//            }
-        }
+        highlight: Rectangle { color: "lightsteelblue"; radius: 5 }
+        focus: true
+        clip: true
     }
 
     // Fill model
@@ -123,12 +110,6 @@ PagePL {
         pageTitle = graphDefs.title
 
         graphsModel = graphDefs.plots.length
-//        for (var i=0; i < graphDefs.plots.length; i++)
-//        {
-//            var o = graphDefs.plots[i]
-//            console.log(i + " " + JSON.stringify(o))
-//            graphsModel.append({command: o.command, type: o.type})
-//        }
     }
 
     onGraphDefsChanged: {
