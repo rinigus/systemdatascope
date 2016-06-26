@@ -73,7 +73,8 @@ ApplicationWindow {
             "COLOR_FONT": Theme.secondaryColor,
             "COLOR_AXIS": Theme.secondaryColor,
             "COLOR_ARROW": Theme.secondaryColor,
-            "COLOR_LINE_SINGLE": Theme.highlightColor
+            "COLOR_LINE_SINGLE": Theme.highlightColor,
+            "COLOR_LINE_SINGLE_SUB": Theme.secondaryHighlightColor
         }
 
         statusUpdate()
