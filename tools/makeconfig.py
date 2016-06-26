@@ -77,10 +77,10 @@ class Colors:
 
         if self.colorschemes.has_key(k):
             self.colors = self.colorschemes[k]
-        elif k < min(self.colorschemes.keys):
-            self.colors = self.colorschemes[ min(self.colorschemes.keys) ]
+        elif k < min(self.colorschemes.keys()):
+            self.colors = self.colorschemes[ min(self.colorschemes.keys()) ]
         else:
-            self.colors = self.colorschemes[ max(self.colorschemes.keys) ]
+            self.colors = self.colorschemes[ max(self.colorschemes.keys()) ]
 
     def makestr(self, c, opacity):
         s = "#"
@@ -111,11 +111,12 @@ class Colors:
 
     
 class StackOrLines:
-    def __init__(self, col, isStack = False, t = "LINE"):
+    def __init__(self, col, isStack = False, minmax = False, t = "LINE"):
         self.lines = []
         self.gt = t
         self.colors = col
         self.isStack = isStack
+        self.minmax = minmax
 
     def add(self, name, width, options, extra="", makeLine=False):
         self.lines.append( { "name": name,
@@ -123,15 +124,14 @@ class StackOrLines:
                              "options": options,
                              "extra": extra,
                              "makeLine": makeLine } )
-        # cmd = self.gt + ":" + l
-        # if self.count > 0 and not makeLine:
-        #     cmd += ":STACK"
-        # self.lines.append(cmd)
-        # self.count += 1
-
+        
     def str(self):
         s = ""
         self.colors.set_number_of_lines(len(self.lines))
+        if self.minmax:
+            for idx, i in enumerate(self.lines):
+                s += "LINE:" + i["name"] + "_min AREA:" + i["name"] + "_max_min_delta" + self.colors.get_color(idx, 0.5) + "::STACK "
+                
         for idx, i in enumerate(self.lines):
             color = self.colors.get_color(idx) 
             s += self.gt
@@ -139,6 +139,7 @@ class StackOrLines:
             s += ":" + i["name"] + color + ":" + i["options"]
             if self.isStack and idx > 0 and not i["makeLine"]: s += ":STACK"
             s += " " + i["extra"] + " "
+            
         return s    
         
 ######################################################################################
@@ -157,15 +158,23 @@ Units = { "DEFAULT": "",
           "Battery/current": "A",
           "Context/context_switch": "1/s",
           "Entropy/entropy": "bits",
-          "Memory": "bytes"
+          "Memory": "bytes",
+          "Network/octets": "bytes/s",
+          "NetworkTotal/octets": "B",
+          "Network": "1/s",
+          "NetworkTotal": ""
 }
 
-Formats = { "DEFAULT": "%0.2lf",
+Formats = { "DEFAULT": "%5.2lf",
             "Battery/voltage": "%1.3lf%S",
             "Battery/current": "%1.0lf%S",
             "Context/context_switch": "%1.0lf%S",
             "Entropy/entropy": "%1.0lf%S",
-            "Memory": "%4.0lf%S"
+            "Memory": "%4.0lf%S",
+            "Load": "%5.2lf",
+            "Network/octets": "%6.0lf%S",
+            "Network/packets": "%6.0lf%S",
+            "Network": "%6.2lf%S"
 }
 
 def getit(name, D):
@@ -214,7 +223,18 @@ def maketypesplot(name, g, Type, Title = None):
     plot = { "type": fullname }
 
     return gt, plot
-    
+
+# Helper function to print table heading
+def makeheads(l):
+    s = ''
+    fmt = '%' + str(l) + 's'
+    heads = ["Avr", "Min", "Max", "Last"]
+    for i, t in enumerate(heads):
+        s += 'COMMENT:"' + (fmt % t)
+        if i == len(heads)-1: s += '\\r" '
+        else: s += '" '
+    return s
+
                 
 ######################################################################################
 # Start definition of types                
@@ -246,12 +266,13 @@ for g in glob.glob( "cpu/*.rrd" ):
 
 cpustates.sort()
 
+command_def += makeheads(6)
 for gcpu in cpustates:
     g = gcpu[1]
     name = re.search( "^cpu.*/.*-(.*).rrd", g ).group(1)
     command_def += "DEF:" + name + "=" + g + ":value:AVERAGE "
     s.add( name, "$LINE_WIDTH_PRIMARY$", "\"" + name + '\\l"',
-           "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"Avr %2.0lf\" GPRINT:"+name+":MIN:\"Min %2.0lf\" GPRINT:"+name+":MAX:\"Max %2.0lf\" GPRINT:"+name+":LAST:\"Last %2.0lf\\r\" " )
+           "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"%6.0lf\" GPRINT:"+name+":MIN:\"%6.0lf\" GPRINT:"+name+":MAX:\"%6.0lf\" GPRINT:"+name+":LAST:\"%6.0lf\\r\" " )
     files.append(g)
 
 command_line = s.str()
@@ -274,7 +295,7 @@ for gcpu in cpustates:
     command_def += "DEF:" + name + "_max=" + g + ":value:MAX "
     command_def += "CDEF:" + name + "_max_min_delta=" + name + "_max," + name + "_min,- "
     command_def += "LINE:" + name + "_min AREA:" + name + "_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK "
-    s.add( name, "$LINE_WIDTH_PRIMARY$", "\"" + name + '\\l"',
+    s.add( name, "$LINE_WIDTH_PRIMARY$", '"\\l"',
            "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"Avr %1.0lf\" GPRINT:"+name+"_min:MIN:\"Min %1.0lf\" GPRINT:"+name+"_max:MAX:\"Max %1.0lf\" GPRINT:"+name+":LAST:\"Last %1.0lf\\r\" ")
     files.append(g)
 
@@ -315,6 +336,7 @@ for gd in glob.glob( "df-*" ):
 
     command_def = '-t "Storage ' + part_name +  '" --lower-limit 0 ' + defColors
     command_line = ""
+    command_def += makeheads(4+1)
     files = []
     s = StackOrLines( cs, isStack = True, t = "AREA" )
 
@@ -326,7 +348,7 @@ for gd in glob.glob( "df-*" ):
         name = re.search( "^df-.*/df_complex-(.*).rrd", g ).group(1)
         command_def += "DEF:" + name + "=" + g + ":value:AVERAGE "
         s.add( name, "$LINE_WIDTH_PRIMARY$", "\"" + name + '\\l"',
-               "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"Avr %2.0lf%S\" GPRINT:"+name+":MIN:\"Min %2.0lf%S\" GPRINT:"+name+":MAX:\"Max %2.0lf%S\" GPRINT:"+name+":LAST:\"Last %2.0lf%S\\r\" " )
+               "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"%4.1lf%S\" GPRINT:"+name+":MIN:\"%4.1lf%S\" GPRINT:"+name+":MAX:\"%4.1lf%S\" GPRINT:"+name+":LAST:\"%4.1lf%S\\r\" " )
         files.append(g)
     
     command_line = s.str()
@@ -365,12 +387,13 @@ for g in glob.glob( "memory/*.rrd" ):
 
 memory.sort()
 
+command_def += makeheads(4+1)
 for gt in memory:
     g = gt[1]
     name = re.search( "^memory/.*-(.*).rrd", g ).group(1)
     command_def += "DEF:" + name + "=" + g + ":value:AVERAGE "
     s.add( name, "$LINE_WIDTH_PRIMARY$", "\"" + name + '\\l"',
-           "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"Avr %4.0lf%S\" GPRINT:"+name+":MIN:\"Min %4.0lf%S\" GPRINT:"+name+":MAX:\"Max %4.0lf%S\" GPRINT:"+name+":LAST:\"Last %4.0lf%S\\r\" " )
+           "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"%4.0lf%S\" GPRINT:"+name+":MIN:\"%4.0lf%S\" GPRINT:"+name+":MAX:\"%4.0lf%S\" GPRINT:"+name+":LAST:\"%4.0lf%S\\r\" " )
     files.append(g)
 
 command_line = s.str()
@@ -393,15 +416,66 @@ Plots["type"] = "Memory/overview"
 Config["page"]["plots"].append( Plots )
 
 ######################################################################################
-# Load
-Plots = { }
+Plots = { "subplots": { "title": "Network details", "plots": [ ] } }
 
-command_def = '-t "Load" --lower-limit 0 ' + defColors
+for CNet in glob.glob("interface-*/if_octets.rrd"):
+    intname = re.search( "^interface-(.*)/if_octets.rrd", CNet ).group(1)
+
+    SubPlots = { "subplots": { "title": "Network details: " + intname, "plots": [ ] } }
+    
+    for g in glob.glob("interface-" + intname + "/if_*.rrd"):
+        name = re.search( "^interface-.*/if_(.*).rrd", g ).group(1)
+        fullname = "Network/" + intname + "/" + name
+        f = getf("Network/" + name)
+        u = getunit("Network/" + name)
+
+        if name == "octets": hname = "traffic"
+        else: hname = name
+    
+        command_def = '-t "Network ' + intname + ' ' + hname + ", " + u + '" --lower-limit 0 ' + defColors + makeheads(7)
+        command_line = ""
+        command_extra = ""
+        files = [g]
+        s = StackOrLines( cs, minmax=True )
+        for li, data_type in  enumerate([ "tx", "rx" ]):
+            frm = f + u
+            humandt = { "tx": "Outgoing", "rx": "Incoming" }[data_type]
+
+            command_def += "DEF:" + data_type + "=" + g + ":" + data_type + ":AVERAGE "
+            command_def += "DEF:" + data_type + "_min=" + g + ":" + data_type + ":MIN "
+            command_def += "DEF:" + data_type + "_max=" + g + ":" + data_type + ":MAX "
+            command_def += "CDEF:" + data_type + "_max_min_delta=" + data_type + "_max," + data_type + "_min,- "
+            command_def += "VDEF:" + data_type + "_total=" + data_type + ",TOTAL "
+                
+            s.add( data_type, "$LINE_WIDTH_PRIMARY$", '"' + humandt + '\\l"',
+                   "COMMENT:\\u GPRINT:"+data_type+":AVERAGE:\"" + f + "\" GPRINT:"+data_type+"_min:MIN:\"" + f +
+                   "\" GPRINT:"+data_type+"_max:MAX:\"" + f + "\" GPRINT:"+data_type+":LAST:\"" + f + "\\r\" " + " " 
+            )
+
+            command_extra += 'GPRINT:' + data_type + '_total:"' + humandt + ' Total %8.0lf%s' + getunit("NetworkTotal/" + name) + '\\r" ' 
+
+        command_line = s.str() + command_extra
+
+        gt = { "command": command_def + command_line,
+               "files": files }
+        plot = { "type": fullname }
+
+        Config["types"][fullname] = gt
+        SubPlots["subplots"]["plots"].append( plot )
+
+    SubPlots["type"] = "Network/" + intname + "/octets"
+    Plots["subplots"]["plots"].append( SubPlots )
+    if not Plots.has_key("type"): Plots["type"]  = "Network/" + intname + "/octets"
+        
+Config["page"]["plots"].append( Plots )
+######################################################################################
+# Load
+Plots = { "subplots": { "title": "Load details", "plots": [ { "type": "Load/load" } ] } }
+
+command_def = '-t "Load" --lower-limit 0 ' + defColors + makeheads(5)
 command_line = ""
 files = ["load/load.rrd"]
-s = StackOrLines( cs )
-clLoad = Colors()
-clLoad.set_number_of_lines(3)
+s = StackOrLines( cs, minmax=True )
 for li, load_type in  enumerate([ "shortterm", "midterm", "longterm" ]):
     Type = "Load"
     name = load_type
@@ -417,10 +491,9 @@ for li, load_type in  enumerate([ "shortterm", "midterm", "longterm" ]):
     command_def += "DEF:" + name + "_min=" + g + ":" + name + ":MIN "
     command_def += "DEF:" + name + "_max=" + g + ":" + name + ":MAX "
     command_def += "CDEF:" + name + "_max_min_delta=" + name + "_max," + name + "_min,- "
-    command_def += "LINE:" + name + "_min AREA:" + name + "_max_min_delta" + clLoad.get_color(li, 0.5) + "::STACK "
     s.add( name, "$LINE_WIDTH_PRIMARY$", '"' + name + '\\l"',
-           "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"Avr " + f + "\" GPRINT:"+name+"_min:MIN:\"Min " + f +
-           "\" GPRINT:"+name+"_max:MAX:\"Max " + f + "\" GPRINT:"+name+":LAST:\"Last " + f + "\\r\" ")
+           "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"" + f + "\" GPRINT:"+name+"_min:MIN:\"" + f +
+           "\" GPRINT:"+name+"_max:MAX:\"" + f + "\" GPRINT:"+name+":LAST:\"" + f + "\\r\" ")
 
 command_line = s.str()
 
@@ -433,11 +506,7 @@ Config["types"]["Load/load"] = gt
 Plots["type"] = "Load/load"
 Config["page"]["plots"].append( Plots )
 
-
-######################################################################################
-# Misc 
-    
-Plots = { "subplots": { "title": "Misc details", "plots": [ ] } }
+#### Other Load related graphs
 
 g = "contextswitch/contextswitch.rrd"
 name = "context_switch"
@@ -451,6 +520,14 @@ gt, plot = maketypesplot( name, g, "Entropy", "Entropy" )
 Config["types"]["Entropy/" + name] = gt
 Plots["subplots"]["plots"].append( plot )
 
+
+###################################################
+# Misc
+
+Plots = { }
+
+
+###################################################
 # uptime needs some math
 g = "uptime/uptime.rrd"
 name = "uptime"
@@ -464,7 +541,7 @@ files = []
 s = StackOrLines(csSingle)
 command_def += "DEF:" + name + "_data=" + g + ":value:AVERAGE "
 command_def += "CDEF:" + name + "=" + name + "_data,86400,/ "
-s.add( name, "$LINE_WIDTH_PRIMARY$", "\"" + name + '\\l"',
+s.add( name, "$LINE_WIDTH_PRIMARY$", '"\\l"',
        "COMMENT:\\u GPRINT:"+name+":LAST:\"Current " + frm + "\\r\" ")
 files.append(g)
 
@@ -475,10 +552,9 @@ gt = { "command": command_def + command_line,
 plot = { "type": "Uptime/" + name }
 
 Config["types"]["Uptime/" + name] = gt
-Plots["subplots"]["plots"].append( plot )
+Plots["type"] = "Uptime/" + name 
 
 # Add all Misc plots
-Plots["type"] = "Context/context_switch"
 Config["page"]["plots"].append( Plots )
 
 
