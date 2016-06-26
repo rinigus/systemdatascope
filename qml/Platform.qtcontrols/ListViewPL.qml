@@ -31,6 +31,7 @@ ListView {
     }
 
     highlightMoveDuration: 500
+    highlightResizeDuration: 100
     focus: true
     clip: true
 
