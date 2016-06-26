@@ -91,19 +91,28 @@ PagePL {
                     }
                 }
             }
+
+
+            Keys.onReturnPressed: {
+                if ( graphDefs.plots[index].subplots )
+                {
+                    appWindow.pushPage( Qt.resolvedUrl("GraphList.qml"),
+                                       { graphDefs: graphDefs.plots[index].subplots }
+                                       )
+                }
+            }
+
+            Keys.onEscapePressed: { appWindow.popPage() }
         }
     }
 
 
     ListViewPL {
+        id: mainList
         anchors.fill: parent
         model: graphsModel
         delegate: graphPlotDelegate
         header_text: pageTitle
-
-//        highlight: Rectangle { color: "lightsteelblue"; radius: 5 }
-//        focus: true
-//        clip: true
     }
 
     // Fill model
@@ -117,6 +126,7 @@ PagePL {
     onGraphDefsChanged: {
         fillModel()
     }
+
     Component.onCompleted: {
         fillModel()
     }
