@@ -171,12 +171,14 @@ ApplicationWindow {
         // have a more logical interface, so just invert the value
         // before passing it to the page stack
         pageStack.push(pageInstance, pageProperties, !animate)
+        pageStack.currentItem.focusToChild()
         return pageInstance
     }
 
     function popPage() {
         console.log("Popping " + pageStack.depth)
         pageStack.pop()
+        pageStack.currentItem.focusToChild()
     }
 
     function popAll() {

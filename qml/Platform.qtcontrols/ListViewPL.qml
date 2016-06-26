@@ -17,4 +17,28 @@ ListView {
         minimumPointSize: 8
 
     }
+
+    Connections {
+        target: parent
+        onFocusToMainList: { forceActiveFocus() }
+    }
+
+    highlight: Rectangle {
+        color: "white"
+        radius: 5
+        border.width: 1
+        border.color: "lightsteelblue"
+    }
+
+    highlightMoveDuration: 500
+    focus: true
+    clip: true
+
+    Component.onCompleted: {
+        forceActiveFocus()
+    }
+
+    function setFocus() {
+        mainList.forceActiveFocus()
+    }
 }
