@@ -26,7 +26,7 @@ One can generate configuration by provided Python script (tools/makeconfig.py) o
 
 ## Development
 
-Everyone are welcome to join. As mentioned, RRDtool commands for graph generation are missing. Linux desktop/Sailfish interface both require polishing.
+Everyone are welcome to join. RRDtool commands for graph generation are not complete. Linux desktop/Sailfish interface both require polishing.
 
 For developing interface, please choose PRO(ject) file that corresponds to the platform you want to develop for. Before loading PRO file into Qt Creator, make a symbolic link qml/Platform that points to corresponding platform specification (qml/Platform.silica or qml/Platform.qtcontrols, for example). Try to separate program logic from some specific platform GUI and position the code either in cross-platform (qml or src) or Platform sections, respectively.
 
