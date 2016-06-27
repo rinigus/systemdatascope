@@ -7,17 +7,24 @@ SystemDataScope is build to support multiple different log configurations. The c
 
 The current implementation is developed on Linux Desktops and Sailfish OS mobile devices. More platforms should be supported immediately or possible to add relatively simply, as long as QML/Qt is supported.
 
+The interface is revolving around stacked pages. User, after configuration, is presented with the top page and its possible to get into the details of the collected stats by pressing into the corresponding graph. The number of levels and connections between them are described by user-provided configuration. 
+
+In Linux desktop, navigation is supported as follows. By mouse: left button selects the stats to be looked into, the right button goes back one level on page stack. By keyboard: arrow keys to go up/down list, Return to select the stats to be looked into, Esc to go back one level. The program options are shown through the buttons in a toolbar. Status messages are below the graphs, on the bottom of the window.
+
+In Sailfish, navigation works by touching the stats image (looking details of the stats) and swiping whole page to get back one level. Use top-level menu to get to the options.
+
+In all environments, configuration can be loaded under Settings.
+
 ## Current status
 
-The program works in Linux Desktop. Linux Desktop requires further polishing, but its not the priority at the moment.
+The program works in Linux Desktop and Sailfish OS. An example configuration is given in configs/default.json file and has to be loaded by the user. For example, URL https://raw.githubusercontent.com/rinigus/systemdatascope/master/configs/default.json can be used.
 
-In Sailfish OS, program works and requires polishing.
+The default configuration is provided for Nexus 4 phone running Sailfish.
 
-RRDtool sets of commands for different readouts are missing. There is no default configuration given leading to an empty interface at the start. 
+One can generate configuration by provided Python script (tools/makeconfig.py) or manually. Note that the configuration format allows variables expansion. For expansion to work, define variable in "variables" property of JSON object and use it in graph type definitions in the form $VARIABLE_NAME$. This allows to specify font sizes through GUI, for example.
 
-My current development will focus on polishing Sailfish OS interface and generation of graph configurations. In addition, this README will be expanded as the development progresses.
 
-## To develop
+## Development
 
 Everyone are welcome to join. As mentioned, RRDtool commands for graph generation are missing. Linux desktop/Sailfish interface both require polishing.
 
