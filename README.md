@@ -25,7 +25,7 @@ One can generate configuration by provided Python script (tools/makeconfig.py) o
 
 ## Screenshots
 
-[[https://github.com/rinigus/systemdatascope/blob/master/screenshots/desktop-load-details.png|desktop]]
+See https://github.com/rinigus/systemdatascope/tree/master/screenshots for screenshots
 
 
 ## Development
