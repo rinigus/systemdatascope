@@ -23,6 +23,10 @@ The default configuration is provided for Nexus 4 phone running Sailfish.
 
 One can generate configuration by provided Python script (tools/makeconfig.py) or manually. Note that the configuration format allows variables expansion. For expansion to work, define variable in "variables" property of JSON object and use it in graph type definitions in the form $VARIABLE_NAME$. This allows to specify font sizes through GUI, for example.
 
+## Screenshots
+
+[[https://github.com/rinigus/systemdatascope/blob/master/screenshots/desktop-load-details.png|desktop]]
+
 
 ## Development
 
