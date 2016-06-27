@@ -468,6 +468,7 @@ for CNet in glob.glob("interface-*/if_octets.rrd"):
     if not Plots.has_key("type"): Plots["type"]  = "Network/" + intname + "/octets"
         
 Config["page"]["plots"].append( Plots )
+
 ######################################################################################
 # Load
 Plots = { "subplots": { "title": "Load details", "plots": [ { "type": "Load/load" } ] } }
@@ -519,6 +520,66 @@ name = "entropy"
 gt, plot = maketypesplot( name, g, "Entropy", "Entropy" )
 Config["types"]["Entropy/" + name] = gt
 Plots["subplots"]["plots"].append( plot )
+
+
+######################################################################################
+# Processes
+
+Plots = { "subplots": { "title": "Processes details", "plots": [ { "type": "Processes/overview" } ] } }
+
+# Processes overview
+command_def = '-t "Processes overview, state" --lower-limit 0 ' + defColors
+command_line = ""
+files = []
+s = StackOrLines( cs, isStack = True, t = "AREA" )
+
+processes_fr = [ 0, ["zombies", "paging", "blocked", "running"] ]
+processes_end = [ len(processes_fr) + 100, ["stopped", "sleeping"] ]
+processes_other = len(processes_fr) + 50
+processes = []
+for g in glob.glob( "processes/ps_state-*.rrd" ):
+    m = re.search( "^processes/ps_state-(.*).rrd", g ).group(1)
+    for k in [ processes_fr, processes_end ] :
+        if m in k[1]:
+            processes.append( [ k[0] + k[1].index( m ), g ] )
+    if m not in processes_fr[1] and m not in processes_end[1]:
+        processes.append( [ processes_other, g ] )
+
+processes.sort()
+
+command_def += makeheads(4+1)
+for gt in processes:
+    g = gt[1]
+    name = re.search( "^processes/ps_state-(.*).rrd", g ).group(1)
+    command_def += "DEF:" + name + "=" + g + ":value:AVERAGE "
+    s.add( name, "$LINE_WIDTH_PRIMARY$", "\"" + name + '\\l"',
+           "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"%5.0lf\" GPRINT:"+name+":MIN:\"%5.0lf\" GPRINT:"+name+":MAX:\"%5.0lf\" GPRINT:"+name+":LAST:\"%5.0lf\\r\" " )
+    files.append(g)
+
+command_line = s.str()
+
+Config["types"]["Processes/overview"] = { "command": command_def + command_line,
+                                          "files": files }
+
+# detailed plots
+g = "processes/fork_rate.rrd"
+name = "fork_rate"
+gt, plot = maketypesplot( name, g, "Processes", "Fork rate, 1/s" )
+Config["types"]["Processes/" + name] = gt
+Plots["subplots"]["plots"].append( plot )
+
+processes.reverse()
+for gm in processes:
+    g = gm[1]
+    name = re.search( "^processes/.*-(.*).rrd", g ).group(1)
+    gt, plot = maketypesplot( name, g, "Processes" )
+
+    Config["types"]["Processes/" + name] = gt
+    Plots["subplots"]["plots"].append( plot )
+
+
+Plots["type"] = "Processes/overview"
+Config["page"]["plots"].append( Plots )
 
 
 ###################################################
