@@ -30,7 +30,7 @@ See https://github.com/rinigus/systemdatascope/tree/master/screenshots for scree
 
 ## Development
 
-Everyone are welcome to join. RRDtool commands for graph generation are not complete. Linux desktop/Sailfish interface both require polishing.
+Everyone are welcome to join. RRDtool commands for graph generation are not complete. Linux desktop/Sailfish interface both require polishing. Current issues are listed under "Issues" in GitHub. If you have found a bug or have a suggestion, submit it as a new issue.
 
 For developing interface, please choose PRO(ject) file that corresponds to the platform you want to develop for. Before loading PRO file into Qt Creator, make a symbolic link qml/Platform that points to corresponding platform specification (qml/Platform.silica or qml/Platform.qtcontrols, for example). Try to separate program logic from some specific platform GUI and position the code either in cross-platform (qml or src) or Platform sections, respectively.
 
