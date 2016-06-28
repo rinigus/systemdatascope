@@ -263,4 +263,11 @@ ApplicationWindowPL {
             stateLastRRDError = "Last error from RRD: " + error_text.replace("\n", " / ") + " @ " + Date().toString()
         }
     }
+
+    Connections {
+        target: service
+        onRunningChanged: {
+            setConfig()
+        }
+    }
 }
