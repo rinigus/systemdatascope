@@ -23,10 +23,14 @@ The default configuration is provided for Nexus 4 phone running Sailfish.
 
 One can generate configuration by provided Python script (tools/makeconfig.py) or manually. Note that the configuration format allows variables expansion. For expansion to work, define variable in "variables" property of JSON object and use it in graph type definitions in the form $VARIABLE_NAME$. This allows to specify font sizes through GUI, for example.
 
+## Screenshots
+
+See https://github.com/rinigus/systemdatascope/tree/master/screenshots for screenshots
+
 
 ## Development
 
-Everyone are welcome to join. RRDtool commands for graph generation are not complete. Linux desktop/Sailfish interface both require polishing.
+Everyone are welcome to join. RRDtool commands for graph generation are not complete. Linux desktop/Sailfish interface both require polishing. Current issues are listed under "Issues" in GitHub. If you have found a bug or have a suggestion, submit it as a new issue.
 
 For developing interface, please choose PRO(ject) file that corresponds to the platform you want to develop for. Before loading PRO file into Qt Creator, make a symbolic link qml/Platform that points to corresponding platform specification (qml/Platform.silica or qml/Platform.qtcontrols, for example). Try to separate program logic from some specific platform GUI and position the code either in cross-platform (qml or src) or Platform sections, respectively.
 
