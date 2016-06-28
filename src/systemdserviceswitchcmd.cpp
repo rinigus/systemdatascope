@@ -23,7 +23,7 @@ void SystemDServiceSwitchCmd::updateState()
         if ( proc.waitForStarted() && proc.waitForFinished() )
         {
             QString out( proc.readAll() );
-            bool v = out.contains("enabled");
+            bool v = (out.contains("enabled") && !out.contains("disabled"));
             if ( m_enabled != v)
             {
                 m_enabled = v;
@@ -40,7 +40,7 @@ void SystemDServiceSwitchCmd::updateState()
         if ( proc.waitForStarted() && proc.waitForFinished() )
         {
             QString out( proc.readAll() );
-            bool v = out.contains("active");
+            bool v = (out.contains("active") && !out.contains("inactive"));
             if ( m_running != v )
             {
                 m_running = v;
