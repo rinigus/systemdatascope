@@ -162,7 +162,16 @@ Units = { "DEFAULT": "",
           "Network/octets": "bytes/s",
           "NetworkTotal/octets": "B",
           "Network": "1/s",
-          "NetworkTotal": ""
+          "NetworkTotal": "",
+          "Processes/cputime": "micros/s",
+          "Processes/disk_ops": "1/s",
+          "Processes/disk_octets": "bytes/s",
+          "Processes/vm": "bytes",
+          "Processes/data": "bytes",
+          "Processes/code": "bytes",
+          "Processes/rss": "bytes",
+          "Processes/pagefaults": "1/s",
+          "Processes/stacksize": "bytes",
 }
 
 Formats = { "DEFAULT": "%5.2lf",
@@ -174,7 +183,11 @@ Formats = { "DEFAULT": "%5.2lf",
             "Load": "%5.2lf",
             "Network/octets": "%6.0lf%S",
             "Network/packets": "%6.0lf%S",
-            "Network": "%6.2lf%S"
+            "Network": "%6.2lf%S",
+            "Processes/cputime": "%4.0lf%S",
+            "Processes/disk_ops": "%4.0lf%S",
+            "Processes/disk_octets": "%4.0lf%S",
+            "Processes": "%4.0lf%S",
 }
 
 def getit(name, D):
@@ -188,12 +201,16 @@ def getf(name): return getit(name, Formats)
 
 ######################################################################################
 # Helper function for a single value plot
-def maketypesplot(name, g, Type, Title = None):
+def maketypesplot(name, g, Type, Title = None, Format = None, Unit = None):
 
     fullname = Type + "/" + name
     
-    f = getf(fullname)
-    u = getunit(fullname)
+    if Format is None: f = getf(fullname)
+    else: f = Format
+    
+    if Unit is None: u = getunit(fullname)
+    else: u = Unit
+    
     frm = f + u
     
     command_def = '-t " '
@@ -577,6 +594,76 @@ for gm in processes:
     Config["types"]["Processes/" + name] = gt
     Plots["subplots"]["plots"].append( plot )
 
+# detailed plots for selected processes
+
+Human = { "DEFAULT": "",
+          "Processes/cputime": "CPU time",
+          "Processes/stacksize": "Stack size",
+          "Processes/vm": "Virtual memory",
+          "Processes/data": "Data size",
+          "Processes/code": "Code size",
+          "Processes/rss": "Resident segment size",
+          "Processes/pagefaults": "Page faults",
+          "Processes/disk_ops": "Disk operations",
+          "Processes/disk_octets": "Disk traffic",
+          "Processes/count": "# processes/threads",
+          
+}
+
+ProcStats = { "cputime": [ "user", "syst" ],
+              "pagefaults": [ "minflt", "majflt" ],
+              "count": [ "processes", "threads" ],
+              "disk_octets": [ "read", "write" ],
+              "disk_ops": [ "read", "write" ],
+              
+}
+
+for gp in glob.glob("processes-*"):
+    procname = re.search("^processes-(.*)", gp).group(1)
+    myplots = { "subplots": {"plots": [], "title": "Process " + procname } }
+    
+    for g in glob.glob("processes-" + procname + "/*rrd"):
+        name = re.search( "^processes-" + procname + "/ps_(.*).rrd", g ).group(1)
+
+        if name in ProcStats.keys():
+            f = getf("Processes/" + name)
+            u = getunit("Processes/" + name)
+            frm = f + u
+
+            command_def = '-t "' + procname + ': ' + getit("Processes/"+name, Human)
+            if len(u) > 0: command_def += ", " + u
+            command_def += '" --lower-limit 0 ' + defColors + makeheads(5)
+            command_line = ""
+            files = [g]
+
+            s = StackOrLines( cs, minmax=True )
+            for li, load_type in  enumerate(ProcStats[ name ]):
+                lname = load_type
+
+                command_def += "DEF:" + lname + "=" + g + ":" + lname + ":AVERAGE "
+                command_def += "DEF:" + lname + "_min=" + g + ":" + lname + ":MIN "
+                command_def += "DEF:" + lname + "_max=" + g + ":" + lname + ":MAX "
+                command_def += "CDEF:" + lname + "_max_min_delta=" + lname + "_max," + lname + "_min,- "
+                s.add( lname, "$LINE_WIDTH_PRIMARY$", '"' + lname + '\\l"',
+                       "COMMENT:\\u GPRINT:"+lname+":AVERAGE:\"" + f + "\" GPRINT:"+lname+"_min:MIN:\"" + f +
+                       "\" GPRINT:"+lname+"_max:MAX:\"" + f + "\" GPRINT:"+lname+":LAST:\"" + f + "\\r\" ")
+
+            command_line = s.str()
+
+            gt = { "command": command_def + command_line,
+                   "files": files }
+            plot = { "type": "Processes/" + procname + "/" + name }
+            
+        else:
+            gt, plot = maketypesplot( name, g, Type = "Processes/" + procname,
+                                      Title = procname + ': ' + getit("Processes/"+name, Human),
+                                      Format = getf("Processes/" + name),
+                                      Unit = getunit("Processes/" + name) )
+        
+        Config["types"]["Processes/" + procname + "/" + name] = gt
+        myplots["subplots"]["plots"].append( plot )
+    myplots["type"] = "Processes/" + procname + "/cputime"
+    Plots["subplots"]["plots"].append( myplots )
 
 Plots["type"] = "Processes/overview"
 Config["page"]["plots"].append( Plots )

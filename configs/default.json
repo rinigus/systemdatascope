@@ -213,6 +213,44 @@
                   }, 
                   {
                      "type": "Processes/zombies"
+                  }, 
+                  {
+                     "type": "Processes/collectd/cputime", 
+                     "subplots": {
+                        "plots": [
+                           {
+                              "type": "Processes/collectd/disk_ops"
+                           }, 
+                           {
+                              "type": "Processes/collectd/disk_octets"
+                           }, 
+                           {
+                              "type": "Processes/collectd/count"
+                           }, 
+                           {
+                              "type": "Processes/collectd/cputime"
+                           }, 
+                           {
+                              "type": "Processes/collectd/vm"
+                           }, 
+                           {
+                              "type": "Processes/collectd/code"
+                           }, 
+                           {
+                              "type": "Processes/collectd/rss"
+                           }, 
+                           {
+                              "type": "Processes/collectd/stacksize"
+                           }, 
+                           {
+                              "type": "Processes/collectd/data"
+                           }, 
+                           {
+                              "type": "Processes/collectd/pagefaults"
+                           }
+                        ], 
+                        "title": "Process collectd"
+                     }
                   }
                ], 
                "title": "Processes details"
@@ -266,13 +304,19 @@
          "files": [
             "processes/ps_state-blocked.rrd"
          ], 
-         "command": "-t \" Processes blocked\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:blocked=processes/ps_state-blocked.rrd:value:AVERAGE DEF:blocked_min=processes/ps_state-blocked.rrd:value:MIN DEF:blocked_max=processes/ps_state-blocked.rrd:value:MAX CDEF:blocked_max_min_delta=blocked_max,blocked_min,- LINE:blocked_min AREA:blocked_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:blocked$COLOR_LINE_SINGLE$:\" \\l\" COMMENT:\\u GPRINT:blocked:AVERAGE:\"Avr %5.2lf\" GPRINT:blocked_min:MIN:\"Min %5.2lf\" GPRINT:blocked_max:MAX:\"Max %5.2lf\" GPRINT:blocked:LAST:\"Last %5.2lf\\r\"  "
+         "command": "-t \" Processes blocked\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:blocked=processes/ps_state-blocked.rrd:value:AVERAGE DEF:blocked_min=processes/ps_state-blocked.rrd:value:MIN DEF:blocked_max=processes/ps_state-blocked.rrd:value:MAX CDEF:blocked_max_min_delta=blocked_max,blocked_min,- LINE:blocked_min AREA:blocked_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:blocked$COLOR_LINE_SINGLE$:\" \\l\" COMMENT:\\u GPRINT:blocked:AVERAGE:\"Avr %4.0lf%S\" GPRINT:blocked_min:MIN:\"Min %4.0lf%S\" GPRINT:blocked_max:MAX:\"Max %4.0lf%S\" GPRINT:blocked:LAST:\"Last %4.0lf%S\\r\"  "
       }, 
       "Uptime/uptime": {
          "files": [
             "uptime/uptime.rrd"
          ], 
          "command": "-t \"Uptime, days\" --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:uptime_data=uptime/uptime.rrd:value:AVERAGE CDEF:uptime=uptime_data,86400,/ LINE$LINE_WIDTH_PRIMARY$:uptime$COLOR_LINE_SINGLE$:\"\\l\" COMMENT:\\u GPRINT:uptime:LAST:\"Current %5.2lf\\r\"  "
+      }, 
+      "Processes/collectd/stacksize": {
+         "files": [
+            "processes-collectd/ps_stacksize.rrd"
+         ], 
+         "command": "-t \" collectd: Stack size, bytes\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:stacksize=processes-collectd/ps_stacksize.rrd:value:AVERAGE DEF:stacksize_min=processes-collectd/ps_stacksize.rrd:value:MIN DEF:stacksize_max=processes-collectd/ps_stacksize.rrd:value:MAX CDEF:stacksize_max_min_delta=stacksize_max,stacksize_min,- LINE:stacksize_min AREA:stacksize_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:stacksize$COLOR_LINE_SINGLE$:\" \\l\" COMMENT:\\u GPRINT:stacksize:AVERAGE:\"Avr %4.0lf%S\" GPRINT:stacksize_min:MIN:\"Min %4.0lf%S\" GPRINT:stacksize_max:MAX:\"Max %4.0lf%S\" GPRINT:stacksize:LAST:\"Last %4.0lf%S\\r\"  "
       }, 
       "CPU/idle": {
          "files": [
@@ -298,6 +342,18 @@
          ], 
          "command": "-t \"Network rmnet_usb0 errors, 1/s\" --lower-limit 0 --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ COMMENT:\"    Avr\" COMMENT:\"    Min\" COMMENT:\"    Max\" COMMENT:\"   Last\\r\" DEF:tx=interface-rmnet_usb0/if_errors.rrd:tx:AVERAGE DEF:tx_min=interface-rmnet_usb0/if_errors.rrd:tx:MIN DEF:tx_max=interface-rmnet_usb0/if_errors.rrd:tx:MAX CDEF:tx_max_min_delta=tx_max,tx_min,- VDEF:tx_total=tx,TOTAL DEF:rx=interface-rmnet_usb0/if_errors.rrd:rx:AVERAGE DEF:rx_min=interface-rmnet_usb0/if_errors.rrd:rx:MIN DEF:rx_max=interface-rmnet_usb0/if_errors.rrd:rx:MAX CDEF:rx_max_min_delta=rx_max,rx_min,- VDEF:rx_total=rx,TOTAL LINE:tx_min AREA:tx_max_min_delta#E41A1C80::STACK LINE:rx_min AREA:rx_max_min_delta#4DAF4A80::STACK LINE$LINE_WIDTH_PRIMARY$:tx#E41A1CFF:\"Outgoing\\l\" COMMENT:\\u GPRINT:tx:AVERAGE:\"%6.2lf%S\" GPRINT:tx_min:MIN:\"%6.2lf%S\" GPRINT:tx_max:MAX:\"%6.2lf%S\" GPRINT:tx:LAST:\"%6.2lf%S\\r\"   LINE$LINE_WIDTH_PRIMARY$:rx#4DAF4AFF:\"Incoming\\l\" COMMENT:\\u GPRINT:rx:AVERAGE:\"%6.2lf%S\" GPRINT:rx_min:MIN:\"%6.2lf%S\" GPRINT:rx_max:MAX:\"%6.2lf%S\" GPRINT:rx:LAST:\"%6.2lf%S\\r\"   GPRINT:tx_total:\"Outgoing Total %8.0lf%s\\r\" GPRINT:rx_total:\"Incoming Total %8.0lf%s\\r\" "
       }, 
+      "Processes/collectd/vm": {
+         "files": [
+            "processes-collectd/ps_vm.rrd"
+         ], 
+         "command": "-t \" collectd: Virtual memory, bytes\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:vm=processes-collectd/ps_vm.rrd:value:AVERAGE DEF:vm_min=processes-collectd/ps_vm.rrd:value:MIN DEF:vm_max=processes-collectd/ps_vm.rrd:value:MAX CDEF:vm_max_min_delta=vm_max,vm_min,- LINE:vm_min AREA:vm_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:vm$COLOR_LINE_SINGLE$:\" \\l\" COMMENT:\\u GPRINT:vm:AVERAGE:\"Avr %4.0lf%S\" GPRINT:vm_min:MIN:\"Min %4.0lf%S\" GPRINT:vm_max:MAX:\"Max %4.0lf%S\" GPRINT:vm:LAST:\"Last %4.0lf%S\\r\"  "
+      }, 
+      "Processes/collectd/disk_ops": {
+         "files": [
+            "processes-collectd/ps_disk_ops.rrd"
+         ], 
+         "command": "-t \"collectd: Disk operations, 1/s\" --lower-limit 0 --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ COMMENT:\"  Avr\" COMMENT:\"  Min\" COMMENT:\"  Max\" COMMENT:\" Last\\r\" DEF:read=processes-collectd/ps_disk_ops.rrd:read:AVERAGE DEF:read_min=processes-collectd/ps_disk_ops.rrd:read:MIN DEF:read_max=processes-collectd/ps_disk_ops.rrd:read:MAX CDEF:read_max_min_delta=read_max,read_min,- DEF:write=processes-collectd/ps_disk_ops.rrd:write:AVERAGE DEF:write_min=processes-collectd/ps_disk_ops.rrd:write:MIN DEF:write_max=processes-collectd/ps_disk_ops.rrd:write:MAX CDEF:write_max_min_delta=write_max,write_min,- LINE:read_min AREA:read_max_min_delta#E41A1C80::STACK LINE:write_min AREA:write_max_min_delta#4DAF4A80::STACK LINE$LINE_WIDTH_PRIMARY$:read#E41A1CFF:\"read\\l\" COMMENT:\\u GPRINT:read:AVERAGE:\"%4.0lf%S\" GPRINT:read_min:MIN:\"%4.0lf%S\" GPRINT:read_max:MAX:\"%4.0lf%S\" GPRINT:read:LAST:\"%4.0lf%S\\r\"  LINE$LINE_WIDTH_PRIMARY$:write#4DAF4AFF:\"write\\l\" COMMENT:\\u GPRINT:write:AVERAGE:\"%4.0lf%S\" GPRINT:write_min:MIN:\"%4.0lf%S\" GPRINT:write_max:MAX:\"%4.0lf%S\" GPRINT:write:LAST:\"%4.0lf%S\\r\"  "
+      }, 
       "Network/rmnet_usb0/dropped": {
          "files": [
             "interface-rmnet_usb0/if_dropped.rrd"
@@ -322,6 +378,12 @@
          ], 
          "command": "-t \"CPU interrupt, %\" --upper-limit 100 --lower-limit 0 --rigid --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:interrupt=cpu/percent-interrupt.rrd:value:AVERAGE DEF:interrupt_min=cpu/percent-interrupt.rrd:value:MIN DEF:interrupt_max=cpu/percent-interrupt.rrd:value:MAX CDEF:interrupt_max_min_delta=interrupt_max,interrupt_min,- LINE:interrupt_min AREA:interrupt_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:interrupt$COLOR_LINE_SINGLE$:\"\\l\" COMMENT:\\u GPRINT:interrupt:AVERAGE:\"Avr %1.0lf\" GPRINT:interrupt_min:MIN:\"Min %1.0lf\" GPRINT:interrupt_max:MAX:\"Max %1.0lf\" GPRINT:interrupt:LAST:\"Last %1.0lf\\r\"  "
       }, 
+      "Processes/collectd/count": {
+         "files": [
+            "processes-collectd/ps_count.rrd"
+         ], 
+         "command": "-t \"collectd: # processes/threads\" --lower-limit 0 --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ COMMENT:\"  Avr\" COMMENT:\"  Min\" COMMENT:\"  Max\" COMMENT:\" Last\\r\" DEF:processes=processes-collectd/ps_count.rrd:processes:AVERAGE DEF:processes_min=processes-collectd/ps_count.rrd:processes:MIN DEF:processes_max=processes-collectd/ps_count.rrd:processes:MAX CDEF:processes_max_min_delta=processes_max,processes_min,- DEF:threads=processes-collectd/ps_count.rrd:threads:AVERAGE DEF:threads_min=processes-collectd/ps_count.rrd:threads:MIN DEF:threads_max=processes-collectd/ps_count.rrd:threads:MAX CDEF:threads_max_min_delta=threads_max,threads_min,- LINE:processes_min AREA:processes_max_min_delta#E41A1C80::STACK LINE:threads_min AREA:threads_max_min_delta#4DAF4A80::STACK LINE$LINE_WIDTH_PRIMARY$:processes#E41A1CFF:\"processes\\l\" COMMENT:\\u GPRINT:processes:AVERAGE:\"%4.0lf%S\" GPRINT:processes_min:MIN:\"%4.0lf%S\" GPRINT:processes_max:MAX:\"%4.0lf%S\" GPRINT:processes:LAST:\"%4.0lf%S\\r\"  LINE$LINE_WIDTH_PRIMARY$:threads#4DAF4AFF:\"threads\\l\" COMMENT:\\u GPRINT:threads:AVERAGE:\"%4.0lf%S\" GPRINT:threads_min:MIN:\"%4.0lf%S\" GPRINT:threads_max:MAX:\"%4.0lf%S\" GPRINT:threads:LAST:\"%4.0lf%S\\r\"  "
+      }, 
       "Memory/free": {
          "files": [
             "memory/memory-free.rrd"
@@ -332,7 +394,7 @@
          "files": [
             "processes/ps_state-paging.rrd"
          ], 
-         "command": "-t \" Processes paging\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:paging=processes/ps_state-paging.rrd:value:AVERAGE DEF:paging_min=processes/ps_state-paging.rrd:value:MIN DEF:paging_max=processes/ps_state-paging.rrd:value:MAX CDEF:paging_max_min_delta=paging_max,paging_min,- LINE:paging_min AREA:paging_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:paging$COLOR_LINE_SINGLE$:\" \\l\" COMMENT:\\u GPRINT:paging:AVERAGE:\"Avr %5.2lf\" GPRINT:paging_min:MIN:\"Min %5.2lf\" GPRINT:paging_max:MAX:\"Max %5.2lf\" GPRINT:paging:LAST:\"Last %5.2lf\\r\"  "
+         "command": "-t \" Processes paging\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:paging=processes/ps_state-paging.rrd:value:AVERAGE DEF:paging_min=processes/ps_state-paging.rrd:value:MIN DEF:paging_max=processes/ps_state-paging.rrd:value:MAX CDEF:paging_max_min_delta=paging_max,paging_min,- LINE:paging_min AREA:paging_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:paging$COLOR_LINE_SINGLE$:\" \\l\" COMMENT:\\u GPRINT:paging:AVERAGE:\"Avr %4.0lf%S\" GPRINT:paging_min:MIN:\"Min %4.0lf%S\" GPRINT:paging_max:MAX:\"Max %4.0lf%S\" GPRINT:paging:LAST:\"Last %4.0lf%S\\r\"  "
       }, 
       "Memory/cached": {
          "files": [
@@ -362,7 +424,7 @@
          "files": [
             "processes/ps_state-running.rrd"
          ], 
-         "command": "-t \" Processes running\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:running=processes/ps_state-running.rrd:value:AVERAGE DEF:running_min=processes/ps_state-running.rrd:value:MIN DEF:running_max=processes/ps_state-running.rrd:value:MAX CDEF:running_max_min_delta=running_max,running_min,- LINE:running_min AREA:running_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:running$COLOR_LINE_SINGLE$:\" \\l\" COMMENT:\\u GPRINT:running:AVERAGE:\"Avr %5.2lf\" GPRINT:running_min:MIN:\"Min %5.2lf\" GPRINT:running_max:MAX:\"Max %5.2lf\" GPRINT:running:LAST:\"Last %5.2lf\\r\"  "
+         "command": "-t \" Processes running\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:running=processes/ps_state-running.rrd:value:AVERAGE DEF:running_min=processes/ps_state-running.rrd:value:MIN DEF:running_max=processes/ps_state-running.rrd:value:MAX CDEF:running_max_min_delta=running_max,running_min,- LINE:running_min AREA:running_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:running$COLOR_LINE_SINGLE$:\" \\l\" COMMENT:\\u GPRINT:running:AVERAGE:\"Avr %4.0lf%S\" GPRINT:running_min:MIN:\"Min %4.0lf%S\" GPRINT:running_max:MAX:\"Max %4.0lf%S\" GPRINT:running:LAST:\"Last %4.0lf%S\\r\"  "
       }, 
       "Network/rmnet_usb0/packets": {
          "files": [
@@ -377,6 +439,12 @@
             "df-root/df_complex-reserved.rrd"
          ], 
          "command": "-t \"Storage root\" --lower-limit 0 --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ COMMENT:\"  Avr\" COMMENT:\"  Min\" COMMENT:\"  Max\" COMMENT:\" Last\\r\" DEF:used=df-root/df_complex-used.rrd:value:AVERAGE DEF:free=df-root/df_complex-free.rrd:value:AVERAGE DEF:reserved=df-root/df_complex-reserved.rrd:value:AVERAGE AREA:used#E41A1CFF:\"used\\l\" COMMENT:\\u GPRINT:used:AVERAGE:\"%4.1lf%S\" GPRINT:used:MIN:\"%4.1lf%S\" GPRINT:used:MAX:\"%4.1lf%S\" GPRINT:used:LAST:\"%4.1lf%S\\r\"  AREA:free#377EB8FF:\"free\\l\":STACK COMMENT:\\u GPRINT:free:AVERAGE:\"%4.1lf%S\" GPRINT:free:MIN:\"%4.1lf%S\" GPRINT:free:MAX:\"%4.1lf%S\" GPRINT:free:LAST:\"%4.1lf%S\\r\"  AREA:reserved#4DAF4AFF:\"reserved\\l\":STACK COMMENT:\\u GPRINT:reserved:AVERAGE:\"%4.1lf%S\" GPRINT:reserved:MIN:\"%4.1lf%S\" GPRINT:reserved:MAX:\"%4.1lf%S\" GPRINT:reserved:LAST:\"%4.1lf%S\\r\"  "
+      }, 
+      "Processes/collectd/cputime": {
+         "files": [
+            "processes-collectd/ps_cputime.rrd"
+         ], 
+         "command": "-t \"collectd: CPU time, micros/s\" --lower-limit 0 --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ COMMENT:\"  Avr\" COMMENT:\"  Min\" COMMENT:\"  Max\" COMMENT:\" Last\\r\" DEF:user=processes-collectd/ps_cputime.rrd:user:AVERAGE DEF:user_min=processes-collectd/ps_cputime.rrd:user:MIN DEF:user_max=processes-collectd/ps_cputime.rrd:user:MAX CDEF:user_max_min_delta=user_max,user_min,- DEF:syst=processes-collectd/ps_cputime.rrd:syst:AVERAGE DEF:syst_min=processes-collectd/ps_cputime.rrd:syst:MIN DEF:syst_max=processes-collectd/ps_cputime.rrd:syst:MAX CDEF:syst_max_min_delta=syst_max,syst_min,- LINE:user_min AREA:user_max_min_delta#E41A1C80::STACK LINE:syst_min AREA:syst_max_min_delta#4DAF4A80::STACK LINE$LINE_WIDTH_PRIMARY$:user#E41A1CFF:\"user\\l\" COMMENT:\\u GPRINT:user:AVERAGE:\"%4.0lf%S\" GPRINT:user_min:MIN:\"%4.0lf%S\" GPRINT:user_max:MAX:\"%4.0lf%S\" GPRINT:user:LAST:\"%4.0lf%S\\r\"  LINE$LINE_WIDTH_PRIMARY$:syst#4DAF4AFF:\"syst\\l\" COMMENT:\\u GPRINT:syst:AVERAGE:\"%4.0lf%S\" GPRINT:syst_min:MIN:\"%4.0lf%S\" GPRINT:syst_max:MAX:\"%4.0lf%S\" GPRINT:syst:LAST:\"%4.0lf%S\\r\"  "
       }, 
       "Network/wlan0/dropped": {
          "files": [
@@ -400,13 +468,13 @@
          "files": [
             "processes/fork_rate.rrd"
          ], 
-         "command": "-t \" Fork rate, 1/s\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:fork_rate=processes/fork_rate.rrd:value:AVERAGE DEF:fork_rate_min=processes/fork_rate.rrd:value:MIN DEF:fork_rate_max=processes/fork_rate.rrd:value:MAX CDEF:fork_rate_max_min_delta=fork_rate_max,fork_rate_min,- LINE:fork_rate_min AREA:fork_rate_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:fork_rate$COLOR_LINE_SINGLE$:\" \\l\" COMMENT:\\u GPRINT:fork_rate:AVERAGE:\"Avr %5.2lf\" GPRINT:fork_rate_min:MIN:\"Min %5.2lf\" GPRINT:fork_rate_max:MAX:\"Max %5.2lf\" GPRINT:fork_rate:LAST:\"Last %5.2lf\\r\"  "
+         "command": "-t \" Fork rate, 1/s\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:fork_rate=processes/fork_rate.rrd:value:AVERAGE DEF:fork_rate_min=processes/fork_rate.rrd:value:MIN DEF:fork_rate_max=processes/fork_rate.rrd:value:MAX CDEF:fork_rate_max_min_delta=fork_rate_max,fork_rate_min,- LINE:fork_rate_min AREA:fork_rate_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:fork_rate$COLOR_LINE_SINGLE$:\" \\l\" COMMENT:\\u GPRINT:fork_rate:AVERAGE:\"Avr %4.0lf%S\" GPRINT:fork_rate_min:MIN:\"Min %4.0lf%S\" GPRINT:fork_rate_max:MAX:\"Max %4.0lf%S\" GPRINT:fork_rate:LAST:\"Last %4.0lf%S\\r\"  "
       }, 
       "Processes/sleeping": {
          "files": [
             "processes/ps_state-sleeping.rrd"
          ], 
-         "command": "-t \" Processes sleeping\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:sleeping=processes/ps_state-sleeping.rrd:value:AVERAGE DEF:sleeping_min=processes/ps_state-sleeping.rrd:value:MIN DEF:sleeping_max=processes/ps_state-sleeping.rrd:value:MAX CDEF:sleeping_max_min_delta=sleeping_max,sleeping_min,- LINE:sleeping_min AREA:sleeping_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:sleeping$COLOR_LINE_SINGLE$:\" \\l\" COMMENT:\\u GPRINT:sleeping:AVERAGE:\"Avr %5.2lf\" GPRINT:sleeping_min:MIN:\"Min %5.2lf\" GPRINT:sleeping_max:MAX:\"Max %5.2lf\" GPRINT:sleeping:LAST:\"Last %5.2lf\\r\"  "
+         "command": "-t \" Processes sleeping\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:sleeping=processes/ps_state-sleeping.rrd:value:AVERAGE DEF:sleeping_min=processes/ps_state-sleeping.rrd:value:MIN DEF:sleeping_max=processes/ps_state-sleeping.rrd:value:MAX CDEF:sleeping_max_min_delta=sleeping_max,sleeping_min,- LINE:sleeping_min AREA:sleeping_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:sleeping$COLOR_LINE_SINGLE$:\" \\l\" COMMENT:\\u GPRINT:sleeping:AVERAGE:\"Avr %4.0lf%S\" GPRINT:sleeping_min:MIN:\"Min %4.0lf%S\" GPRINT:sleeping_max:MAX:\"Max %4.0lf%S\" GPRINT:sleeping:LAST:\"Last %4.0lf%S\\r\"  "
       }, 
       "Network/lo/errors": {
          "files": [
@@ -444,17 +512,47 @@
          ], 
          "command": "-t \"Network rmnet_usb0 traffic, bytes/s\" --lower-limit 0 --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ COMMENT:\"    Avr\" COMMENT:\"    Min\" COMMENT:\"    Max\" COMMENT:\"   Last\\r\" DEF:tx=interface-rmnet_usb0/if_octets.rrd:tx:AVERAGE DEF:tx_min=interface-rmnet_usb0/if_octets.rrd:tx:MIN DEF:tx_max=interface-rmnet_usb0/if_octets.rrd:tx:MAX CDEF:tx_max_min_delta=tx_max,tx_min,- VDEF:tx_total=tx,TOTAL DEF:rx=interface-rmnet_usb0/if_octets.rrd:rx:AVERAGE DEF:rx_min=interface-rmnet_usb0/if_octets.rrd:rx:MIN DEF:rx_max=interface-rmnet_usb0/if_octets.rrd:rx:MAX CDEF:rx_max_min_delta=rx_max,rx_min,- VDEF:rx_total=rx,TOTAL LINE:tx_min AREA:tx_max_min_delta#E41A1C80::STACK LINE:rx_min AREA:rx_max_min_delta#4DAF4A80::STACK LINE$LINE_WIDTH_PRIMARY$:tx#E41A1CFF:\"Outgoing\\l\" COMMENT:\\u GPRINT:tx:AVERAGE:\"%6.0lf%S\" GPRINT:tx_min:MIN:\"%6.0lf%S\" GPRINT:tx_max:MAX:\"%6.0lf%S\" GPRINT:tx:LAST:\"%6.0lf%S\\r\"   LINE$LINE_WIDTH_PRIMARY$:rx#4DAF4AFF:\"Incoming\\l\" COMMENT:\\u GPRINT:rx:AVERAGE:\"%6.0lf%S\" GPRINT:rx_min:MIN:\"%6.0lf%S\" GPRINT:rx_max:MAX:\"%6.0lf%S\" GPRINT:rx:LAST:\"%6.0lf%S\\r\"   GPRINT:tx_total:\"Outgoing Total %8.0lf%sB\\r\" GPRINT:rx_total:\"Incoming Total %8.0lf%sB\\r\" "
       }, 
+      "Processes/collectd/data": {
+         "files": [
+            "processes-collectd/ps_data.rrd"
+         ], 
+         "command": "-t \" collectd: Data size, bytes\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:data=processes-collectd/ps_data.rrd:value:AVERAGE DEF:data_min=processes-collectd/ps_data.rrd:value:MIN DEF:data_max=processes-collectd/ps_data.rrd:value:MAX CDEF:data_max_min_delta=data_max,data_min,- LINE:data_min AREA:data_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:data$COLOR_LINE_SINGLE$:\" \\l\" COMMENT:\\u GPRINT:data:AVERAGE:\"Avr %4.0lf%S\" GPRINT:data_min:MIN:\"Min %4.0lf%S\" GPRINT:data_max:MAX:\"Max %4.0lf%S\" GPRINT:data:LAST:\"Last %4.0lf%S\\r\"  "
+      }, 
+      "Processes/collectd/pagefaults": {
+         "files": [
+            "processes-collectd/ps_pagefaults.rrd"
+         ], 
+         "command": "-t \"collectd: Page faults, 1/s\" --lower-limit 0 --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ COMMENT:\"  Avr\" COMMENT:\"  Min\" COMMENT:\"  Max\" COMMENT:\" Last\\r\" DEF:minflt=processes-collectd/ps_pagefaults.rrd:minflt:AVERAGE DEF:minflt_min=processes-collectd/ps_pagefaults.rrd:minflt:MIN DEF:minflt_max=processes-collectd/ps_pagefaults.rrd:minflt:MAX CDEF:minflt_max_min_delta=minflt_max,minflt_min,- DEF:majflt=processes-collectd/ps_pagefaults.rrd:majflt:AVERAGE DEF:majflt_min=processes-collectd/ps_pagefaults.rrd:majflt:MIN DEF:majflt_max=processes-collectd/ps_pagefaults.rrd:majflt:MAX CDEF:majflt_max_min_delta=majflt_max,majflt_min,- LINE:minflt_min AREA:minflt_max_min_delta#E41A1C80::STACK LINE:majflt_min AREA:majflt_max_min_delta#4DAF4A80::STACK LINE$LINE_WIDTH_PRIMARY$:minflt#E41A1CFF:\"minflt\\l\" COMMENT:\\u GPRINT:minflt:AVERAGE:\"%4.0lf%S\" GPRINT:minflt_min:MIN:\"%4.0lf%S\" GPRINT:minflt_max:MAX:\"%4.0lf%S\" GPRINT:minflt:LAST:\"%4.0lf%S\\r\"  LINE$LINE_WIDTH_PRIMARY$:majflt#4DAF4AFF:\"majflt\\l\" COMMENT:\\u GPRINT:majflt:AVERAGE:\"%4.0lf%S\" GPRINT:majflt_min:MIN:\"%4.0lf%S\" GPRINT:majflt_max:MAX:\"%4.0lf%S\" GPRINT:majflt:LAST:\"%4.0lf%S\\r\"  "
+      }, 
+      "Processes/collectd/disk_octets": {
+         "files": [
+            "processes-collectd/ps_disk_octets.rrd"
+         ], 
+         "command": "-t \"collectd: Disk traffic, bytes/s\" --lower-limit 0 --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ COMMENT:\"  Avr\" COMMENT:\"  Min\" COMMENT:\"  Max\" COMMENT:\" Last\\r\" DEF:read=processes-collectd/ps_disk_octets.rrd:read:AVERAGE DEF:read_min=processes-collectd/ps_disk_octets.rrd:read:MIN DEF:read_max=processes-collectd/ps_disk_octets.rrd:read:MAX CDEF:read_max_min_delta=read_max,read_min,- DEF:write=processes-collectd/ps_disk_octets.rrd:write:AVERAGE DEF:write_min=processes-collectd/ps_disk_octets.rrd:write:MIN DEF:write_max=processes-collectd/ps_disk_octets.rrd:write:MAX CDEF:write_max_min_delta=write_max,write_min,- LINE:read_min AREA:read_max_min_delta#E41A1C80::STACK LINE:write_min AREA:write_max_min_delta#4DAF4A80::STACK LINE$LINE_WIDTH_PRIMARY$:read#E41A1CFF:\"read\\l\" COMMENT:\\u GPRINT:read:AVERAGE:\"%4.0lf%S\" GPRINT:read_min:MIN:\"%4.0lf%S\" GPRINT:read_max:MAX:\"%4.0lf%S\" GPRINT:read:LAST:\"%4.0lf%S\\r\"  LINE$LINE_WIDTH_PRIMARY$:write#4DAF4AFF:\"write\\l\" COMMENT:\\u GPRINT:write:AVERAGE:\"%4.0lf%S\" GPRINT:write_min:MIN:\"%4.0lf%S\" GPRINT:write_max:MAX:\"%4.0lf%S\" GPRINT:write:LAST:\"%4.0lf%S\\r\"  "
+      }, 
       "Processes/stopped": {
          "files": [
             "processes/ps_state-stopped.rrd"
          ], 
-         "command": "-t \" Processes stopped\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:stopped=processes/ps_state-stopped.rrd:value:AVERAGE DEF:stopped_min=processes/ps_state-stopped.rrd:value:MIN DEF:stopped_max=processes/ps_state-stopped.rrd:value:MAX CDEF:stopped_max_min_delta=stopped_max,stopped_min,- LINE:stopped_min AREA:stopped_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:stopped$COLOR_LINE_SINGLE$:\" \\l\" COMMENT:\\u GPRINT:stopped:AVERAGE:\"Avr %5.2lf\" GPRINT:stopped_min:MIN:\"Min %5.2lf\" GPRINT:stopped_max:MAX:\"Max %5.2lf\" GPRINT:stopped:LAST:\"Last %5.2lf\\r\"  "
+         "command": "-t \" Processes stopped\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:stopped=processes/ps_state-stopped.rrd:value:AVERAGE DEF:stopped_min=processes/ps_state-stopped.rrd:value:MIN DEF:stopped_max=processes/ps_state-stopped.rrd:value:MAX CDEF:stopped_max_min_delta=stopped_max,stopped_min,- LINE:stopped_min AREA:stopped_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:stopped$COLOR_LINE_SINGLE$:\" \\l\" COMMENT:\\u GPRINT:stopped:AVERAGE:\"Avr %4.0lf%S\" GPRINT:stopped_min:MIN:\"Min %4.0lf%S\" GPRINT:stopped_max:MAX:\"Max %4.0lf%S\" GPRINT:stopped:LAST:\"Last %4.0lf%S\\r\"  "
       }, 
       "Processes/zombies": {
          "files": [
             "processes/ps_state-zombies.rrd"
          ], 
-         "command": "-t \" Processes zombies\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:zombies=processes/ps_state-zombies.rrd:value:AVERAGE DEF:zombies_min=processes/ps_state-zombies.rrd:value:MIN DEF:zombies_max=processes/ps_state-zombies.rrd:value:MAX CDEF:zombies_max_min_delta=zombies_max,zombies_min,- LINE:zombies_min AREA:zombies_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:zombies$COLOR_LINE_SINGLE$:\" \\l\" COMMENT:\\u GPRINT:zombies:AVERAGE:\"Avr %5.2lf\" GPRINT:zombies_min:MIN:\"Min %5.2lf\" GPRINT:zombies_max:MAX:\"Max %5.2lf\" GPRINT:zombies:LAST:\"Last %5.2lf\\r\"  "
+         "command": "-t \" Processes zombies\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:zombies=processes/ps_state-zombies.rrd:value:AVERAGE DEF:zombies_min=processes/ps_state-zombies.rrd:value:MIN DEF:zombies_max=processes/ps_state-zombies.rrd:value:MAX CDEF:zombies_max_min_delta=zombies_max,zombies_min,- LINE:zombies_min AREA:zombies_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:zombies$COLOR_LINE_SINGLE$:\" \\l\" COMMENT:\\u GPRINT:zombies:AVERAGE:\"Avr %4.0lf%S\" GPRINT:zombies_min:MIN:\"Min %4.0lf%S\" GPRINT:zombies_max:MAX:\"Max %4.0lf%S\" GPRINT:zombies:LAST:\"Last %4.0lf%S\\r\"  "
+      }, 
+      "Processes/collectd/code": {
+         "files": [
+            "processes-collectd/ps_code.rrd"
+         ], 
+         "command": "-t \" collectd: Code size, bytes\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:code=processes-collectd/ps_code.rrd:value:AVERAGE DEF:code_min=processes-collectd/ps_code.rrd:value:MIN DEF:code_max=processes-collectd/ps_code.rrd:value:MAX CDEF:code_max_min_delta=code_max,code_min,- LINE:code_min AREA:code_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:code$COLOR_LINE_SINGLE$:\" \\l\" COMMENT:\\u GPRINT:code:AVERAGE:\"Avr %4.0lf%S\" GPRINT:code_min:MIN:\"Min %4.0lf%S\" GPRINT:code_max:MAX:\"Max %4.0lf%S\" GPRINT:code:LAST:\"Last %4.0lf%S\\r\"  "
+      }, 
+      "Processes/collectd/rss": {
+         "files": [
+            "processes-collectd/ps_rss.rrd"
+         ], 
+         "command": "-t \" collectd: Resident segment size, bytes\"   --color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  --color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ DEF:rss=processes-collectd/ps_rss.rrd:value:AVERAGE DEF:rss_min=processes-collectd/ps_rss.rrd:value:MIN DEF:rss_max=processes-collectd/ps_rss.rrd:value:MAX CDEF:rss_max_min_delta=rss_max,rss_min,- LINE:rss_min AREA:rss_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK LINE$LINE_WIDTH_PRIMARY$:rss$COLOR_LINE_SINGLE$:\" \\l\" COMMENT:\\u GPRINT:rss:AVERAGE:\"Avr %4.0lf%S\" GPRINT:rss_min:MIN:\"Min %4.0lf%S\" GPRINT:rss_max:MAX:\"Max %4.0lf%S\" GPRINT:rss:LAST:\"Last %4.0lf%S\\r\"  "
       }, 
       "Processes/overview": {
          "files": [
