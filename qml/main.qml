@@ -207,6 +207,7 @@ ApplicationWindowPL {
         popAll()
         pushPage(gList)
         updateGraphs()
+        setCover()
     }
 
     // returns Callback IDs in sequence

@@ -24,6 +24,11 @@ ApplicationWindow {
     // dummy properties/signals to ensure compatibility with Sailfish
     signal applicationActiveChanged()
 
+    function setCover()
+    {
+    }
+
+
     toolBar: ToolBar {
         RowLayout {
             id: appToolbar

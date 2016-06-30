@@ -80,4 +80,118 @@ ApplicationWindow {
         statusUpdate()
     }
 
+    //////////////////////////////////////////////////////////////////////
+    /// Functions and objects dealing with cover
+
+    property int cover_index: 0
+    property var cover_list: []
+
+    function setCover()
+    {
+        var old_len = cover_list.length
+        cover_list = appWindow.graphConfig[ "cover" ]
+
+        if (old_len != cover_list.length )
+            cover_index = 0
+
+        imageCover.askImage()
+    }
+
+    cover:     Component {
+        CoverBackground {
+            id: cover
+
+            CoverActionList {
+                CoverAction {
+                    iconSource: "image://theme/icon-m-left"
+                    onTriggered: {
+                        if ( cover_list.length < 1 ) return;
+                        cover_index = cover_index-1
+                        if (cover_index < 0)
+                            cover_index = cover_list.length-1
+
+                        imageCover.askImage()
+                    }
+
+                }
+                CoverAction {
+                    iconSource: "image://theme/icon-m-right"
+                    onTriggered: {
+                        if ( cover_list.length < 1 ) return;
+                        cover_index = cover_index+1
+                        if (cover_index >= cover_list.length)
+                            cover_index = 0
+
+                        imageCover.askImage()
+                    }
+                }
+            }
+
+            onStatusChanged: {
+                if (status == Cover.Active)
+                    imageCover.askImage()
+            }
+
+            Image {
+                id: imageCover
+
+                property int myCallbackId: -1
+
+                source: "image://theme/icon-l-clock"
+
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: cover.height * 0.75
+
+                function askImage() {
+                    if (myCallbackId <= 0)
+                        myCallbackId = appWindow.getCallbackId()
+
+                    if (cover_index >= cover_list.length)
+                        return ; // list is not filled
+
+                    grapher.getImage(myCallbackId, cover_list[cover_index], settings.timewindow_from, settings.timewindow_duration,
+                                     Qt.size(width,height), true )
+                }
+
+                Connections {
+                    target: grapher
+                    onNewImage: {
+                        if (imageFor == imageCover.myCallbackId)
+                        {
+                            console.log("Cover Image received: ", imageFor, fname)
+                            imageCover.source = fname
+                        }
+                    }
+                }
+
+                onWidthChanged: {
+                    askImage()
+                }
+
+                onHeightChanged: {
+                    askImage()
+                }
+
+                Component.onCompleted: {
+                    askImage()
+                }
+
+                // We are updating when the cover becomes active,
+                // no need to do it earlier
+//                // cover update timer
+//                Timer {
+//                    id: coverTimer
+//                    interval: settings.updates_period * 1000
+//                    running: true
+//                    repeat: true
+//                    onTriggered: {
+//                        var now = new Date()
+//                        console.log(now.toTimeString() + " Cover Timer")
+//                        imageCover.askImage();
+//                    }
+//                }
+            }
+        }
+    }
 }

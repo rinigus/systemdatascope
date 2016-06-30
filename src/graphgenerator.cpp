@@ -466,8 +466,11 @@ QString Generator::setConfig(QString config)
     if ( !init.contains("page") || !init["page"].isObject() )
         RETERR("JSON configuration missing page and it is not defined as JSON object");
 
-    std::cout << "Init JSON: \n"
-              << QString(document_init.toJson()).toStdString() << std::endl;
+    if ( init.contains("cover") && !init["cover"].isArray() )
+        RETERR("JSON configuration cover that is not defined as JSON array");
+
+//    std::cout << "Init JSON: \n"
+//              << QString(document_init.toJson()).toStdString() << std::endl;
 
     // Lets replace all variables
     if ( init.contains("variables") )
@@ -527,8 +530,8 @@ QString Generator::setConfig(QString config)
 
     QJsonDocument result( init );
 
-    std::cout << "End JSON: \n"
-              << QString(result.toJson()).toStdString() << std::endl;
+//    std::cout << "End JSON: \n"
+//              << QString(result.toJson()).toStdString() << std::endl;
 
     return result.toJson();
 }

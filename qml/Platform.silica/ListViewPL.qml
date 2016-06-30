@@ -27,7 +27,7 @@ SilicaListView {
                 }
 
                 MenuItem {
-                    text: "Time control"
+                    text: "Time"
                     onClicked: {
                         appWindow.pushPage(Qt.resolvedUrl("TimeControlPL.qml"))
                     }
