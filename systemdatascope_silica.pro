@@ -64,5 +64,6 @@ DISTFILES += \
     qml/Platform/SettingsPL.qml \
     qml/Platform/SettingsStoragePL.qml \
     qml/Platform/MessageAboutPL.qml \
-    qml/Platform/TimeControlPL.qml
+    qml/Platform/TimeControlPL.qml \
+    qml/Platform/StatusPL.qml
 

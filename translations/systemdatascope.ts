@@ -200,6 +200,13 @@
     </message>
 </context>
 <context>
+    <name>StatusPL</name>
+    <message>
+        <source>Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TimeControlPL</name>
     <message>
         <source>Time axis control</source>

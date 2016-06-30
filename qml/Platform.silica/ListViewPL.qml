@@ -22,6 +22,11 @@ SilicaListView {
                 }
 
                 MenuItem {
+                    text: "Status"
+                    onClicked: { appWindow.pushPage(Qt.resolvedUrl("StatusPL.qml")) }
+                }
+
+                MenuItem {
                     text: "Settings"
                     onClicked: { appWindow.appSettings() }
                 }
