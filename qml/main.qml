@@ -140,20 +140,13 @@ ApplicationWindowPL {
     }
 
     // Dialogs
-    AppAbout {
-        id: aboutDialog
-    }
-
     onAppAbout: {
-        aboutDialog.open()
-    }
-
-    AppSettings {
-        id: settingsDialog
+        appWindow.pushPage(Qt.resolvedUrl("AppAbout.qml"))
     }
 
     onAppSettings: {
-        settingsDialog.updateAndOpen()
+        service.updateState()
+        appWindow.pushPage(Qt.resolvedUrl("AppSettings.qml"))
     }
 
 

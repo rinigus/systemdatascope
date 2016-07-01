@@ -3,24 +3,24 @@ import "Platform"
 
 SettingsPL {
 
-    function updateAndOpen()
-    {
-        service.updateState()
+//    function updateAndOpen()
+//    {
+//        service.updateState()
 
-        updateGraphsInterval = settings.updates_period
-        graphHeight = settings.graph_base_height
-        graphFSZTitle = settings.graph_font_size_title
-        graphFSZAxis = settings.graph_font_size_axis
-        graphFSZUnit = settings.graph_font_size_unit
-        graphFSZLegend = settings.graph_font_size_legend
+//        updateGraphsInterval = settings.updates_period
+//        graphHeight = settings.graph_base_height
+//        graphFSZTitle = settings.graph_font_size_title
+//        graphFSZAxis = settings.graph_font_size_axis
+//        graphFSZUnit = settings.graph_font_size_unit
+//        graphFSZLegend = settings.graph_font_size_legend
 
-        folderWhileRunning = settings.workingdir_collectd_running
-        folderWhileStopped = settings.workingdir_collectd_stopped
-        trackCollecd = settings.track_connectd_service
+//        folderWhileRunning = settings.workingdir_collectd_running
+//        folderWhileStopped = settings.workingdir_collectd_stopped
+//        trackCollecd = settings.track_connectd_service
 
-        prop2gui()
-        open()
-    }
+//        prop2gui()
+//        open()
+//    }
 
     onAccepted:
     {
@@ -40,4 +40,18 @@ SettingsPL {
         appWindow.setConfig()
     }
 
+    Component.onCompleted: {
+        updateGraphsInterval = settings.updates_period
+        graphHeight = settings.graph_base_height
+        graphFSZTitle = settings.graph_font_size_title
+        graphFSZAxis = settings.graph_font_size_axis
+        graphFSZUnit = settings.graph_font_size_unit
+        graphFSZLegend = settings.graph_font_size_legend
+
+        folderWhileRunning = settings.workingdir_collectd_running
+        folderWhileStopped = settings.workingdir_collectd_stopped
+        trackCollecd = settings.track_connectd_service
+
+        prop2gui()
+    }
 }
