@@ -86,37 +86,6 @@ PagePL {
                         image.askImage()
                     }
                 }
-
-                MouseArea {
-                    anchors.fill: parent
-                    acceptedButtons: Qt.LeftButton | Qt.RightButton
-                    onClicked: {
-                        if (mouse.button == Qt.LeftButton && graphDefs.plots[index].subplots)
-                        {
-                            appWindow.pushPage( Qt.resolvedUrl("GraphList.qml"),
-                                               { graphDefs: graphDefs.plots[index].subplots }
-                                               )
-                            return
-                        }
-
-                        if (mouse.button == Qt.RightButton)
-                        {
-                            appWindow.popPage()
-                        }
-                    }
-                }
-
-
-                Keys.onReturnPressed: {
-                    if ( graphDefs.plots[index].subplots )
-                    {
-                        appWindow.pushPage( Qt.resolvedUrl("GraphList.qml"),
-                                           { graphDefs: graphDefs.plots[index].subplots }
-                                           )
-                    }
-                }
-
-                Keys.onEscapePressed: { appWindow.popPage() }
             }
 
             IndicatorPL {
@@ -125,6 +94,39 @@ PagePL {
                 anchors.right: image.right
                 visible: false
             }
+
+
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                onClicked: {
+                    if (mouse.button == Qt.LeftButton && graphDefs.plots[index].subplots)
+                    {
+                        appWindow.pushPage( Qt.resolvedUrl("GraphList.qml"),
+                                           { graphDefs: graphDefs.plots[index].subplots }
+                                           )
+                        return
+                    }
+
+                    if (mouse.button == Qt.RightButton)
+                    {
+                        appWindow.popPage()
+                    }
+                }
+            }
+
+
+            Keys.onReturnPressed: {
+                if ( graphDefs.plots[index].subplots )
+                {
+                    appWindow.pushPage( Qt.resolvedUrl("GraphList.qml"),
+                                       { graphDefs: graphDefs.plots[index].subplots }
+                                       )
+                }
+            }
+
+            Keys.onEscapePressed: { appWindow.popPage() }
+
         }
     }
 
