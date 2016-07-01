@@ -104,7 +104,7 @@ ApplicationWindow {
             CoverActionList {
 
                 CoverAction {
-                    iconSource: "image://theme/icon-m-left"
+                    iconSource: "image://theme/icon-cover-previous"
                     onTriggered: {
                         if ( cover_list.length < 1 ) return;
                         cover_index = cover_index-1
@@ -116,7 +116,7 @@ ApplicationWindow {
 
                 }
                 CoverAction {
-                    iconSource: "image://theme/icon-m-right"
+                    iconSource: "image://theme/icon-cover-next"
                     onTriggered: {
                         if ( cover_list.length < 1 ) return;
                         cover_index = cover_index+1
