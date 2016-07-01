@@ -373,7 +373,7 @@ BatteryPlots["type"] = "Battery/voltage"
 Config["page"]["plots"].append( BatteryPlots )
 
 # Cover
-gt, plot = maketypesplot( "voltage", "battery-0/voltage.rrd", "Battery", SkipLegend = True )
+gt, plot = maketypesplot( "voltage", "battery-0/voltage.rrd", "Battery", "Battery", SkipLegend = True )
 Config["types"]["Battery/voltage/cover"] = gt
 
 
@@ -453,7 +453,7 @@ Config["types"]["Memory/overview"] = { "command": command_def + command_line,
                                        "files": files }
 
 # Memory overview: cover
-command_def = '-t "Memory, bytes" --lower-limit 0 ' + defColors
+command_def = '-t "Memory, B" --lower-limit 0 ' + defColors
 command_line = ""
 files = []
 s = StackOrLines( cs, isStack = True, t = "AREA" )

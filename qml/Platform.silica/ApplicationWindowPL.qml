@@ -102,6 +102,7 @@ ApplicationWindow {
             id: cover
 
             CoverActionList {
+
                 CoverAction {
                     iconSource: "image://theme/icon-m-left"
                     onTriggered: {
@@ -141,7 +142,8 @@ ApplicationWindow {
 
                 anchors.left: parent.left
                 anchors.right: parent.right
-                height: cover.height * 0.75
+                anchors.top: parent.top
+                height: parent.height*0.8
 
                 function askImage() {
                     if (myCallbackId <= 0)
