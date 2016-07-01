@@ -26,7 +26,6 @@ SOURCES += \
     src/systemdserviceswitchcmd.cpp
 
 OTHER_FILES += \
-    qml/cover/CoverPage.qml \
     rpm/systemdatascope.changes.in \
     rpm/systemdatascope.spec \
     rpm/systemdatascope.yaml \

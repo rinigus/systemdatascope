@@ -37,6 +37,7 @@ Page {
     }
 
     function updateStatus() {
+        service.updateState()
         stat = "collectd: " + (service.running ? "Running" : "Stopped") + " / " +
                 (service.enabled ? "Enabled on boot" : "Will not start on boot") +
                 "<br><br>" +
