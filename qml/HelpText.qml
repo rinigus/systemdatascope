@@ -3,11 +3,19 @@ import "Platform"
 
 TextPL {
 
-    text: qsTr("<h1>Welcome to " + programName + "</h1> <p>It seems that you are
-running non-configured GUI or, for some reason, with an empty
-configuration on this level.</p>
+    property bool asHelp: true
 
-<p>This is a short HOWTO to get you started.</p>
+    text: qsTr("
+<h1>Welcome to " + programName + "</h1>" +
+
+( asHelp ? "" : "
+<p>It seems that you are
+running non-configured GUI or, for some reason, with an empty
+configuration on this level.</p>" ) + "
+
+<p>This is a short HOWTO to get you started.
+On Desktop, press Esc or the right mouse button to get out of this HOWTO.
+On Sailfish, swipe the page back, as usual</p>
 
 <h2>Start <i>collectd</i></h2>
 

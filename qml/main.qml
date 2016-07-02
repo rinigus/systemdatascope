@@ -121,23 +121,8 @@ ApplicationWindowPL {
         appWindow.pushPage(Qt.resolvedUrl("AppSettings.qml"))
     }
 
-    PagePL {
-        id: helpPage
-
-        FlickablePL {
-            anchors.fill: parent
-            contentHeight: helpText.height
-
-            HelpText {
-                id: helpText
-                anchors.left: parent.left
-                anchors.right: parent.right
-            }
-        }
-    }
-
     onAppHelp: {
-        appWindow.pushPage(helpPage)
+        appWindow.pushPage(Qt.resolvedUrl("AppHelp.qml"))
     }
 
     // Applies configuration from settings.graph_definitions

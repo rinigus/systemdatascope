@@ -14,5 +14,8 @@
         <file>qml/main.qml</file>
         <file>qml/Platform/MessageAboutPL.qml</file>
         <file>qml/Platform/IndicatorPL.qml</file>
+        <file>qml/Platform/TextPL.qml</file>
+        <file>qml/HelpText.qml</file>
+        <file>qml/AppHelp.qml</file>
     </qresource>
 </RCC>

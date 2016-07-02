@@ -20,6 +20,7 @@ ApplicationWindow {
     signal appTimespan(real timespan)
     signal appSettings()
     signal appAbout()
+    signal appHelp()
 
     // dummy properties/signals to ensure compatibility with Sailfish
     signal applicationActiveChanged()
@@ -127,6 +128,11 @@ ApplicationWindow {
             ToolButton {
                 text: qsTr("Settings")
                 onClicked: { appWindowBase.appSettings() }
+            }
+
+            ToolButton {
+                text: qsTr("Help")
+                onClicked: { appWindowBase.appHelp() }
             }
 
             ToolButton {

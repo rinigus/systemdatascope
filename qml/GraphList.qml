@@ -100,6 +100,7 @@ PagePL {
 
             HelpText {
                 id: helpMessage
+                asHelp: false
                 anchors.left: parent.left
                 anchors.right: parent.right
                 visible: !showGraphs
@@ -151,7 +152,6 @@ PagePL {
 
     // Fill model
     function fillModel() {
-
         if ( !graphDefs.title )
         {
             showGraphs = false
