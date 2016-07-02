@@ -15,7 +15,7 @@ configuration on this level.</p>" ) + "
 
 <p>This is a short HOWTO to get you started.
 On Desktop, press Esc or the right mouse button to get out of this HOWTO.
-On Sailfish, swipe the page back, as usual</p>
+On Sailfish, swipe the page back, as usual.</p>
 
 <h2>Start <i>collectd</i></h2>
 

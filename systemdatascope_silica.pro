@@ -67,5 +67,6 @@ DISTFILES += \
     qml/Platform/StatusPL.qml \
     qml/Platform/IndicatorPL.qml \
     qml/Platform/TextPL.qml \
-    qml/HelpText.qml
+    qml/HelpText.qml \
+    qml/AppHelp.qml
 
