@@ -3,9 +3,7 @@
   License: MIT
 */
 
-//#ifdef QT_QML_DEBUG
 #include <QtQuick>
-//#endif
 
 #include "graphgenerator.h"
 #include "systemdserviceswitchcmd.h"

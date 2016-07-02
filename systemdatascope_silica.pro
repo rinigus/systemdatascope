@@ -12,8 +12,12 @@
 # The name of your application
 TARGET = systemdatascope
 
-CONFIG += sailfishapp
+CONFIG += sailfishapp sailfishapp_no_deploy_qml
 CONFIG += c++11
+
+qml.files = qml/*.qml qml/Platform qml/Platform.silica
+qml.path = /usr/share/$${TARGET}
+INSTALLS += qml
 
 CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
@@ -44,7 +48,7 @@ CONFIG += sailfishapp_i18n
 # planning to localize your app, remember to comment out the
 # following TRANSLATIONS line. And also do not forget to
 # modify the localized app name in the the .desktop file.
-TRANSLATIONS += translations/systemdatascope-de.ts
+# TRANSLATIONS += translations/systemdatascope-de.ts
 
 HEADERS += \
     src/commandqueue.h \
