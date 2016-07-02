@@ -51,34 +51,6 @@ ApplicationWindowPL {
 
         settings.timewindow_from = 0
 
-        //        //if (settings.graph_definitions.length == 0) // First run: fill it with default
-        //        {
-        //            var ini = {
-
-        //                title: "Overview",
-        //                plots: [
-        //                    { type: "CPU/system",
-        //                        command: "--full-size-mode DEF:c=cpu-0/cpu-system.rrd:value:AVERAGE LINE:c#0000FF:\"default resolution\\l\"",
-
-        //                        subplots: {
-        //                            title: "Details",
-        //                            plots: [
-        //                                { type: "CPU/system",
-        //                                    command: "--full-size-mode DEF:c=cpu-0/cpu-system.rrd:value:AVERAGE LINE:c#0000FF:\"default resolution\\l\""
-        //                                }
-        //                            ]
-        //                        }
-        //                    },
-
-        //                    { type: "CPU/user",
-        //                        command: "--full-size-mode DEF:c=cpu-0/cpu-user.rrd:value:AVERAGE LINE:c#0000FF:\"default resolution\\l\""
-        //                    },
-        //                ]
-        //            }
-
-        //            settings.graph_definitions = JSON.stringify(ini)
-        //        }
-
         // Settings
         if (settings.workingdir_collectd_running.length < 1)
             settings.workingdir_collectd_running = grapher.suggestDirectory(true);
@@ -149,6 +121,24 @@ ApplicationWindowPL {
         appWindow.pushPage(Qt.resolvedUrl("AppSettings.qml"))
     }
 
+    PagePL {
+        id: helpPage
+
+        FlickablePL {
+            anchors.fill: parent
+            contentHeight: helpText.height
+
+            HelpText {
+                id: helpText
+                anchors.left: parent.left
+                anchors.right: parent.right
+            }
+        }
+    }
+
+    onAppHelp: {
+        appWindow.pushPage(helpPage)
+    }
 
     // Applies configuration from settings.graph_definitions
     //

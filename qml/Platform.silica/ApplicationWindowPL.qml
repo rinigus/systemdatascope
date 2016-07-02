@@ -19,6 +19,7 @@ ApplicationWindow {
     signal appTimespan(real timespan)
     signal appSettings()
     signal appAbout()
+    signal appHelp()
 
     // Settings
     allowedOrientations : Orientation.All

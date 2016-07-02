@@ -4,9 +4,10 @@ import "Platform"
 PagePL {
 
     property var graphDefs: []
-    property string pageTitle: qsTr("Undefined")
+    property string pageTitle: qsTr("Welcome")
 
-    property int graphsModel: 0
+    property int graphsModel: 1
+    property bool showGraphs: false //true
 
     Component {
         id: graphPlotDelegate
@@ -16,10 +17,11 @@ PagePL {
 
             anchors.left: parent.left
             anchors.right: parent.right
-            height: image.height
+            height: showGraphs ? image.height : helpMessage.height
 
             Image {
                 id: image
+                visible: showGraphs
 
                 property int myCallbackId: -1
                 property bool update_skipped_since_invisible: false
@@ -31,7 +33,7 @@ PagePL {
 
                 function askImage() {
                     // continue only if we are active
-                    if ( appWindow.isActive() ) {
+                    if ( appWindow.isActive() && showGraphs ) {
                         if (myCallbackId <= 0)
                             myCallbackId = appWindow.getCallbackId()
 
@@ -43,7 +45,7 @@ PagePL {
                 Connections {
                     target: appWindow
                     onUpdateGraphs: {
-                        if ( visible ) image.askImage()
+                        if ( visible && showGraphs ) image.askImage()
                         else image.update_skipped_since_invisible = true
                     }
                 }
@@ -56,9 +58,9 @@ PagePL {
                             console.log("Image received: ", imageFor, fname)
                             image.source = fname
 
-                            var sh = image.sourceSize.height
-                            if (container.height != sh)
-                                container.height = sh
+                            //                            var sh = image.sourceSize.height
+                            //                            if (container.height != sh)
+                            //                                container.height = sh
 
                             if (graphDefs.plots[index].subplots) indicator.visible = true
                             else indicator.visible = false
@@ -71,12 +73,13 @@ PagePL {
                 }
 
                 // don't need it since height is already according to current image
-//                onHeightChanged: {
-//                    image.askImage()
-//                }
+                //                onHeightChanged: {
+                //                    image.askImage()
+                //                }
 
                 Component.onCompleted: {
-                    image.askImage()
+                    if (showGraphs)
+                        image.askImage()
                 }
 
                 onVisibleChanged: {
@@ -95,11 +98,19 @@ PagePL {
                 visible: false
             }
 
+            HelpText {
+                id: helpMessage
+                anchors.left: parent.left
+                anchors.right: parent.right
+                visible: !showGraphs
+            }
 
             MouseArea {
                 anchors.fill: parent
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
                 onClicked: {
+                    if (!showGraphs) return
+
                     if (mouse.button == Qt.LeftButton && graphDefs.plots[index].subplots)
                     {
                         appWindow.pushPage( Qt.resolvedUrl("GraphList.qml"),
@@ -140,10 +151,19 @@ PagePL {
 
     // Fill model
     function fillModel() {
-        if ( !graphDefs.title ) return;
+
+        if ( !graphDefs.title )
+        {
+            showGraphs = false
+            graphsModel = 1
+            return;
+        }
 
         pageTitle = graphDefs.title
         graphsModel = graphDefs.plots.length
+
+        if (graphsModel > 0) showGraphs = true
+        else showGraphs = false
     }
 
     onGraphDefsChanged: {

@@ -78,7 +78,7 @@
 <context>
     <name>GraphList</name>
     <message>
-        <source>Undefined</source>
+        <source>Welcome</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

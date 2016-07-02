@@ -3,7 +3,7 @@ import "Platform"
 
 MessageAboutPL {
 
-    mainText: "<p>" + programName + "reads the system performance data gathered by <i>collectd</i>. Graphs are generated using RRDTOOL</p><br>" +
+    mainText: "<p>" + programName + " reads the system performance data gathered by <i>collectd</i>. Graphs are generated using RRDTOOL</p><br>" +
               "<p>GUI source code at: <br> <a href=http://github.com/rinigus>http://github.com/rinigus</a></p><br>" +
               "<p>GUI Copyright: 2016 <br>rinigus rinigus.git@gmail.com<br></p>" +
               "License: MIT<br><br>" +

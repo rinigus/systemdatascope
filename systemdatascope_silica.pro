@@ -65,5 +65,7 @@ DISTFILES += \
     qml/Platform/MessageAboutPL.qml \
     qml/Platform/TimeControlPL.qml \
     qml/Platform/StatusPL.qml \
-    qml/Platform/IndicatorPL.qml
+    qml/Platform/IndicatorPL.qml \
+    qml/Platform/TextPL.qml \
+    qml/HelpText.qml
 
