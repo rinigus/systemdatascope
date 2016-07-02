@@ -15,6 +15,8 @@ TARGET = systemdatascope
 CONFIG += sailfishapp
 CONFIG += c++11
 
+CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
+
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 DEFINES += IS_SAILFISH_OS
 

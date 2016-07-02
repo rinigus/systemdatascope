@@ -55,7 +55,7 @@ PagePL {
                     onNewImage: {
                         if (imageFor == image.myCallbackId)
                         {
-                            console.log("Image received: ", imageFor, fname)
+                            // console.log("Image received: ", imageFor, fname)
                             image.source = fname
 
                             //                            var sh = image.sourceSize.height

@@ -36,7 +36,7 @@ ApplicationWindow {
     }
 
     function popPage() {
-        console.log("Popping " + pageStack.depth)
+        //console.log("Popping " + pageStack.depth)
         pageStack.pop()
     }
 
@@ -162,7 +162,7 @@ ApplicationWindow {
                     onNewImage: {
                         if (imageFor == imageCover.myCallbackId)
                         {
-                            console.log("Cover Image received: ", imageFor, fname)
+                            // console.log("Cover Image received: ", imageFor, fname)
                             imageCover.source = fname
                         }
                     }

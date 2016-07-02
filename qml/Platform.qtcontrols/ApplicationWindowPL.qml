@@ -187,7 +187,7 @@ ApplicationWindow {
     }
 
     function popPage() {
-        console.log("Popping " + pageStack.depth)
+        //console.log("Popping " + pageStack.depth)
         pageStack.pop()
         pageStack.currentItem.focusToChild()
     }

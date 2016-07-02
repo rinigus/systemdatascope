@@ -85,8 +85,8 @@ ApplicationWindowPL {
         running: true
         repeat: true
         onTriggered: {
-            var now = new Date()
-            console.log(now.toTimeString() + " Timer")
+            // var now = new Date()
+            // console.log(now.toTimeString() + " Timer")
             grapher.checkCache();
             if ( isActive() )
             {
@@ -96,8 +96,8 @@ ApplicationWindowPL {
     }
 
     onApplicationActiveChanged: {
-        var now = new Date()
-        console.log(now.toTimeString() + " Application active changed to " + Qt.application.active)
+        // var now = new Date()
+        // console.log(now.toTimeString() + " Application active changed to " + Qt.application.active)
         if ( isActive() )
         {
             // make updates and reinstall timer
@@ -149,7 +149,7 @@ ApplicationWindowPL {
         // parse configuration taking into account generators and variables
         var tmps = grapher.setConfig( settings.graph_definitions )
 
-        console.log(tmps)
+        // console.log(tmps)
         try {
             graphConfig = JSON.parse( tmps )
 
@@ -218,7 +218,7 @@ ApplicationWindowPL {
     }
 
     onStateLoadingUrlChanged: {
-        console.log(appWindow.stateLoadingUrl)
+        // console.log(appWindow.stateLoadingUrl)
     }
 
     Connections {
