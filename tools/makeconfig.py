@@ -1,3 +1,5 @@
+#!/usr/bin/env python2.7
+
 import json, os, os.path, argparse, glob, re, ast
 
 parser = argparse.ArgumentParser(description='Generate JSON configuration file for SystemDataScope')
@@ -179,6 +181,10 @@ Units = { "DEFAULT": "",
           "Processes/rss": "bytes",
           "Processes/pagefaults": "1/s",
           "Processes/stacksize": "bytes",
+          "Disk/io_time": "ms",
+          "Disk/ops": "1/s",
+          "Disk/octets": "bytes/s",
+          #"Disk/time": "1/s",
 }
 
 Formats = { "DEFAULT": "%5.2lf",
@@ -195,6 +201,8 @@ Formats = { "DEFAULT": "%5.2lf",
             "Processes/disk_ops": "%4.0lf%S",
             "Processes/disk_octets": "%4.0lf%S",
             "Processes": "%4.0lf%S",
+            "Disk": "%4.0lf%S",
+            "Disk/merged": "%5.2lf",
 }
 
 def getit(name, D):
@@ -408,6 +416,72 @@ for gd in glob.glob( "df-*" ):
                                                 "files": files }
 
     Plots["subplots"]["plots"].append( {"type": "Storage/" + part_name} )
+
+# disk access rates
+Human = { "DEFAULT": "",
+          "Disk/io_time": "I/O time",
+          "Disk/merged": "Merged operations",
+          "Disk/octets": "Traffic",
+          "Disk/ops": "Operations",
+          "Disk/time": "Average time per operation"
+          
+}
+
+DiskStats = { "time": [ "read", "write" ],
+              "octets": [ "read", "write" ],
+              "ops": [ "read", "write" ],
+              "merged": [ "read", "write" ],
+              "io_time": [ "io_time" ],
+              
+}
+
+for gd in glob.glob( "disk-*" ):
+    dname = re.search( "^disk-(.*)", gd ).group(1)
+    if re.search( "(.*)p.*", dname ) is not None:
+        continue # skip partitions
+
+    for g in glob.glob( gd + "/disk_*.rrd" ):
+        name = re.search( "^disk-.*/disk_(.*).rrd", g ).group(1)
+        if name == "time":
+            continue # skip this stat, not sure what it means [units]
+        
+        if name in DiskStats.keys():
+            f = getf("Disk/" + name)
+            u = getunit("Disk/" + name)
+            frm = f + u
+
+            command_def = '-t "' + dname + ': ' + getit("Disk/"+name, Human)
+            if len(u) > 0: command_def += ", " + u
+            command_def += '" --lower-limit 0 ' + defColors + makeheads(5)
+            command_line = ""
+            files = [g]
+
+            s = StackOrLines( cs, minmax=True )
+            for li, load_type in  enumerate(DiskStats[ name ]):
+                lname = load_type
+
+                command_def += "DEF:" + lname + "=" + g + ":" + lname + ":AVERAGE "
+                command_def += "DEF:" + lname + "_min=" + g + ":" + lname + ":MIN "
+                command_def += "DEF:" + lname + "_max=" + g + ":" + lname + ":MAX "
+                command_def += "CDEF:" + lname + "_max_min_delta=" + lname + "_max," + lname + "_min,- "
+                s.add( lname, "$LINE_WIDTH_PRIMARY$", '"' + lname + '\\l"',
+                       "COMMENT:\\u GPRINT:"+lname+":AVERAGE:\"" + f + "\" GPRINT:"+lname+"_min:MIN:\"" + f +
+                       "\" GPRINT:"+lname+"_max:MAX:\"" + f + "\" GPRINT:"+lname+":LAST:\"" + f + "\\r\" ")
+
+            command_line = s.str()
+
+            gt = { "command": command_def + command_line,
+                   "files": files }
+            plot = { "type": "Disk/" + dname + "/" + name }
+            
+        else:
+            gt, plot = maketypesplot( name, g, Type = "Disk/" + dname,
+                                      Title = dname + ': ' + getit("Disk/"+name, Human),
+                                      Format = getf("Disk/" + name),
+                                      Unit = getunit("Disk/" + name) )
+        
+        Config["types"]["Disk/" + dname + "/" + name] = gt
+        Plots["subplots"]["plots"].append( plot )        
 
 Plots["type"] = "Storage/root"
 Config["page"]["plots"].append( Plots )
