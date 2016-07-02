@@ -138,7 +138,7 @@ ApplicationWindow {
 
                 property int myCallbackId: -1
 
-                source: "image://theme/icon-l-clock"
+                source: "/usr/share/icons/hicolor/128x128/apps/systemdatascope.png"
 
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -168,15 +168,15 @@ ApplicationWindow {
                 }
 
                 onWidthChanged: {
-                    askImage()
+                    imageCover.askImage()
                 }
 
                 onHeightChanged: {
-                    askImage()
+                    imageCover.askImage()
                 }
 
                 Component.onCompleted: {
-                    askImage()
+                    imageCover.askImage()
                 }
 
                 // We are updating when the cover becomes active,

@@ -22,10 +22,9 @@ PagePL {
                 id: image
 
                 property int myCallbackId: -1
-                //property string image_fname: ""
                 property bool update_skipped_since_invisible: false
 
-                source: "" //image_fname
+                source: ""
 
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -71,9 +70,10 @@ PagePL {
                     image.askImage()
                 }
 
-                onHeightChanged: {
-                    image.askImage()
-                }
+                // don't need it since height is already according to current image
+//                onHeightChanged: {
+//                    image.askImage()
+//                }
 
                 Component.onCompleted: {
                     image.askImage()
@@ -126,7 +126,6 @@ PagePL {
             }
 
             Keys.onEscapePressed: { appWindow.popPage() }
-
         }
     }
 
