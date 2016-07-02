@@ -79,7 +79,7 @@ loading process, configuration is checked against available RRD
 files. For example, if a graph requires load/load.rrd and this
 file is unavailable, the corresponding graph will not be
 shown. If the file appeared later, you would have to reload
-configuration to get it detected</p>
+configuration to get it detected.</p>
 
 <h3>Make configuration using a helper script</h3>
 
@@ -88,7 +88,7 @@ configuration to get it detected</p>
 <p>Get the helper script from the GUI source tree in GitHub:
 <a href=https://github.com/rinigus/systemdatascope/blob/master/tools/makeconfig.py>
 https://github.com/rinigus/systemdatascope/blob/master/tools/makeconfig.py
-</a> </p>
+</a> .</p>
 
 <p>Run script:</p>
 
@@ -104,7 +104,7 @@ Settings, insert location of configuration as URL:</p>
 <p>The URL will be loaded after you press Load button. Note that
 if the loading was successful, URL will stay in settings and you
 could easily update configuration by script or editor and then
-reload it again in Settings</p>
+reload it again in Settings.</p>
 
 
 <h3>Load default configuration from Internet</h3>
@@ -120,7 +120,7 @@ and press Load button. Loading is performed using QML
 XMLHttpRequest.</p>
 
 <p>If you want to share your configuration, send it as a pull
-request in GitHub or open an issue with it</p>
+request in GitHub or open an issue with it.</p>
 
 
 <h3>Manual configuration</h3>
@@ -129,13 +129,14 @@ request in GitHub or open an issue with it</p>
 configuration in the GitHub source tree as an example. Note that
 all variables defined in <i>variables</i> section of JSON would
 be replaced by their values in RRD commands specified under
-<i>types</i></p>
-
-<p> </p>
+<i>types</i>.</p>
 
 <h2>Help</h2>
 
-<p>This help text is available under Help menu (or Button), depending on your platform</p>
+<p>This help text is available under Help menu (or Button), depending on your platform.</p>
+
+<p> </p>
+
 "
 )
 }
