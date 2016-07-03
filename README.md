@@ -17,7 +17,7 @@ In all environments, configuration can be loaded under Settings.
 
 ## Current status
 
-The program works in Linux Desktop and Sailfish OS. An example configuration is given in configs/default.json file and has to be loaded by the user. For example, URL https://raw.githubusercontent.com/rinigus/systemdatascope/master/configs/default.json can be used.
+The program works in Linux Desktop and Sailfish OS. An example configuration is given in configs/sfos-n4.json file and has to be loaded by the user. For example, URL https://raw.githubusercontent.com/rinigus/systemdatascope/master/configs/sfos-n4.json can be used.
 
 The default configuration is provided for Nexus 4 phone running Sailfish.
 
