@@ -19,6 +19,10 @@ qml.files = qml/*.qml qml/Platform qml/Platform.silica
 qml.path = /usr/share/$${TARGET}
 INSTALLS += qml
 
+confscript.files = tools/systemdatascope-makeconfig
+confscript.path = /usr/bin
+INSTALLS += confscript
+
 CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"

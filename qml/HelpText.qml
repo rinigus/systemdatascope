@@ -91,16 +91,16 @@ configuration to get it detected.</p>
 
 <h3>Make configuration using a helper script</h3>
 
-<p>The helper script requires python2.7 .</p>
+<p>The helper script requires python2.7, which should be installed as dependency in Sailfish .</p>
 
 <p>Get the helper script from the GUI source tree in GitHub:
-<a href=https://github.com/rinigus/systemdatascope/blob/master/tools/makeconfig.py>
-https://github.com/rinigus/systemdatascope/blob/master/tools/makeconfig.py
-</a> .</p>
+<a href=https://github.com/rinigus/systemdatascope/blob/master/tools/systemdatascope-makeconfig>
+https://github.com/rinigus/systemdatascope/blob/master/tools/systemdatascope-makeconfig.py
+</a> . In Sailfish, the script is installed as a part of a RPM package. </p>
 
 <p>Run script:</p>
 
-<p><tt>python makeconfig.py /tmp/collectd/Jolla > myconf.json </tt></p>
+<p><tt>systemdatascope-makeconfig /tmp/collectd/Jolla > myconf.json </tt></p>
 
 <p>where the first argument is the directory with collectd
 datasets. Check the configuration by looking into the generated
@@ -120,8 +120,8 @@ reload it again in Settings.</p>
 <p>Some configurations would be provided online. At present, there
 is a configuration for Nexus 4 running Sailfish at GitHub in GUI
 source tree under configs:
-<a href=https://github.com/rinigus/systemdatascope/blob/master/configs/default.json>
-https://github.com/rinigus/systemdatascope/blob/master/configs/default.json</a></p>
+<a href=https://github.com/rinigus/systemdatascope/blob/master/configs/sfos-n4.json>
+https://github.com/rinigus/systemdatascope/blob/master/configs/sfos-n4.json</a></p>
 
 <p>To load the configuration given online, insert URL in Settings
 and press Load button. Loading is performed using QML
