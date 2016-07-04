@@ -35,6 +35,7 @@ Config["page"] = {
 
 Config["cover"] = [
     "CPU/overview/cover",
+    "CPUstate/cpusleep/cover",
     "Memory/overview/cover",
     "Battery/voltage/cover"
     ]
@@ -203,6 +204,7 @@ Formats = { "DEFAULT": "%5.2lf",
             "Processes": "%4.0lf%S",
             "Disk": "%4.0lf%S",
             "Disk/merged": "%5.2lf",
+            "CPUstate/cpusleep": "%0.0lf",
 }
 
 def getit(name, D):
@@ -383,6 +385,54 @@ Config["page"]["plots"].append( BatteryPlots )
 # Cover
 gt, plot = maketypesplot( "voltage", "battery-0/voltage.rrd", "Battery", "Battery", SkipLegend = True )
 Config["types"]["Battery/voltage/cover"] = gt
+
+
+######################################################################################
+# CPU states 
+
+Plots = { "subplots": { "title": "CPU states", "plots": [ ] } }
+
+###################################################
+# CPU sleep needs some math
+g = "cpusleep/cpusleep.rrd"
+name = "cpusleep"
+f = getf("CPUstate/" + name)
+u = getunit("CPUstate/" + name)
+frm = f + u
+
+command_def = '-t "CPU sleep, %" ' + defColors
+command_line = ""
+files = []
+s = StackOrLines(csSingle)
+sCover = StackOrLines(csSingle)
+command_def += "DEF:" + name + "_data=" + g + ":value:AVERAGE "
+command_def += "DEF:" + name + "_data_min=" + g + ":value:MIN "
+command_def += "DEF:" + name + "_data_max=" + g + ":value:MAX "
+command_def += "CDEF:" + name + "=" + name + "_data,10,/ "
+command_def += "CDEF:" + name + "_min=" + name + "_data_min,10,/ "
+command_def += "CDEF:" + name + "_max=" + name + "_data_max,10,/ "
+s.add( name, "$LINE_WIDTH_PRIMARY$", '"\\l"',
+       "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"Avr " + f + "\" GPRINT:"+name+"_min:MIN:\"Min " + f +
+       "\" GPRINT:"+name+"_max:MAX:\"Max " + f + "\" GPRINT:"+name+":LAST:\"Last " + f + "\\r\" ")
+sCover.add( name, "$LINE_WIDTH_PRIMARY$", '"\\l"')
+files.append(g)
+
+command_line = s.str()
+
+gt = { "command": command_def + command_line,
+       "files": files }
+plot = { "type": "CPUstate/" + name }
+Plots["subplots"]["plots"].append( {"type": "CPUstate/" + name} )
+
+Config["types"]["CPUstate/" + name] = gt
+Plots["type"] = "CPUstate/" + name 
+
+gt = { "command": command_def + sCover.str(),
+       "files": files }
+Config["types"]["CPUstate/" + name + "/cover"] = gt
+
+# Add all CPU state plots
+Config["page"]["plots"].append( Plots )
 
 
 ######################################################################################
