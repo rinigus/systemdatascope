@@ -16,7 +16,7 @@ CONFIG += sailfishapp sailfishapp_no_deploy_qml
 CONFIG += c++11
 
 qml.files = qml/*.qml qml/Platform qml/Platform.silica
-qml.path = /usr/share/$${TARGET}
+qml.path = /usr/share/$${TARGET}/qml
 INSTALLS += qml
 
 confscript.files = tools/systemdatascope-makeconfig
