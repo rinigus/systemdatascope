@@ -400,7 +400,7 @@ f = getf("CPUstate/" + name)
 u = getunit("CPUstate/" + name)
 frm = f + u
 
-command_def = '-t "CPU sleep, %" ' + defColors
+command_def = '-t "CPU sleep, %" --upper-limit 100 --lower-limit 0 --rigid ' + defColors
 command_line = ""
 files = []
 s = StackOrLines(csSingle)
@@ -414,7 +414,7 @@ command_def += "CDEF:" + name + "_max=" + name + "_data_max,10,/ "
 s.add( name, "$LINE_WIDTH_PRIMARY$", '"\\l"',
        "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"Avr " + f + "\" GPRINT:"+name+"_min:MIN:\"Min " + f +
        "\" GPRINT:"+name+"_max:MAX:\"Max " + f + "\" GPRINT:"+name+":LAST:\"Last " + f + "\\r\" ")
-sCover.add( name, "$LINE_WIDTH_PRIMARY$", '"\\l"')
+sCover.add( name, "$LINE_WIDTH_PRIMARY$", '')
 files.append(g)
 
 command_line = s.str()
