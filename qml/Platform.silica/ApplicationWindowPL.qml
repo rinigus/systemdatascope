@@ -17,6 +17,7 @@ ApplicationWindow {
     signal appTimeToHistory()
     signal appTimeToFuture()
     signal appTimespan(real timespan)
+    signal appCoverTimespan(real timespan)
     signal appSettings()
     signal appAbout()
     signal appHelp()
@@ -84,16 +85,12 @@ ApplicationWindow {
     //////////////////////////////////////////////////////////////////////
     /// Functions and objects dealing with cover
 
-    property int cover_index: 0
     property var cover_list: []
 
     function setCover()
     {
         var old_len = cover_list.length
         cover_list = appWindow.graphConfig[ "cover" ]
-
-        if (old_len != cover_list.length )
-            cover_index = 0
 
         imageCover.askImage()
     }
@@ -108,9 +105,9 @@ ApplicationWindow {
                     iconSource: "image://theme/icon-cover-previous"
                     onTriggered: {
                         if ( cover_list.length < 1 ) return;
-                        cover_index = cover_index-1
-                        if (cover_index < 0)
-                            cover_index = cover_list.length-1
+                        settings.cover_index = settings.cover_index-1
+                        if (settings.cover_index < 0)
+                            settings.cover_index = cover_list.length-1
 
                         imageCover.askImage()
                     }
@@ -120,9 +117,9 @@ ApplicationWindow {
                     iconSource: "image://theme/icon-cover-next"
                     onTriggered: {
                         if ( cover_list.length < 1 ) return;
-                        cover_index = cover_index+1
-                        if (cover_index >= cover_list.length)
-                            cover_index = 0
+                        settings.cover_index = settings.cover_index+1
+                        if (settings.cover_index >= cover_list.length)
+                            settings.cover_index = 0
 
                         imageCover.askImage()
                     }
@@ -150,10 +147,13 @@ ApplicationWindow {
                     if (myCallbackId <= 0)
                         myCallbackId = appWindow.getCallbackId()
 
-                    if (cover_index >= cover_list.length)
+                    if (cover_list.length < 1)
                         return ; // list is not filled
 
-                    grapher.getImage(myCallbackId, cover_list[cover_index], settings.timewindow_from, settings.timewindow_duration,
+                    if (settings.cover_index >= cover_list.length)
+                        settings.cover_index = 0
+
+                    grapher.getImage(myCallbackId, cover_list[settings.cover_index], 0, settings.cover_timewindow_duration,
                                      Qt.size(width,height), true )
                 }
 
@@ -165,6 +165,15 @@ ApplicationWindow {
                             // console.log("Cover Image received: ", imageFor, fname)
                             imageCover.source = fname
                         }
+                    }
+
+                }
+
+                Connections {
+                    target: appWindow
+                    onAppCoverTimespan: {
+                        settings.cover_timewindow_duration = timespan
+                        imageCover.askImage()
                     }
                 }
 
@@ -182,18 +191,18 @@ ApplicationWindow {
 
                 // We are updating when the cover becomes active,
                 // no need to do it earlier
-//                // cover update timer
-//                Timer {
-//                    id: coverTimer
-//                    interval: settings.updates_period * 1000
-//                    running: true
-//                    repeat: true
-//                    onTriggered: {
-//                        var now = new Date()
-//                        console.log(now.toTimeString() + " Cover Timer")
-//                        imageCover.askImage();
-//                    }
-//                }
+                //                // cover update timer
+                //                Timer {
+                //                    id: coverTimer
+                //                    interval: settings.updates_period * 1000
+                //                    running: true
+                //                    repeat: true
+                //                    onTriggered: {
+                //                        var now = new Date()
+                //                        console.log(now.toTimeString() + " Cover Timer")
+                //                        imageCover.askImage();
+                //                    }
+                //                }
             }
         }
     }

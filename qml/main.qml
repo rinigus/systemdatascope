@@ -40,6 +40,9 @@ ApplicationWindowPL {
         property bool track_connectd_service: true
 
         property real updates_period: 30
+
+        property real cover_timewindow_duration: 60*60
+        property int cover_index: 0
     }
 
     // Main GUI List
