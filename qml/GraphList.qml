@@ -38,10 +38,7 @@ PagePL {
                     // continue only if we are active
                     if ( appWindow.isActive() && showGraphs ) {
                         if (myCallbackId <= 0)
-                        {
                             myCallbackId = appWindow.getCallbackId()
-                            // console.log("New ID for" + graphDefs.plots[index].type)
-                        }
 
                         grapher.getImage(myCallbackId, graphDefs.plots[index].type, settings.timewindow_from, settings.timewindow_duration,
                                          Qt.size(width,settings.graph_base_height), false )
@@ -74,6 +71,12 @@ PagePL {
 
                             if (graphDefs.plots[index].subplots) indicator.visible = true
                             else indicator.visible = false
+
+                            // ask for new image if the width doesn't match
+                            if (image.sourceSize.width != width) {
+                                // console.log("onNI: " + graphDefs.plots[index].type + " width difference " + width + " " + image.sourceSize.width)
+                                image.askImage()
+                            }
                         }
                     }
                 }
@@ -89,15 +92,14 @@ PagePL {
                         if (graphHeightCache.length > index && graphHeightCache[index] != null)
                             image.myHeight = graphHeightCache[index]
 
-                        // console.log("new item with height: " + image.myHeight)
-
                         image.askImage()
                     }
                 }
 
                 onVisibleChanged: {
-                    if (visible && update_skipped_since_invisible)
+                    if (visible && showGraphs && (update_skipped_since_invisible || sourceSize.width != width))
                     {
+                        // console.log("onVC: " + graphDefs.plots[index].type + " " + width + " " + image.sourceSize.width)
                         update_skipped_since_invisible = false
                         image.askImage()
                     }
