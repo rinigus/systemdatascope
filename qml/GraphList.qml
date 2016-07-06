@@ -9,6 +9,8 @@ PagePL {
     property int graphsModel: 1
     property bool showGraphs: false //true
 
+    property var graphHeightCache: []
+
     Component {
         id: graphPlotDelegate
 
@@ -17,7 +19,7 @@ PagePL {
 
             anchors.left: parent.left
             anchors.right: parent.right
-            height: showGraphs ? image.height : helpMessage.height
+            height: showGraphs ? image.myHeight : helpMessage.height
 
             Image {
                 id: image
@@ -25,6 +27,7 @@ PagePL {
 
                 property int myCallbackId: -1
                 property bool update_skipped_since_invisible: false
+                property int myHeight: 0
 
                 source: ""
 
@@ -35,7 +38,10 @@ PagePL {
                     // continue only if we are active
                     if ( appWindow.isActive() && showGraphs ) {
                         if (myCallbackId <= 0)
+                        {
                             myCallbackId = appWindow.getCallbackId()
+                            // console.log("New ID for" + graphDefs.plots[index].type)
+                        }
 
                         grapher.getImage(myCallbackId, graphDefs.plots[index].type, settings.timewindow_from, settings.timewindow_duration,
                                          Qt.size(width,settings.graph_base_height), false )
@@ -58,9 +64,13 @@ PagePL {
                             // console.log("Image received: ", imageFor, fname)
                             image.source = fname
 
-                            //                            var sh = image.sourceSize.height
-                            //                            if (container.height != sh)
-                            //                                container.height = sh
+                            var sh = image.sourceSize.height
+                            if (image.myHeight != sh)
+                            {
+                                //console.log("Changing height " + imageFor + ": " + image.myHeight + " -> " + sh)
+                                image.myHeight = sh
+                                graphHeightCache[index] = sh
+                            }
 
                             if (graphDefs.plots[index].subplots) indicator.visible = true
                             else indicator.visible = false
@@ -69,17 +79,20 @@ PagePL {
                 }
 
                 onWidthChanged: {
-                    image.askImage()
+                    if ( visible && showGraphs ) image.askImage()
+                    else image.update_skipped_since_invisible = true
                 }
-
-                // don't need it since height is already according to current image
-                //                onHeightChanged: {
-                //                    image.askImage()
-                //                }
 
                 Component.onCompleted: {
                     if (showGraphs)
+                    {
+                        if (graphHeightCache.length > index && graphHeightCache[index] != null)
+                            image.myHeight = graphHeightCache[index]
+
+                        // console.log("new item with height: " + image.myHeight)
+
                         image.askImage()
+                    }
                 }
 
                 onVisibleChanged: {
@@ -148,6 +161,15 @@ PagePL {
         model: graphsModel
         delegate: graphPlotDelegate
         header_text: pageTitle
+
+        Component.onCompleted: {
+            // console.log("Cache buffer old: " + cacheBuffer)
+
+            // Allocate significant cacheBuffer (in pixels) to keep more off-page images intact
+            // and avoid reloading them
+            var ncache = 1600
+            if (cacheBuffer < ncache) cacheBuffer = ncache
+        }
     }
 
     // Fill model
