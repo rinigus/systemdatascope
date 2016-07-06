@@ -249,4 +249,23 @@ ApplicationWindowPL {
             setConfig()
         }
     }
+
+
+    // Helper function to print out configuration
+    function config2str(levstr, page) {
+        var s = ""
+
+        s += levstr + "--- page title: " + page.title + " ---<br>"
+        for (var n in page.plots) {
+            if (page.plots[n].subplots) s+= "<br>"
+            s += levstr + " " + page.plots[n].type + "<br>"
+            if (page.plots[n].subplots) {
+                s += config2str(levstr + "  ", page.plots[n].subplots)
+                s += "<br>"
+            }
+        }
+        return s
+    }
+
+
 }

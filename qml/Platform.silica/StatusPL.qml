@@ -47,6 +47,7 @@ Page {
         }
     }
 
+
     function updateStatus() {
         service.updateState()
         stat = "collectd: " + (service.running ? "Running" : "Stopped") + " / " +
@@ -64,6 +65,8 @@ Page {
                 qsTr("Folder with the collectd databases while running: ") + settings.workingdir_collectd_running + "<br><br>" +
 
                 qsTr("Folder with the collectd databases while the daemon is stopped: ")  + settings.workingdir_collectd_stopped + "<br>"
+
+        stat += "<br>Loaded configuration:<br>" + appWindow.config2str("", appWindow.graphConfig.page)
 
     }
 
