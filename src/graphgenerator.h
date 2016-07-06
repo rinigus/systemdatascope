@@ -60,9 +60,13 @@ public:
 
     /// \brief Asks for a new image
     ///
+    /// Used to make a request for a new image. If the same image is in cache already then that image is returned
+    /// via signal. Such signal is only emitted if image in cache is different from current_fname. If the image is
+    /// not available in cache, it will be generated and sent via signal with its filename.
+    ///
     /// @param caller QML Image Id of the calling QML object. When image is ready, this Id would be used in emitted signal
     ///
-    Q_INVOKABLE void getImage(int caller, QString id, double from, double duration, QSize size, bool full_size);
+    Q_INVOKABLE void getImage(int caller, QString id, double from, double duration, QSize size, bool full_size, QString current_fname);
 
 signals:
     void readyChanged();

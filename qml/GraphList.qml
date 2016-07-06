@@ -41,7 +41,7 @@ PagePL {
                             myCallbackId = appWindow.getCallbackId()
 
                         grapher.getImage(myCallbackId, graphDefs.plots[index].type, settings.timewindow_from, settings.timewindow_duration,
-                                         Qt.size(width,settings.graph_base_height), false )
+                                         Qt.size(width,settings.graph_base_height), false, source )
                     }
                 }
 

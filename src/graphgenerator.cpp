@@ -214,7 +214,7 @@ void Generator::imageSizeTypeCallback(QString size_key, QString fname,
 
     m_image_cache[size_key].setImage(fname, size); // to delete as any other cache file
 
-    getImage(caller, type, from, duration, size, full_size);
+    getImage(caller, type, from, duration, size, full_size, "");
 }
 
 
@@ -303,7 +303,7 @@ void Generator::setExtraVariable(QString name, QColor value)
 /////////////////////////////////////////////////////////////////////////
 /// Registration of image requests
 ///
-void Generator::getImage(int caller, QString type, double from, double duration, QSize size, bool full_size)
+void Generator::getImage(int caller, QString type, double from, double duration, QSize size, bool full_size, QString current_fname)
 {
     // check sanity
     if (size.width() < 1 || size.height() < 1) return; // called when initializing image, will call again soon
@@ -335,8 +335,12 @@ void Generator::getImage(int caller, QString type, double from, double duration,
             m_image_cache[comm.graph_id].getImageSize() == size &&
             m_image_cache[comm.graph_id].secsTo(QDateTime::currentDateTimeUtc()) < m_timeout)
     {
+        QString cache_fname = "file://" + m_image_cache[comm.graph_id].getFilename();
+        if ( cache_fname == current_fname ) // nothing to do, you have this image already
+            return;
+
         qDebug() << QTime::currentTime().toString("h:mm:ss") <<  " Found in cache: " << comm.graph_id;
-        newImage(caller, "file://" + m_image_cache[comm.graph_id].getFilename() );
+        newImage(caller, cache_fname );
         return;
     }
 

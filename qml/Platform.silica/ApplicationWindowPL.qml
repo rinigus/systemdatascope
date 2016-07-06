@@ -154,7 +154,7 @@ ApplicationWindow {
                         settings.cover_index = 0
 
                     grapher.getImage(myCallbackId, cover_list[settings.cover_index], 0, settings.cover_timewindow_duration,
-                                     Qt.size(width,height), true )
+                                     Qt.size(width,height), true, source )
                 }
 
                 Connections {
