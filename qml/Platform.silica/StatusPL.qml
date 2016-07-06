@@ -16,7 +16,8 @@ Page {
                 text: "Copy to clipboard"
                 onClicked: {
                     var s = stat
-                    var n = s.replace("<br>", "\n")
+                    var n = s.replace(/<br>/g, "\n")
+                    console.log(n)
                     Clipboard.text = n
                 }
             }
