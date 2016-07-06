@@ -11,6 +11,17 @@ Page {
         anchors.fill: parent
         contentHeight: column.height + Theme.paddingLarge
 
+        PullDownMenu {
+            MenuItem {
+                text: "Copy to clipboard"
+                onClicked: {
+                    var s = stat
+                    var n = s.replace("<br>", "\n")
+                    Clipboard.text = n
+                }
+            }
+        }
+
         Column {
             id: column
 
@@ -46,7 +57,14 @@ Page {
 
                 "Last state of the loading URL: " + stateLoadingUrl + "<br><br>" +
 
-                "Last RRDtool error: " + stateLastRRDError + "<br>"
+                "Last RRDtool error: " + stateLastRRDError + "<br><br>" +
+
+                qsTr("Use " + programName + " to enable/disable collectd: ") + settings.track_connectd_service + "<br><br>" +
+
+                qsTr("Folder with the collectd databases while running: ") + settings.workingdir_collectd_running + "<br><br>" +
+
+                qsTr("Folder with the collectd databases while the daemon is stopped: ")  + settings.workingdir_collectd_stopped + "<br>"
+
     }
 
     Component.onCompleted: { updateStatus() }

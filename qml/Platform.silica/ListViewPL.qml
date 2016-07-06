@@ -14,36 +14,35 @@ SilicaListView {
         }
     }
 
+    PullDownMenu {
+        MenuItem {
+            text: "About"
+            onClicked: { appWindow.appAbout() }
+        }
 
-   PullDownMenu {
-                MenuItem {
-                    text: "About"
-                    onClicked: { appWindow.appAbout() }
-                }
+        MenuItem {
+            text: "Help"
+            onClicked: { appWindow.appHelp() }
+        }
 
-                MenuItem {
-                    text: "Help"
-                    onClicked: { appWindow.appHelp() }
-                }
+        MenuItem {
+            text: "Status"
+            onClicked: { appWindow.pushPage(Qt.resolvedUrl("StatusPL.qml")) }
+        }
 
-                MenuItem {
-                    text: "Status"
-                    onClicked: { appWindow.pushPage(Qt.resolvedUrl("StatusPL.qml")) }
-                }
+        MenuItem {
+            text: "Settings"
+            onClicked: { appWindow.appSettings() }
+        }
 
-                MenuItem {
-                    text: "Settings"
-                    onClicked: { appWindow.appSettings() }
-                }
-
-                MenuItem {
-                    text: "Time"
-                    onClicked: {
-                        appWindow.pushPage(Qt.resolvedUrl("TimeControlPL.qml"))
-                    }
-                }
-
+        MenuItem {
+            text: "Time"
+            onClicked: {
+                appWindow.pushPage(Qt.resolvedUrl("TimeControlPL.qml"))
             }
+        }
 
-   VerticalScrollDecorator {}
+    }
+
+    VerticalScrollDecorator {}
 }

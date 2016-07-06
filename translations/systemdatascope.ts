@@ -202,6 +202,14 @@
         <source>Status</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Folder with the collectd databases while running: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Folder with the collectd databases while the daemon is stopped: </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TimeControlPL</name>
