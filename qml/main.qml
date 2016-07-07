@@ -255,12 +255,16 @@ ApplicationWindowPL {
     function config2str(levstr, page) {
         var s = ""
 
-        s += levstr + "--- page title: " + page.title + " ---<br>"
+        s += levstr + "<b>Page: " + page.title + "</b><br>"
         for (var n in page.plots) {
             if (page.plots[n].subplots) s+= "<br>"
-            s += levstr + " " + page.plots[n].type + "<br>"
+            s += levstr + "&nbsp;&nbsp;" + page.plots[n].type;
+            if (!grapher.isTypeRegistered(page.plots[n].type))
+                s += " N/A"
+            s += "<br>"
+
             if (page.plots[n].subplots) {
-                s += config2str(levstr + "  ", page.plots[n].subplots)
+                s += config2str(levstr + "&nbsp;&nbsp;&nbsp;&nbsp;", page.plots[n].subplots)
                 s += "<br>"
             }
         }

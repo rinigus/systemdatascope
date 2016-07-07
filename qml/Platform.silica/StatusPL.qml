@@ -16,8 +16,10 @@ Page {
                 text: "Copy to clipboard"
                 onClicked: {
                     var s = stat
-                    var n = s.replace(/<br>/g, "\n")
-                    Clipboard.text = n
+                    s = s.replace(/<br>/g, "\n")
+                    s = s.replace(/&nbsp;/g, " ")
+                    Clipboard.text = s
+                    console.log(s)
                 }
             }
         }
@@ -50,23 +52,24 @@ Page {
 
     function updateStatus() {
         service.updateState()
-        stat = "collectd: " + (service.running ? "Running" : "Stopped") + " / " +
+        stat = "<b>collectd:</b> " + (service.running ? "Running" : "Stopped") + " / " +
                 (service.enabled ? "Enabled on boot" : "Will not start on boot") +
                 "<br><br>" +
 
-                "RRDtool: " + (appWindow.stateRRDRunning ? "Running" : "Stopped") + "<br><br>" +
+                "<b>RRDtool:</b> " + (appWindow.stateRRDRunning ? "Running" : "Stopped") + "<br><br>" +
 
-                "Last state of the loading URL: " + stateLoadingUrl + "<br><br>" +
+                "<b>Last state of the loading URL:</b> " + stateLoadingUrl + "<br><br>" +
 
-                "Last RRDtool error: " + stateLastRRDError + "<br><br>" +
+                "<b>Last RRDtool error:</b> " + stateLastRRDError + "<br><br>" +
 
-                qsTr("Use " + programName + " to enable/disable collectd: ") + settings.track_connectd_service + "<br><br>" +
+                qsTr("<b>Use " + programName + " to enable/disable collectd:</b> ") + settings.track_connectd_service + "<br><br>" +
 
-                qsTr("Folder with the collectd databases while running: ") + settings.workingdir_collectd_running + "<br><br>" +
+                qsTr("<b>Folder with the collectd databases while running:</b> ") + settings.workingdir_collectd_running + "<br><br>" +
 
-                qsTr("Folder with the collectd databases while the daemon is stopped: ")  + settings.workingdir_collectd_stopped + "<br>"
+                qsTr("<b>Folder with the collectd databases while the daemon is stopped:</b> ")  + settings.workingdir_collectd_stopped + "<br>"
 
-        stat += "<br>Loaded configuration:<br>" + appWindow.config2str("", appWindow.graphConfig.page)
+        stat += "<br><b>Loaded configuration:</b><br><br><small>" + appWindow.config2str("", appWindow.graphConfig.page)
+        stat += "<br>N/A corresponds to the non-available plot (RRD file is missing, for example)<br></small>"
 
     }
 

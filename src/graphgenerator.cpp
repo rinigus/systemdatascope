@@ -273,6 +273,15 @@ void Generator::registerImageType(QString type, QString command_json)
     m_image_types[type] = command.toString();
 }
 
+
+bool Generator::isTypeRegistered(QString type)
+{
+    if ( !m_image_types.contains(type) )
+        return false;
+
+    return true;
+}
+
 void Generator::dropAllImageTypes()
 {
     m_image_types = QHash<QString, QString >();

@@ -203,11 +203,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Folder with the collectd databases while running: </source>
+        <source>&lt;b&gt;Folder with the collectd databases while running:&lt;/b&gt; </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Folder with the collectd databases while the daemon is stopped: </source>
+        <source>&lt;b&gt;Folder with the collectd databases while the daemon is stopped:&lt;/b&gt; </source>
         <translation type="unfinished"></translation>
     </message>
 </context>

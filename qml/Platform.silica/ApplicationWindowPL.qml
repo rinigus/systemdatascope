@@ -144,6 +144,9 @@ ApplicationWindow {
                 height: parent.height*0.8
 
                 function askImage() {
+                    if ( cover_list == null )
+                        return;
+
                     if (myCallbackId <= 0)
                         myCallbackId = appWindow.getCallbackId()
 

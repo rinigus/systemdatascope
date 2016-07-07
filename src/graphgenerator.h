@@ -50,6 +50,8 @@ public:
     /// are used in getImage
     Q_INVOKABLE void registerImageType(QString type, QString command_json);
 
+    Q_INVOKABLE bool isTypeRegistered(QString type);
+
     Q_INVOKABLE void dropAllImageTypes(); ///< Drops all registered image types and all images from cache
 
     Q_INVOKABLE void setFontSize(QString type, int size);  ///< Sets font size for RRDTOOL. Use type as a FONTTAG in the manual
@@ -66,7 +68,7 @@ public:
     ///
     /// @param caller QML Image Id of the calling QML object. When image is ready, this Id would be used in emitted signal
     ///
-    Q_INVOKABLE void getImage(int caller, QString id, double from, double duration, QSize size, bool full_size, QString current_fname);
+    Q_INVOKABLE void getImage(int caller, QString plot_type, double from, double duration, QSize size, bool full_size, QString current_fname);
 
 signals:
     void readyChanged();
