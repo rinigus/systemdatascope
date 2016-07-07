@@ -5,6 +5,7 @@
 
 #include <QtQuick>
 
+#include "configurator.h"
 #include "graphgenerator.h"
 #include "systemdserviceswitchcmd.h"
 
@@ -53,6 +54,7 @@ int main(int argc, char *argv[])
 
 #endif
 
+    Graph::Configurator configurator;
     Graph::Generator grapher;
     SystemDServiceSwitchCmd service( "collectd.service" );
 
@@ -60,6 +62,7 @@ int main(int argc, char *argv[])
     service.startAutoUpdates(60);
 #endif
 
+    rootContext->setContextProperty("configurator", &configurator);
     rootContext->setContextProperty("grapher", &grapher);
     rootContext->setContextProperty("service", &service);
 

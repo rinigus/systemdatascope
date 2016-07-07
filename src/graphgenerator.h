@@ -35,14 +35,7 @@ public:
 
     Q_INVOKABLE void checkCache(); ///< Call to check cache periodically
 
-    /// \brief Suggests a directory with collectd databases
-    ///
-    /// @param temp set true if the directory should be suggested in /tmp or similar location
-    Q_INVOKABLE QString suggestDirectory(bool temp);
-
     Q_INVOKABLE void chdir(QString dir); ///< Changes the working directory for RRDTOOL
-
-    Q_INVOKABLE QString setConfig(QString config); ///< Parses configuration from JSON string and returns updated JSON string for GUI
 
     /// \brief Register new type of images
     ///
@@ -55,10 +48,6 @@ public:
     Q_INVOKABLE void dropAllImageTypes(); ///< Drops all registered image types and all images from cache
 
     Q_INVOKABLE void setFontSize(QString type, int size);  ///< Sets font size for RRDTOOL. Use type as a FONTTAG in the manual
-
-    Q_INVOKABLE void setExtraVariable(QString name, QString value);    ///< Sets variable by GUI allowing to override or complement variables provided by JSON configuration
-
-    Q_INVOKABLE void setExtraVariable(QString name, QColor value);    ///< Sets variable by GUI allowing to override or complement variables provided by JSON configuration. An overrided function
 
     /// \brief Asks for a new image
     ///
@@ -106,7 +95,6 @@ protected:
     QHash< QString, int > m_image_type_size;        ///< Keeps full image sizes for each type separately
 
     QHash< QString, QString > m_font_options;       ///< Font options used in the construction of all images
-    QHash< QString, QString > m_extra_variables;       ///< Variables overriding or complementing JSON variables
 
     QProcess *m_rrdtool = NULL;    ///< pointer to RRDTOOL process
     bool m_ready = false;

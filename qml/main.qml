@@ -56,10 +56,10 @@ ApplicationWindowPL {
 
         // Settings
         if (settings.workingdir_collectd_running.length < 1)
-            settings.workingdir_collectd_running = grapher.suggestDirectory(true);
+            settings.workingdir_collectd_running = configurator.suggestDirectory(true);
 
         if (settings.workingdir_collectd_stopped.length < 1)
-            settings.workingdir_collectd_stopped = grapher.suggestDirectory(false);
+            settings.workingdir_collectd_stopped = configurator.suggestDirectory(false);
 
         setConfig()
     }
@@ -154,10 +154,10 @@ ApplicationWindowPL {
         grapher.setImageCacheTimeout( settings.updates_period * 0.75 )
 
         for (var i in extraVariables)
-            grapher.setExtraVariable( i, extraVariables[i] )
+            configurator.setExtraVariable( i, extraVariables[i] )
 
         // parse configuration taking into account generators and variables
-        var tmps = grapher.setConfig( settings.graph_definitions )
+        var tmps = configurator.parseConfig( settings.graph_definitions )
 
         // console.log(tmps)
         try {

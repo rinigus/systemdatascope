@@ -33,7 +33,8 @@ SOURCES += \
     src/graphgenerator.cpp \
     src/imagefile.cpp \
     src/main.cpp \
-    src/systemdserviceswitchcmd.cpp
+    src/systemdserviceswitchcmd.cpp \
+    src/configurator.cpp
 
 OTHER_FILES += \
     rpm/systemdatascope.changes.in \
@@ -58,7 +59,8 @@ HEADERS += \
     src/commandqueue.h \
     src/graphgenerator.h \
     src/imagefile.h \
-    src/systemdserviceswitchcmd.h
+    src/systemdserviceswitchcmd.h \
+    src/configurator.h
 
 DISTFILES += \
     qml/AppAbout.qml \
