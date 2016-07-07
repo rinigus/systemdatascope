@@ -47,6 +47,8 @@ public:
     /// @param temp set true if the directory should be suggested in /tmp or similar location
     Q_INVOKABLE QString suggestDirectory(bool temp);
 
+    Q_INVOKABLE QString isDirectoryOK(QString dir);
+
 protected:
     bool checkConfig (QJsonObject &init) const;
 

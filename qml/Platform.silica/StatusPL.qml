@@ -62,11 +62,14 @@ Page {
 
                 "<b>Last RRDtool error:</b> " + stateLastRRDError + "<br><br>" +
 
-                qsTr("<b>Use " + programName + " to enable/disable collectd:</b> ") + settings.track_connectd_service + "<br><br>" +
+                qsTr("<b>Use " + programName + " to enable/disable collectd:</b> ") + settings.track_connectd_service + "<br><br>"
 
-                qsTr("<b>Folder with the collectd databases while running:</b> ") + settings.workingdir_collectd_running + "<br><br>" +
+        stat += qsTr("<b>Folder with the collectd databases while running:</b> ") + settings.workingdir_collectd_running +
+                " : check result : " + configurator.isDirectoryOK(settings.workingdir_collectd_running) + "<br><br>"
 
-                qsTr("<b>Folder with the collectd databases while the daemon is stopped:</b> ")  + settings.workingdir_collectd_stopped + "<br>"
+        stat += qsTr("<b>Folder with the collectd databases while the daemon is stopped:</b> ") +
+                settings.workingdir_collectd_stopped +
+                " : check result : " + configurator.isDirectoryOK(settings.workingdir_collectd_stopped) + "<br>"
 
         stat += "<br><b>Loaded configuration:</b><br><br><small>" + appWindow.config2str("", appWindow.graphConfig.page)
         stat += "<br>N/A corresponds to the non-available plot (RRD file is missing, for example)<br></small>"

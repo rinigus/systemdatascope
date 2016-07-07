@@ -46,6 +46,31 @@ QString Configurator::suggestDirectory(bool temp)
     return dir;
 }
 
+//#define ERR(txt) { error = txt; return false; }
+
+QString Configurator::isDirectoryOK(QString dirname)
+{
+    // check if dir exists
+    if ( dirname.length() < 1 ) return "Error: Directory name is empty";
+
+    QDir dir(dirname);
+    if (!dir.exists()) return "Error: Directory does not exists";
+
+    // Let's see if there are RRD files organized as dir/files.rrd
+    dir.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+    QDirIterator itdir(dir);
+    QStringList fname; fname << "*.rrd";
+    while (itdir.hasNext())
+    {
+        QDir subdir(itdir.next());
+        if ( subdir.entryList(fname, QDir::Files).size() > 0 )
+            // we have found at least one rrd in correct place
+            return "OK";
+    }
+
+    return "Error: no RRD files found";
+}
+
 /////////////////////////////////////////////////////////////////////////
 /// Set extra variables
 ///
