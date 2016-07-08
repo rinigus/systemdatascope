@@ -50,6 +50,11 @@ ApplicationWindowPL {
         id: gList
     }
 
+    BusyIndicatorPL {
+        id: busy
+        running: false
+    }
+
     Component.onCompleted: {
 
         settings.timewindow_from = 0
@@ -133,6 +138,11 @@ ApplicationWindowPL {
 
     onAppHelp: {
         appWindow.pushPage(Qt.resolvedUrl("AppHelp.qml"))
+    }
+
+    // Error dialog that can be used anywhere
+    MessageErrorPL {
+        id: errorDialog
     }
 
     // Applies configuration from settings.graph_definitions
@@ -271,5 +281,35 @@ ApplicationWindowPL {
         return s
     }
 
+    // Generation of configuration by script
+    function makeConfiguration() {
+        busy.running = true
+        var dir = ""
+        if ( settings.track_connectd_service && !service.running)
+            dir = settings.workingdir_collectd_stopped
+        else
+            dir = settings.workingdir_collectd_running
+
+        configurator.makeConfiguration(dir)
+    }
+
+    Connections {
+        target: configurator
+        onNewConfiguration: {
+            busy.running = false
+            settings.graph_definitions = config;
+            setConfig()
+        }
+    }
+
+    Connections {
+        target: configurator
+        onErrorConfigurator: {
+            console.log("Error while generating configuration: " + error_text)
+            busy.running = false
+            errorDialog.mainText = error_text
+            errorDialog.open()
+        }
+    }
 
 }

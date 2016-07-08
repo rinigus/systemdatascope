@@ -68,6 +68,7 @@ DISTFILES += \
     qml/GraphList.qml \
     qml/main.qml \
     qml/Platform/ApplicationWindowPL.qml \
+    qml/Platform/BusyIndicatorPL.qml \
     qml/Platform/FlickablePL.qml \
     qml/Platform/ListViewPL.qml \
     qml/Platform/MessageDialogPL.qml \
@@ -80,5 +81,6 @@ DISTFILES += \
     qml/Platform/IndicatorPL.qml \
     qml/Platform/TextPL.qml \
     qml/HelpText.qml \
-    qml/AppHelp.qml
+    qml/AppHelp.qml \
+    qml/Platform/MessageErrorPL.qml
 

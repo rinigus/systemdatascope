@@ -32,6 +32,7 @@ ApplicationWindow {
     }
 
     function pushPage(pageInstance, pageProperties, animate) {
+        pageStack.completeAnimation()
         pageStack.push(pageInstance, pageProperties)
         return pageInstance
     }
@@ -89,9 +90,7 @@ ApplicationWindow {
 
     function setCover()
     {
-        var old_len = cover_list.length
         cover_list = appWindow.graphConfig[ "cover" ]
-
         imageCover.askImage()
     }
 
