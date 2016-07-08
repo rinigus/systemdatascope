@@ -106,10 +106,10 @@ void Generator::commandRun()
 
     m_rrdtool_busy = true;
     m_rrdtool_output = QString();
-    m_rrdtool_output_skip_lines = 0;
+    //m_rrdtool_output_skip_lines = 0;
 
-    // the first response line in graph command is the image size
-    if ( m_command_current.is_graph ) m_rrdtool_output_skip_lines = 1;
+//    // the first response line in graph command is the image size
+//    if ( m_command_current.is_graph ) m_rrdtool_output_skip_lines = 1;
 
     com.append("\n");
     m_rrdtool->write(com.toLatin1());
@@ -122,8 +122,10 @@ void Generator::readFromProcess()
 
     // check for ERROR. NB! works for cd and graph commands. some listings could do damage,
     // if file named ERROR is in the listed directory
-    if ( m_rrdtool_output.count('\n') > m_rrdtool_output_skip_lines ||
-         m_rrdtool_output.indexOf("ERROR") >= 0 )
+//    if ( m_rrdtool_output.count('\n') > m_rrdtool_output_skip_lines ||
+//         m_rrdtool_output.indexOf("ERROR") >= 0 )
+        if ( m_rrdtool_output.indexOf("OK u:") >= 0 ||
+             m_rrdtool_output.indexOf("ERROR") >= 0 )
     {
         //qDebug() << "RRDTOOL returned: " << m_rrdtool_output;
 

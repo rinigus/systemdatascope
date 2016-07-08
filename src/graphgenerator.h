@@ -103,7 +103,7 @@ protected:
     QString m_rrdtool_output;
     CommandQueue m_command_queue;
     Command m_command_current;
-    int m_rrdtool_output_skip_lines = 0;
+    //int m_rrdtool_output_skip_lines = 0;
 
     size_t m_next_image_index = 0;
 
