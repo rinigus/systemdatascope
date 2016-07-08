@@ -143,6 +143,15 @@ ColumnLayoutDialog {
             validator: IntValidator { bottom: 4 }
         }
 
+        Label { text: qsTr("Generate graph definitions using systemdatascope-makeconfig:") }
+        Button {
+            text: "Generate"
+            onClicked: {
+                appWindow.makeConfiguration()
+                close()
+            }
+        }
+
         Label { text: qsTr("Load new graph definitions from URL:") }
         Row {
             spacing: cld.elemSpacing
@@ -156,10 +165,10 @@ ColumnLayoutDialog {
                 text: "Load"
                 onClicked: {
                     appWindow.loadNewConfig(guiConfigUrl.text)
+                    close()
                 }
             }
         }
-
 
     }
 

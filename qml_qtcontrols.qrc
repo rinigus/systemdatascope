@@ -17,5 +17,7 @@
         <file>qml/Platform/TextPL.qml</file>
         <file>qml/HelpText.qml</file>
         <file>qml/AppHelp.qml</file>
+        <file>qml/Platform/BusyIndicatorPL.qml</file>
+        <file>qml/Platform/MessageErrorPL.qml</file>
     </qresource>
 </RCC>

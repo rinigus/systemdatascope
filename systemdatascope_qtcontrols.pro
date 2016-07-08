@@ -14,7 +14,8 @@ SOURCES += \
     src/graphgenerator.cpp \
     src/imagefile.cpp \
     src/main.cpp \
-    src/systemdserviceswitchcmd.cpp
+    src/systemdserviceswitchcmd.cpp \
+    src/configurator.cpp
 
 RESOURCES += qml_qtcontrols.qrc
 
@@ -28,4 +29,5 @@ HEADERS += \
     src/commandqueue.h \
     src/graphgenerator.h \
     src/imagefile.h \
-    src/systemdserviceswitchcmd.h
+    src/systemdserviceswitchcmd.h \
+    src/configurator.h
