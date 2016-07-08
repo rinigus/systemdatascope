@@ -9,19 +9,22 @@ The current implementation is developed on Linux Desktops and Sailfish OS mobile
 
 The interface is revolving around stacked pages. User, after configuration, is presented with the top page and its possible to get into the details of the collected stats by pressing into the corresponding graph. The number of levels and connections between them are described by user-provided configuration. 
 
-In Linux desktop, navigation is supported as follows. By mouse: left button selects the stats to be looked into, the right button goes back one level on page stack. By keyboard: arrow keys to go up/down list, Return to select the stats to be looked into, Esc to go back one level. The program options are shown through the buttons in a toolbar. Status messages are below the graphs, on the bottom of the window.
+In Linux desktop, navigation is supported as follows. By mouse: left button selects the stats to be looked into, the right button goes back one level on page stack. By keyboard: arrow keys to go up/down list, Return or the right arrow to select the stats to be looked into, Esc or the left arrow to go back one level. The program options are shown through the buttons in a toolbar. Status messages are below the graphs, on the bottom of the window.
 
-In Sailfish, navigation works by touching the stats image (looking details of the stats) and swiping whole page to get back one level. Use top-level menu to get to the options.
+In Sailfish, navigation works by touching the stats image (looking details of the stats) and swiping whole page to get back one level. Use top-level menu to get to the options. Status is shown on a separate page accessible via top menu.
 
 In all environments, configuration can be loaded under Settings.
 
 ## Current status
 
-The program works in Linux Desktop and Sailfish OS. An example configuration is given in configs/sfos-n4.json file and has to be loaded by the user. For example, URL https://raw.githubusercontent.com/rinigus/systemdatascope/master/configs/sfos-n4.json can be used.
+The program works in Linux Desktop and Sailfish OS. The configuration can be either generated or loaded from URL. The default configuration is empty, but, as explained below, its easy to provide one.
 
-The default configuration is provided for Nexus 4 phone running Sailfish.
+One can generate configuration by provided Python script (tools/systemdatascope-makeconfig) or manually. Running of a script is hooked to GUI and can be started under Settings with the output processed by GUI automatically. For that, the script has to be in the PATH.
 
-One can generate configuration by provided Python script (tools/systemdatascope-makeconfig) or manually. Note that the configuration format allows variables expansion. For expansion to work, define variable in "variables" property of JSON object and use it in graph type definitions in the form $VARIABLE_NAME$. This allows to specify font sizes through GUI, for example.
+An example configuration is given in configs/sfos-n4.json file and has to be loaded by the user. For example, URL https://raw.githubusercontent.com/rinigus/systemdatascope/master/configs/sfos-n4.json can be used. This configuration is provided for Nexus 4 phone running Sailfish and could be outdated.
+
+Note that the configuration format allows variables expansion. For expansion to work, define variable in "variables" property of JSON object and use it in graph type definitions in the form $VARIABLE_NAME$. This allows to specify font sizes through GUI, for example.
+
 
 ## Screenshots
 
