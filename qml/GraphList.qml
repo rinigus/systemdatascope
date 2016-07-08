@@ -142,8 +142,7 @@ PagePL {
                 }
             }
 
-
-            Keys.onReturnPressed: {
+            function goIn() {
                 if ( graphDefs.plots[index].subplots )
                 {
                     appWindow.pushPage( Qt.resolvedUrl("GraphList.qml"),
@@ -152,7 +151,13 @@ PagePL {
                 }
             }
 
-            Keys.onEscapePressed: { appWindow.popPage() }
+            function goOut() { appWindow.popPage() }
+
+            Keys.onReturnPressed: { goIn() }
+            Keys.onRightPressed: { goIn() }
+
+            Keys.onEscapePressed: { goOut() }
+            Keys.onLeftPressed: { goOut() }
         }
     }
 
