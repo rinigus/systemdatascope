@@ -158,6 +158,17 @@ PagePL {
 
             Keys.onEscapePressed: { goOut() }
             Keys.onLeftPressed: { goOut() }
+
+            Keys.onPressed: {
+                if (event.key == Qt.Key_Home )
+                    mainList.currentIndex = 0
+                else if (event.key == Qt.Key_End )
+                    mainList.currentIndex = graphsModel-1
+                else if (event.key == Qt.Key_PageUp)
+                    mainList.currentIndex = Math.max(mainList.currentIndex - 3, 0);
+                else if (event.key == Qt.Key_PageDown)
+                    mainList.currentIndex = Math.min(mainList.currentIndex + 3, graphsModel-1);
+            }
         }
     }
 
