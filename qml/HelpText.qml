@@ -17,6 +17,26 @@ configuration on this level.</p>" ) + "
 On Desktop, press Esc or the right mouse button to get out of this HOWTO.
 On Sailfish, swipe the page back, as usual.</p>
 
+<h2>Very short version</h2>
+
+<p>For those who are just checking out and/or are trusting the default settings:</p>
+
+<ol>
+<li>Go to Settings, select <i>Use " + programName + " to enable/disable collectd</i>.</li>
+<li>In Settings, select <i>Run collectd</i> and, if you wish, <i>Enable collectd on boot</i>.
+Note that when you select Run, GUI may revert back Help screen or graph list.</li>
+<li>Close GUI and wait for 10 minutes. You can close it after 10 minutes, but GUI restart is needed.</li>
+<li>Start the GUI and check if a directory corresponding to running collectd passed a check in Status.</li>
+<li>Go to Settings, scroll down, and push the button to <i>Generate definitions</i>.</li>
+</ol>
+
+<p>If it all worked, you are all set and can proceed monitoring your system. To see the generated outline of graphs
+and other info regarding GUI, go to Status (Sailfish only at present). In Status, you could also copy the state to
+clipboard via pulley menu.  If you wish to know more, something failed, or you want to
+tune it, read on. </p>
+
+<p>Below, is more detailed HOWTO</p>
+
 <h2>Start <i>collectd</i></h2>
 
 <p>If you have not started <i>collectd</i>, then you have to start it. This GUI supports systemd and you could use it for starting/stopping and
@@ -78,6 +98,11 @@ and should be filled (at least the running one) if collectd
 runs. The second directory (on collectd stopped) would get filled
 when collectd has been stopped earlier. </p>
 
+<p>After setting directory(ies), go to Status to see if the directory(ies)
+are passing the check. If you just started, you are mainly interested in the
+directory that corresponds to current <i>collectd</i> state (running or stopped).</p>
+
+
 <h3>Configuration loading by GUI</h3>
 
 <p>Note that when configuration is changed by loading a new one in
@@ -89,7 +114,15 @@ file is unavailable, the corresponding graph will not be
 shown. If the file appeared later, you would have to reload
 configuration to get it detected.</p>
 
-<h3>Make configuration using a helper script</h3>
+<p>At any stage, you could check the configuration under Status.</p>
+
+<h3>Make configuration from GUI</h3>
+
+<p>Go to Settings and press the button Generate configuration. The configuration
+script will be run by GUI and configuration loaded from it. If it works, you are all
+set.</p>
+
+<h3>Make configuration using a helper script and command line</h3>
 
 <p>The helper script requires python2.7, which should be installed as dependency in Sailfish .</p>
 

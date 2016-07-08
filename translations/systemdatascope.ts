@@ -210,6 +210,10 @@
         <source>Generate definitions</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Generate graph definitions using systemdatascope-makeconfig:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StatusPL</name>
