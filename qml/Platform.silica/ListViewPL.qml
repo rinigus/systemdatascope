@@ -41,8 +41,17 @@ SilicaListView {
                 appWindow.pushPage(Qt.resolvedUrl("TimeControlPL.qml"))
             }
         }
-
     }
+
+    PushUpMenu {
+        MenuItem {
+            text: "Time"
+            onClicked: {
+                appWindow.pushPage(Qt.resolvedUrl("TimeControlPL.qml"))
+            }
+        }
+    }
+
 
     VerticalScrollDecorator {}
 }
