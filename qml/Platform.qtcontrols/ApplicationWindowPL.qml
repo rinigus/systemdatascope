@@ -22,6 +22,12 @@ ApplicationWindow {
     signal appAbout()
     signal appHelp()
 
+    //////////////////////////////////////////////////////
+    // special properties required by this platform
+
+    // list of "pages" that are actually dialogs
+    property var dialogFileNames: [ "AppAbout.qml", "AppSettings.qml", "MessageErrorPL.qml" ]
+
     // dummy properties/signals to ensure compatibility with Sailfish
     signal applicationActiveChanged()
 
@@ -177,6 +183,21 @@ ApplicationWindow {
     }
 
     function pushPage(pageInstance, pageProperties, animate) {
+
+        // check if it as actually a page or dialog first
+        if (typeof pageInstance === 'string' || pageInstance instanceof String)
+            for (var i in dialogFileNames)
+                if ( pageInstance.search(dialogFileNames[i]) >= 0 ) {
+                    // we have a dialog and now need to open it
+                    var c = Qt.createComponent(pageInstance);
+                    if (pageProperties === undefined)
+                        pageProperties = {}
+                    var dialog = c.createObject(appWindow, pageProperties);
+                    dialog.open()
+                    return;
+                }
+
+
         // the Controls page stack disables animations when
         // false is passed as the third argument, but we want to
         // have a more logical interface, so just invert the value

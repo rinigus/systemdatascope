@@ -120,29 +120,16 @@ ApplicationWindowPL {
     }
 
     // Dialogs
-    AppAbout {
-        id: aboutDialog
-    }
-
     onAppAbout: {
-        aboutDialog.open()
-    }
-
-    AppSettings {
-        id: settingsDialog
+        appWindow.pushPage(Qt.resolvedUrl("AppAbout.qml"))
     }
 
     onAppSettings: {
-        settingsDialog.updateAndOpen()
+        appWindow.pushPage(Qt.resolvedUrl("AppSettings.qml"))
     }
 
     onAppHelp: {
         appWindow.pushPage(Qt.resolvedUrl("AppHelp.qml"))
-    }
-
-    // Error dialog that can be used anywhere
-    MessageErrorPL {
-        id: errorDialog
     }
 
     // Applies configuration from settings.graph_definitions
@@ -313,8 +300,7 @@ ApplicationWindowPL {
         onErrorConfigurator: {
             console.log("Error while generating configuration: " + error_text)
             busy.running = false
-            errorDialog.mainText = error_text
-            errorDialog.open()
+            appWindow.pushPage(Qt.resolvedUrl("Platform/MessageErrorPL.qml"), {"mainText": error_text})
         }
     }
 

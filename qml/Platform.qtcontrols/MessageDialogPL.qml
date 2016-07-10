@@ -4,7 +4,6 @@ MessageDialog {
 
     property string mainText: ""
     property string additionalInfo: ""
-    property bool toOpen: true
 
     text: mainText
 

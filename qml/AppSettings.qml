@@ -3,8 +3,7 @@ import "Platform"
 
 SettingsPL {
 
-    function updateAndOpen()
-    {
+    Component.onCompleted: {
         service.updateState()
 
         updateGraphsInterval = settings.updates_period
@@ -19,7 +18,6 @@ SettingsPL {
         trackCollecd = settings.track_connectd_service
 
         prop2gui()
-        open()
     }
 
     onAccepted:
