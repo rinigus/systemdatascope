@@ -71,8 +71,12 @@ Page {
                 settings.workingdir_collectd_stopped +
                 " : check result : " + configurator.isDirectoryOK(settings.workingdir_collectd_stopped) + "<br>"
 
-        stat += "<br><b>Loaded configuration:</b><br><br><small>" + appWindow.config2str("", appWindow.graphConfig.page)
-        stat += "<br>N/A corresponds to the non-available plot (RRD file is missing, for example)<br></small>"
+        if (appWindow.graphConfig && appWindow.graphConfig.page) {
+            stat += "<br><b>Loaded configuration:</b><br><br><small>" + appWindow.config2str("", appWindow.graphConfig.page)
+            stat += "<br>N/A corresponds to the non-available plot (RRD file is missing, for example)<br></small>"
+        }
+        else
+            stat += "<br><b>No active configuration defined.</b> Please generate the configuration of the graphs.</br>"
 
     }
 
