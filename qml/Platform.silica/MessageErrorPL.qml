@@ -7,10 +7,6 @@ Page {
 
     allowedOrientations : Orientation.All
 
-    function open() {
-        appWindow.pushPage(errorDialog)
-    }
-
     SilicaFlickable {
         anchors.fill: parent
         contentHeight: column.height + Theme.paddingLarge
