@@ -7,7 +7,6 @@ PagePL {
     property string pageTitle: qsTr("Welcome")
 
     property int graphsModel: 1
-    property bool showGraphs: false //true
 
     property var graphHeightCache: []
 
@@ -19,11 +18,10 @@ PagePL {
 
             anchors.left: parent.left
             anchors.right: parent.right
-            height: showGraphs ? image.myHeight : helpMessage.height
+            height: image.myHeight
 
             Image {
                 id: image
-                visible: showGraphs
 
                 property int myCallbackId: -1
                 property bool update_skipped_since_invisible: false
@@ -36,7 +34,7 @@ PagePL {
 
                 function askImage() {
                     // continue only if we are active
-                    if ( appWindow.isActive() && showGraphs ) {
+                    if ( appWindow.isActive() ) {
                         if (myCallbackId <= 0)
                             myCallbackId = appWindow.getCallbackId()
 
@@ -48,7 +46,7 @@ PagePL {
                 Connections {
                     target: appWindow
                     onUpdateGraphs: {
-                        if ( visible && showGraphs ) image.askImage()
+                        if ( visible ) image.askImage()
                         else image.update_skipped_since_invisible = true
                     }
                 }
@@ -82,22 +80,19 @@ PagePL {
                 }
 
                 onWidthChanged: {
-                    if ( visible && showGraphs ) image.askImage()
+                    if ( visible ) image.askImage()
                     else image.update_skipped_since_invisible = true
                 }
 
                 Component.onCompleted: {
-                    if (showGraphs)
-                    {
-                        if (graphHeightCache.length > index && graphHeightCache[index] != null)
-                            image.myHeight = graphHeightCache[index]
+                    if (graphHeightCache.length > index && graphHeightCache[index] != null)
+                        image.myHeight = graphHeightCache[index]
 
-                        image.askImage()
-                    }
+                    image.askImage()
                 }
 
                 onVisibleChanged: {
-                    if (visible && showGraphs && (update_skipped_since_invisible || sourceSize.width != width))
+                    if (visible && (update_skipped_since_invisible || sourceSize.width != width))
                     {
                         // console.log("onVC: " + graphDefs.plots[index].type + " " + width + " " + image.sourceSize.width)
                         update_skipped_since_invisible = false
@@ -113,20 +108,10 @@ PagePL {
                 visible: false
             }
 
-            HelpText {
-                id: helpMessage
-                asHelp: false
-                anchors.left: parent.left
-                anchors.right: parent.right
-                visible: !showGraphs
-            }
-
             MouseArea {
                 anchors.fill: parent
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
                 onClicked: {
-                    if (!showGraphs) return
-
                     if (mouse.button == Qt.LeftButton && graphDefs.plots[index].subplots)
                     {
                         appWindow.pushPage( Qt.resolvedUrl("GraphList.qml"),
@@ -194,16 +179,13 @@ PagePL {
     function fillModel() {
         if ( !graphDefs.title )
         {
-            showGraphs = false
-            graphsModel = 1
+            graphsModel = 0
+            appWindow.appHelp()
             return;
         }
 
         pageTitle = graphDefs.title
         graphsModel = graphDefs.plots.length
-
-        if (graphsModel > 0) showGraphs = true
-        else showGraphs = false
     }
 
     onGraphDefsChanged: {

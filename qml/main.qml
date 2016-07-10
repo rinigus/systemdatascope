@@ -193,9 +193,15 @@ ApplicationWindowPL {
 
         // update GUI
         popAll()
-        pushPage(gList)
-        updateGraphs()
+
+        // Show graphs if the configuration is ready. Otherwise, show Help
+        if (graphConfig && graphConfig.page && graphConfig.page.plots && graphConfig.page.plots.length > 0)
+            pushPage(gList)
+        else
+            appWindow.appHelp()
+
         setCover()
+        updateGraphs()
     }
 
     // returns Callback IDs in sequence
