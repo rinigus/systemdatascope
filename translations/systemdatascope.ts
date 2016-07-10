@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1">
 <context>
+    <name>AppStatus</name>
+    <message>
+        <source>&lt;b&gt;Folder with the collectd databases while running:&lt;/b&gt; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Folder with the collectd databases while the daemon is stopped:&lt;/b&gt; </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ApplicationWindowPL</name>
     <message>
         <source>Zoom In</source>
@@ -219,14 +230,6 @@
     <name>StatusPL</name>
     <message>
         <source>Status</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Folder with the collectd databases while running:&lt;/b&gt; </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Folder with the collectd databases while the daemon is stopped:&lt;/b&gt; </source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -16,7 +16,7 @@ SilicaFlickable {
 
         MenuItem {
             text: "Status"
-            onClicked: { appWindow.pushPage(Qt.resolvedUrl("StatusPL.qml")) }
+            onClicked: { appWindow.appStatus() }
         }
 
         MenuItem {

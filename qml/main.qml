@@ -132,6 +132,10 @@ ApplicationWindowPL {
         appWindow.pushPage(Qt.resolvedUrl("AppHelp.qml"))
     }
 
+    onAppStatus: {
+        appWindow.pushPage(Qt.resolvedUrl("AppStatus.qml"))
+    }
+
     // Applies configuration from settings.graph_definitions
     //
     function setConfig()

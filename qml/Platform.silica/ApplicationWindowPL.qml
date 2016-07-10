@@ -21,6 +21,7 @@ ApplicationWindow {
     signal appSettings()
     signal appAbout()
     signal appHelp()
+    signal appStatus()
 
     // Settings
     allowedOrientations : Orientation.All
@@ -46,28 +47,11 @@ ApplicationWindow {
         pageStack.clear()
     }
 
-    function statusUpdate()
-    {
-        if (settings.track_connectd_service)
-        {
-            var stat = "collectd: "
-            if ( service.running ) stat += "running and "
-            else stat += "stopped and "
-            if ( service.enabled ) stat += "is enabled on boot"
-            else stat += "will not start on boot"
-
-        }
-        else
-        {
-            //guiCollectDStat.text = ""
-        }
-    }
-
-    Connections {
-        target: service
-        onRunningChanged: { statusUpdate() }
-        onEnabledChanged: { statusUpdate() }
-    }
+//    Connections {
+//        target: service
+//        onRunningChanged: {  }
+//        onEnabledChanged: {  }
+//    }
 
     Component.onCompleted: {
 

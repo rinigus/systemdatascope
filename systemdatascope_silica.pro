@@ -82,5 +82,6 @@ DISTFILES += \
     qml/Platform/TextPL.qml \
     qml/HelpText.qml \
     qml/AppHelp.qml \
-    qml/Platform/MessageErrorPL.qml
+    qml/Platform/MessageErrorPL.qml \
+    qml/AppStatus.qml
 
