@@ -82,6 +82,10 @@
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Status</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ColumnLayoutDialog</name>
