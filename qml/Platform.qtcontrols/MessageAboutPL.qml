@@ -1,32 +1,15 @@
 import QtQuick 2.0
+import QtQuick.Dialogs 1.2
 import "."
 
 MessageDialogPL {
 
-    property string mainText: ""
+    title: "About " + programName
 
-    Text {
-        text: "About"
-        font.pointSize: 24
-    }
+    text: programName + ", version " + programVersion + "\n" +
+            programName + " is a GUI for visualization of collectd datasets"
 
-    Text {
-        text: programName + ", version " + programVersion
-        font.pointSize: 24
-    }
+    informativeText: mainText
 
-    Item {}
-
-    Text {
-        text: programName + " is a GUI for visualization of collectd datasets"
-        font.pointSize: 16
-    }
-
-    Item {}
-
-    Text {
-        text: mainText
-        //style: Text.StyledText
-        font.pointSize: 12
-    }
+    icon: StandardIcon.Information
 }
