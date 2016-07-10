@@ -21,6 +21,7 @@ ApplicationWindow {
     signal appSettings()
     signal appAbout()
     signal appHelp()
+    signal appStatus()
 
     //////////////////////////////////////////////////////
     // special properties required by this platform
@@ -134,6 +135,11 @@ ApplicationWindow {
             ToolButton {
                 text: qsTr("Settings")
                 onClicked: { appWindowBase.appSettings() }
+            }
+
+            ToolButton {
+                text: qsTr("Status")
+                onClicked: { appWindowBase.appStatus() }
             }
 
             ToolButton {

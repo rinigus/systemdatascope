@@ -19,5 +19,7 @@
         <file>qml/AppHelp.qml</file>
         <file>qml/Platform/BusyIndicatorPL.qml</file>
         <file>qml/Platform/MessageErrorPL.qml</file>
+        <file>qml/AppStatus.qml</file>
+        <file>qml/Platform/StatusPL.qml</file>
     </qresource>
 </RCC>
