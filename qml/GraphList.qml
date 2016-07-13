@@ -180,7 +180,7 @@ PagePL {
         if ( !graphDefs.title )
         {
             graphsModel = 0
-            appWindow.appHelp()
+            pageTitle = qsTr("Empty page with undefined title")
             return;
         }
 

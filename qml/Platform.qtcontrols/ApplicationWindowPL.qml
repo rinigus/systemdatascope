@@ -214,15 +214,14 @@ ApplicationWindow {
     }
 
     function popPage() {
-        //console.log("Popping " + pageStack.depth)
-        pageStack.pop()
-        pageStack.currentItem.focusToChild()
+        if ( pageStack.depth > 1) {
+            pageStack.pop()
+            pageStack.currentItem.focusToChild()
+        }
     }
 
     function popAll() {
-        while (pageStack.depth > 1) {
-            pageStack.pop()
-        }
+        pageStack.clear()
     }
 
     function statusUpdate()
