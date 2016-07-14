@@ -11,48 +11,124 @@ args = parser.parse_args()
 Root = args.root_dir
 os.chdir(Root)
 
-Config = {}
 
-Config["variables"] = {
-    "COLOR_BACKGROUND": "#00000000",
-    "COLOR_CANVAS": "#00000000",
-    "COLOR_FONT": "#000000FF",
-    "COLOR_AXIS": "#000000FF",
-    "COLOR_ARROW": "#000000FF",
-    "COLOR_LINE_SINGLE": "#0000FFFF",
-    "COLOR_LINE_SINGLE_SUB": "#0000FF80",
+######################################################################################
+#
+# These maps are used to specify several parameters of the graphs
+# 
 
-    "LINE_WIDTH_PRIMARY": "3",
-    "LINE_WIDTH_SECONDARY": "1"    
-    }
-
-Config["page"] = {
-    
-    "title": "Overview",
-    "plots": [
-    ]
+Units = { "DEFAULT": "",
+          "CPU": "%",
+          "Battery/voltage": "V",
+          "Battery/current": "A",
+          "Context/context_switch": "1/s",
+          "Entropy/entropy": "bits",
+          "Memory": "bytes",
+          "Network/octets": "bytes/s",
+          "NetworkTotal/octets": "B",
+          "Network": "1/s",
+          "NetworkTotal": "",
+          "Processes/cputime": "%",
+          "Processes/disk_ops": "1/s",
+          "Processes/disk_octets": "bytes/s",
+          "Processes/vm": "bytes",
+          "Processes/data": "bytes",
+          "Processes/code": "bytes",
+          "Processes/rss": "bytes",
+          "Processes/pagefaults": "1/s",
+          "Processes/stacksize": "bytes",
+          "Disk/io_time": "%",
+          "Disk/ops": "1/s",
+          "Disk/octets": "bytes/s",
+          #"Disk/time": "1/s",
+          "Storage": "bytes",
+          "Uptime/uptime": "days",
 }
 
-Config["cover"] = [
-    ]
-    
+Formats = { "DEFAULT": "%5.2lf",
+            "Battery/voltage": "%1.3lf%S",
+            "Battery/current": "%1.0lf%S",
+            "Context/context_switch": "%1.0lf%S",
+            "Entropy/entropy": "%1.0lf%S",
+            "Memory/Overview": "%4.0lf%S",
+            "Memory": "%4.0lf%S",
+            "Load": "%5.2lf",
+            "Network/octets": "%6.0lf%S",
+            "Network/packets": "%6.0lf%S",
+            "Network": "%6.2lf%S",
+            "Processes/code": "%5.1lf%S",
+            "Processes/data": "%5.1lf%S",
+            "Processes/rss": "%5.1lf%S",
+            "Processes/stacksize": "%5.1lf%S",
+            "Processes/vm": "%5.1lf%S",
+            "Processes/cputime": "%4.0lf%S",
+            "Processes/disk_ops": "%4.0lf%S",
+            "Processes/disk_octets": "%4.0lf%S",
+            "Processes": "%5.1lf",
+            "Processes/Overview": "%5.1lf",
+            "Disk": "%4.0lf%S",
+            "Disk/merged": "%5.2lf",
+            "Disk/io_time": "%5.1lf",
+            "Disk/ops": "%5.2lf",
+            "CPUstate/cpusleep": "%0.0lf",
+            "CPU/Overview": "%6.0lf",
+            "CPU": "%0.0lf",
+            "Storage": "%6.1lf%S",
+}
 
-defColors = "--color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  "
-defColors += "--color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ "
+Heads = { "DEFAULT": None,
+          "CPU/Overview": 6,
+          "Storage": 7,
+          "Disk": 5,
+          "Memory/Overview": 5,
+          "Network": 7,
+          "Load/load": 5,
+          "Processes/Overview": 5,
+          "Processes/cputime": 5,
+          "Processes/count": 5,
+          "Processes/pagefaults": 5,
+          "Processes/disk_octets": 5,
+          "Processes/disk_ops": 5,
+}
+
+Human = { "DEFAULT": None,
+          "Disk/io_time": "I/O time",
+          "Disk/merged": "Merged operations",
+          "Disk/octets": "Traffic",
+          "Disk/ops": "Operations",
+          "Disk/time": "Average time per operation",
+          "Network/octets": "Traffic",
+          "Processes/cputime": "CPU time",
+          "Processes/stacksize": "Stack size",
+          "Processes/vm": "Virtual memory",
+          "Processes/data": "Data size",
+          "Processes/code": "Code size",
+          "Processes/rss": "Resident segment size",
+          "Processes/pagefaults": "Page faults",
+          "Processes/disk_ops": "Disk operations",
+          "Processes/disk_octets": "Disk traffic",
+          "Processes/count": "# processes/threads",
+}
 
 ######################################################################################
 ## Helper classes
 
+######################################################################################
+# Colors
+
 class ColorSingle:
-    def __init__(self, color):
+    def __init__(self, color, color_opa):
         self.color = color
+        self.color_opa = color_opa
 
     def set_number_of_lines(self, n):
         # noop
         self.n = n
 
-    def get_color(self, i):
-        return self.color
+    def get_color(self, i, opacity = 1.0):
+        if opacity > 0.9: return self.color
+        return self.color_opa
+    
 
 class Colors:
     # internally stored as RGBA integers
@@ -115,8 +191,156 @@ class Colors:
             c.append( (1-factor)*self.colors[color0][i] + factor*self.colors[color0+1][i] )
         return self.makestr(c, opacity)
 
+### Useful color objects
     
+cs = Colors( )
+csTr = Colors( True )
+csSingle = ColorSingle( "$COLOR_LINE_SINGLE$", "$COLOR_LINE_SINGLE_SUB$")
+
+############################################################################################
+
+# Helper function to print table heading
+def makeheads(l):
+    s = ''
+    fmt = '%' + str(l) + 's'
+    heads = ["Avr", "Min", "Max", "Last"]
+    for i, t in enumerate(heads):
+        s += 'COMMENT:"' + (fmt % t)
+        if i == len(heads)-1: s += '\\r" '
+        else: s += '" '
+    return s
+
+# Class for making multiline(-area) plots or stacks
+
 class StackOrLines:
+    def __init__(self, colors, Type, name, Title = None,
+                 Unit = None, isStack = False, minmax = False,
+                 SkipLegend = False, HeadSize = None,
+                 t = "LINE",
+                 extra_command = "" ):
+        self.lines = []
+        self.gt = t
+        self.colors = colors
+        self.isStack = isStack
+        self.minmax = minmax
+        self.fullname = Type + "/" + name
+        self.SkipLegend = SkipLegend
+        
+        if Unit is None: self.u = getunit(self.fullname)
+        else: self.u = Unit
+        
+        if HeadSize is None: self.HeadSize = gethead(self.fullname)
+        else: self.HeadSize = HeadSize
+        
+        command_def = '-t " '
+        if Title is not None: command_def += Title
+        else: command_def += Type + " " + name
+
+        if len(self.u) > 0: command_def += ", " + self.u
+        command_def += '"  '  + " " + defColors + " " + extra_command + " "
+
+        self.command_def = command_def
+
+    # def add(self, name, width, options, extra="", makeLine=False, var_name = "value"):
+    #     self.lines.append( { "name": name,
+    #                          "width": width,
+    #                          "options": options,
+    #                          "extra": extra,
+    #                          "makeLine": makeLine,
+    #                          "var_name": var_name,
+    #     } )
+        
+    def add(self, name, g, width="$LINE_WIDTH_PRIMARY$", makeLine=False, var_name = "value", Format = None, scale_data = None):
+        if Format is None: Format = getf( self.fullname + "/" + name )
+        self.lines.append( { "name": name,
+                             "g": g,
+                             "width": width,
+                             "makeLine": makeLine,
+                             "var_name": var_name,
+                             "format": Format,
+                             "scale_data": scale_data,
+        } )
+        
+    def compose(self):
+        command_def = self.command_def
+        files = []
+
+        # make all defs
+        for i in self.lines:
+            if i["scale_data"] is None: scale = False
+            else: scale = True
+        
+            if i["g"] not in files:
+                files.append( i["g"] )
+
+            vd = i["name"]
+            if scale: vd += "_data"
+
+            command_def += "DEF:" + vd + "=" + i["g"] + ":" + i["var_name"] + ":AVERAGE "
+            if self.minmax or not self.SkipLegend:
+                command_def += "DEF:" + vd + "_min=" + i["g"] + ":" + i["var_name"] + ":MIN "
+                command_def += "DEF:" + vd + "_max=" + i["g"] + ":" + i["var_name"] + ":MAX "
+
+            if scale:
+                command_def += "CDEF:" + i["name"] + "=" + vd + "," + i["scale_data"] + " "
+                if self.minmax or not self.SkipLegend:
+                    command_def += "CDEF:" + i["name"] + "_min=" + vd + "_min," + i["scale_data"] + " "
+                    command_def += "CDEF:" + i["name"] + "_max=" + vd + "_max," + i["scale_data"] + " "
+                    
+            if self.minmax or not self.SkipLegend:    
+                command_def += "CDEF:" + i["name"] + "_max_min_delta=" + i["name"] + "_max," + i["name"] + "_min,- "
+
+        if not self.SkipLegend and self.HeadSize is not None:
+            command_def += makeheads( self.HeadSize ) + " "
+                
+        s = command_def
+        
+        self.colors.set_number_of_lines(len(self.lines))
+        if self.minmax:
+            for idx, i in enumerate(self.lines):
+                s += "LINE:" + i["name"] + "_min AREA:" + i["name"] + "_max_min_delta" + self.colors.get_color(idx, 0.5) + "::STACK "
+                
+        for idx, i in enumerate(self.lines):
+            color = self.colors.get_color(idx) 
+            s += self.gt
+            if self.gt == "LINE": s += i["width"]
+            s += ":" + i["name"] + color + ":"
+            if not self.SkipLegend:
+                if len(self.lines) > 1:
+                    s += '"' + i["name"] + '\\l"'
+                else:
+                    s += '" \\l"'
+                    
+            if self.isStack and idx > 0 and not i["makeLine"]: s += ":STACK"
+            s += " " #+ i["extra"] + " "
+
+            if not self.SkipLegend:
+                f = i["format"]
+                name = i["name"]
+                if self.HeadSize is None:
+                    s += "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"Avr " + f + "\" GPRINT:"+name+"_min:MIN:\"Min " + f + "\" GPRINT:"+name+"_max:MAX:\"Max " + f + "\" GPRINT:"+name+":LAST:\"Last " + f + "\\r\" "
+                else:
+                    s += "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"" + f + "\" GPRINT:"+name+"_min:MIN:\"" + f + "\" GPRINT:"+name+"_max:MAX:\"" + f + "\" GPRINT:"+name+":LAST:\"" + f + "\\r\" "
+                    
+        gt = { "command": s,
+               "files": files }
+        plot = { "type": self.fullname }
+        
+        return gt, plot, self.fullname
+    
+######################################################################################
+# Helper function for a single value plot
+def maketypesplot(Type, name, g, Title = None, Format = None, Unit = None, minmax=True, SkipLegend = False,
+                  var_name = "value", extra_command = "", scale_data = None):
+
+    s = StackOrLines( csSingle, Type, name, Title=Title, Unit=Unit, SkipLegend=SkipLegend, minmax=minmax, extra_command=extra_command)
+    s.add( name, g, var_name=var_name, Format=Format, scale_data=scale_data )
+
+    return s.compose()
+
+
+# used when more control is needed
+class StackOrLinesOld:
     def __init__(self, col, isStack = False, minmax = False, t = "LINE"):
         self.lines = []
         self.gt = t
@@ -147,217 +371,129 @@ class StackOrLines:
             s += " " + i["extra"] + " "
             
         return s    
-        
-######################################################################################
-# Colorschemes. If more are needed, see at http://colorbrewer2.org/
 
-# http://colorbrewer2.org/?type=qualitative&scheme=Set1&n=8
-cmap = [ [228,26,28,255],[55,126,184,255],[77,175,74,255],[152,78,163,255],[255,127,0,255],[255,255,51,255],[166,86,40,255],[247,129,191,255] ]
-cs = Colors( )
-csTr = Colors( True )
-csSingle = ColorSingle( "$COLOR_LINE_SINGLE$" )
 
 ######################################################################################
-Units = { "DEFAULT": "",
-          "CPU": "%",
-          "Battery/voltage": "V",
-          "Battery/current": "A",
-          "Context/context_switch": "1/s",
-          "Entropy/entropy": "bits",
-          "Memory": "bytes",
-          "Network/octets": "bytes/s",
-          "NetworkTotal/octets": "B",
-          "Network": "1/s",
-          "NetworkTotal": "",
-          "Processes/cputime": "micros/s",
-          "Processes/disk_ops": "1/s",
-          "Processes/disk_octets": "bytes/s",
-          "Processes/vm": "bytes",
-          "Processes/data": "bytes",
-          "Processes/code": "bytes",
-          "Processes/rss": "bytes",
-          "Processes/pagefaults": "1/s",
-          "Processes/stacksize": "bytes",
-          "Disk/io_time": "ms",
-          "Disk/ops": "1/s",
-          "Disk/octets": "bytes/s",
-          #"Disk/time": "1/s",
-}
 
-Formats = { "DEFAULT": "%5.2lf",
-            "Battery/voltage": "%1.3lf%S",
-            "Battery/current": "%1.0lf%S",
-            "Context/context_switch": "%1.0lf%S",
-            "Entropy/entropy": "%1.0lf%S",
-            "Memory": "%4.0lf%S",
-            "Load": "%5.2lf",
-            "Network/octets": "%6.0lf%S",
-            "Network/packets": "%6.0lf%S",
-            "Network": "%6.2lf%S",
-            "Processes/cputime": "%4.0lf%S",
-            "Processes/disk_ops": "%4.0lf%S",
-            "Processes/disk_octets": "%4.0lf%S",
-            "Processes": "%4.0lf%S",
-            "Disk": "%4.0lf%S",
-            "Disk/merged": "%5.2lf",
-            "CPUstate/cpusleep": "%0.0lf",
-}
+def sorter(glob_arg, re_search = None, front = [], end = []):
+    a = []
+    for g in glob.glob( glob_arg ):
+        if re_search is not None: m = re.search( re_search, g ).group(1)
+        else: m = g
+        added = False
+        for k in [ [0,front], [10000,end] ] :
+            if m in k[1]:
+                a.append( [ k[0] + k[1].index( m ), g ] )
+                added = True
+        if not added:
+            a.append( [ 5000, g ] )
+
+    a.sort()
+    r = []
+    for i in a: r.append(i[1])
+    return r
+    
 
 def getit(name, D):
     if name in D: return D[name]
-    sname = name.split("/")[0]
-    if sname in D: return D[sname]
+    
+    sname = name.split("/")
+    if len(sname) > 1:
+        s = ''
+        for i in sname[:-1]: s += i + "/"        
+        return getit( s[:-1], D )
+
     return D["DEFAULT"]
 
 def getunit(name): return getit(name, Units)
 def getf(name): return getit(name, Formats)
+def gethead(name): return getit(name, Heads)
 
-######################################################################################
-# Helper function for a single value plot
-def maketypesplot(name, g, Type, Title = None, Format = None, Unit = None, SkipLegend = False):
-
-    fullname = Type + "/" + name
-    
-    if Format is None: f = getf(fullname)
-    else: f = Format
-    
-    if Unit is None: u = getunit(fullname)
-    else: u = Unit
-    
-    frm = f + u
-    
-    command_def = '-t " '
-    if Title is not None: command_def += Title
-    else: command_def += Type + " " + name
-
-    if len(u) > 0: command_def += ", " + u
-    command_def += '"  '  + " " + defColors
-    
-    command_line = ""
-    files = []
-    s = StackOrLines(csSingle)
-    command_def += "DEF:" + name + "=" + g + ":value:AVERAGE "
-    command_def += "DEF:" + name + "_min=" + g + ":value:MIN "
-    command_def += "DEF:" + name + "_max=" + g + ":value:MAX "
-    command_def += "CDEF:" + name + "_max_min_delta=" + name + "_max," + name + "_min,- "
-    command_def += "LINE:" + name + "_min AREA:" + name + "_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK "
-
-    if not SkipLegend:
-        s.add( name, "$LINE_WIDTH_PRIMARY$", '" \\l"',
-               "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"Avr " + f + "\" GPRINT:"+name+"_min:MIN:\"Min " + f +
-               "\" GPRINT:"+name+"_max:MAX:\"Max " + f + "\" GPRINT:"+name+":LAST:\"Last " + f + "\\r\" ")
-    else:
-        s.add( name, "$LINE_WIDTH_PRIMARY$", '""' )
-
-    files.append(g)
-
-    command_line = s.str()
-
-    gt = { "command": command_def + command_line,
-           "files": files }
-    plot = { "type": fullname }
-
-    return gt, plot
-
-# Helper function to print table heading
-def makeheads(l):
-    s = ''
-    fmt = '%' + str(l) + 's'
-    heads = ["Avr", "Min", "Max", "Last"]
-    for i, t in enumerate(heads):
-        s += 'COMMENT:"' + (fmt % t)
-        if i == len(heads)-1: s += '\\r" '
-        else: s += '" '
-    return s
-
-                
+def gethuman(name):
+    n = getit(name, Human)
+    if n is None: return name
+    return n
+             
 ######################################################################################
 # Start definition of types                
+
+Config = {}
+
+Config["variables"] = {
+    "COLOR_BACKGROUND": "#00000000",
+    "COLOR_CANVAS": "#00000000",
+    "COLOR_FONT": "#000000FF",
+    "COLOR_AXIS": "#000000FF",
+    "COLOR_ARROW": "#000000FF",
+    "COLOR_LINE_SINGLE": "#0000FFFF",
+    "COLOR_LINE_SINGLE_SUB": "#0000FF80",
+
+    "LINE_WIDTH_PRIMARY": "3",
+    "LINE_WIDTH_SECONDARY": "1"    
+    }
+
+Config["page"] = {
+    
+    "title": "Overview",
+    "plots": [
+    ]
+}
+
+Config["cover"] = [
+    ]
+    
 Config["types"] = {}
 
+defColors = "--color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  "
+defColors += "--color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$COLOR_ARROW$ "
 
-               
+
+######################################################################################
+#
+# DEFINITION OF GRAPHS
+#
+######################################################################################
+
 ######################################################################################
 # CPU
 if os.path.exists( "cpu" ):
-    CpuPlots = { "subplots": { "title": "CPU details", "plots": [ { "type": "CPU/overview" } ] } }
+    CpuPlots = { "subplots": { "title": "CPU details", "plots": [ { "type": "CPU/Overview" } ] } }
 
     # CPU overview
-    command_def = "-t \"CPU usage, " + getunit("CPU") + "\" --upper-limit 100 --lower-limit 0 --rigid " + defColors
-    command_line = ""
-    files = []
-    s = StackOrLines( csTr, isStack = True, t = "AREA" )
-    cpustates_fr = [ 0, ["interrupt", "softirq", "steal", "wait", "system"] ]
-    cpustates_end = [ len(cpustates_fr) + 100, ["user", "nice", "idle"] ]
-    cpustates_other = len(cpustates_fr) + 50
-    cpustates = []
-    for g in glob.glob( "cpu/*.rrd" ):
-        m = re.search( "^cpu.*/.*-(.*).rrd", g ).group(1)
-        for k in [ cpustates_fr, cpustates_end ] :
-            if m in k[1]:
-                cpustates.append( [ k[0] + k[1].index( m ), g ] )
-        if m not in cpustates_fr[1] and m not in cpustates_end[1]:
-            cpustates.append( [ cpustates_other, g ] )
-
-    cpustates.sort()
-
-    command_def += makeheads(6)
-    for gcpu in cpustates:
-        g = gcpu[1]
+    
+    s = StackOrLines( csTr, "CPU", "Overview", isStack = True, t = "AREA" )
+    cpustates = sorter( "cpu/*.rrd", "^cpu.*/.*-(.*).rrd",
+                        ["interrupt", "softirq", "steal", "wait", "system"], 
+                        ["user", "nice", "idle"] )
+    
+    for g in cpustates:
         name = re.search( "^cpu.*/.*-(.*).rrd", g ).group(1)
-        command_def += "DEF:" + name + "=" + g + ":value:AVERAGE "
-        s.add( name, "$LINE_WIDTH_PRIMARY$", "\"" + name + '\\l"',
-               "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"%6.0lf\" GPRINT:"+name+":MIN:\"%6.0lf\" GPRINT:"+name+":MAX:\"%6.0lf\" GPRINT:"+name+":LAST:\"%6.0lf\\r\" " )
-        files.append(g)
+        s.add( name, g )
 
-    command_line = s.str()
-    Config["types"]["CPU/overview"] = { "command": command_def + command_line,
-                                        "files": files }
-
-    CpuPlots["type"] = "CPU/overview"
+    gt, plot, fullname = s.compose()
+    Config["types"][fullname] = gt
+    CpuPlots["type"] = fullname
 
     # CPU overview : cover
-    command_def = "-t \"CPU usage, " + getunit("CPU") + "\" --upper-limit 100 --lower-limit 0 --rigid " + defColors
-    command_line = ""
-    files = []
-    s = StackOrLines( csTr, isStack = True, t = "AREA" )
+    s = StackOrLines( csTr, "CPU", "Overview", isStack = True, t = "AREA", SkipLegend = True )
 
-    for gcpu in cpustates:
-        g = gcpu[1]
+    for g in cpustates:
         name = re.search( "^cpu.*/.*-(.*).rrd", g ).group(1)
-        command_def += "DEF:" + name + "=" + g + ":value:AVERAGE "
-        s.add( name, "$LINE_WIDTH_PRIMARY$", '' )
-        files.append(g)
+        s.add( name, g )
 
-    command_line = s.str()
+    gt, plot, fullname = s.compose()
 
-    Config["types"]["CPU/overview/cover"] = { "command": command_def + command_line,
-                                              "files": files }
-    Config["cover"].append( "CPU/overview/cover" )
+    Config["types"]["CPU/Overview/cover"] = gt
+    Config["cover"].append( "CPU/Overview/cover" )
 
     # Make CPU subplots
     cpustates.reverse()
-    for gcpu in cpustates:
-        g = gcpu[1]
+    for g in cpustates:
         name = re.search( "^cpu.*/.*-(.*).rrd", g ).group(1)
-        command_def = "-t \"CPU " + name + ", " + getunit("CPU") + "\" --upper-limit 100 --lower-limit 0 --rigid " + defColors
-        command_line = ""
-        files = []
-        s = StackOrLines(csSingle)
-        command_def += "DEF:" + name + "=" + g + ":value:AVERAGE "
-        command_def += "DEF:" + name + "_min=" + g + ":value:MIN "
-        command_def += "DEF:" + name + "_max=" + g + ":value:MAX "
-        command_def += "CDEF:" + name + "_max_min_delta=" + name + "_max," + name + "_min,- "
-        command_def += "LINE:" + name + "_min AREA:" + name + "_max_min_delta$COLOR_LINE_SINGLE_SUB$::STACK "
-        s.add( name, "$LINE_WIDTH_PRIMARY$", '"\\l"',
-               "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"Avr %1.0lf\" GPRINT:"+name+"_min:MIN:\"Min %1.0lf\" GPRINT:"+name+"_max:MAX:\"Max %1.0lf\" GPRINT:"+name+":LAST:\"Last %1.0lf\\r\" ")
-        files.append(g)
+        gt, plot, fullname = maketypesplot( "CPU", name, g, extra_command = "--upper-limit 100 --lower-limit 0 --rigid")
 
-        command_line = s.str()
-
-        Config["types"]["CPU/" + name] = { "command": command_def + command_line,
-                                           "files": files }
-        CpuPlots["subplots"]["plots"].append( { "type": "CPU/" + name } )
+        Config["types"][fullname] = gt
+        CpuPlots["subplots"]["plots"].append( plot )
 
     # Add all CPU plots
     Config["page"]["plots"].append( CpuPlots )
@@ -369,11 +505,11 @@ if os.path.exists( "cpu" ):
 if os.path.exists( "battery-0" ):
     BatteryPlots = { "subplots": { "title": "Battery details", "plots": [ ] } }
 
-    for g in glob.glob( "battery-0/*.rrd" ):
+    for g in sorter( "battery-0/*.rrd", "^battery.*/(.*).rrd" ):
         name = re.search( "^battery.*/(.*).rrd", g ).group(1)
-        gt, plot = maketypesplot( name, g, "Battery" )
+        gt, plot, fullname = maketypesplot( "Battery", name, g )
 
-        Config["types"]["Battery/" + name] = gt
+        Config["types"][fullname] = gt
         BatteryPlots["subplots"]["plots"].append( plot )
 
     # Add all Battery plots
@@ -381,7 +517,7 @@ if os.path.exists( "battery-0" ):
     Config["page"]["plots"].append( BatteryPlots )
 
     # Cover
-    gt, plot = maketypesplot( "voltage", "battery-0/voltage.rrd", "Battery", "Battery", SkipLegend = True )
+    gt, plot, fullname = maketypesplot( "Battery", "voltage", "battery-0/voltage.rrd", Title = "Battery", SkipLegend = True )
     Config["types"]["Battery/voltage/cover"] = gt
     Config["cover"].append( "Battery/voltage/cover" )
 
@@ -396,39 +532,19 @@ if os.path.exists( "cpusleep" ):
     # CPU sleep needs some math
     g = "cpusleep/cpusleep.rrd"
     name = "cpusleep"
-    f = getf("CPUstate/" + name)
-    u = getunit("CPUstate/" + name)
-    frm = f + u
+    gt, plot, fullname = maketypesplot( "CPUstate", name, g, Title="CPU sleep",
+                                        extra_command='--upper-limit 100 --lower-limit 0 --rigid',
+                                        scale_data = "10,/" )
 
-    command_def = '-t "CPU sleep, %" --upper-limit 100 --lower-limit 0 --rigid ' + defColors
-    command_line = ""
-    files = []
-    s = StackOrLines(csSingle)
-    sCover = StackOrLines(csSingle)
-    command_def += "DEF:" + name + "_data=" + g + ":value:AVERAGE "
-    command_def += "DEF:" + name + "_data_min=" + g + ":value:MIN "
-    command_def += "DEF:" + name + "_data_max=" + g + ":value:MAX "
-    command_def += "CDEF:" + name + "=" + name + "_data,10,/ "
-    command_def += "CDEF:" + name + "_min=" + name + "_data_min,10,/ "
-    command_def += "CDEF:" + name + "_max=" + name + "_data_max,10,/ "
-    s.add( name, "$LINE_WIDTH_PRIMARY$", '"\\l"',
-           "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"Avr " + f + "\" GPRINT:"+name+"_min:MIN:\"Min " + f +
-           "\" GPRINT:"+name+"_max:MAX:\"Max " + f + "\" GPRINT:"+name+":LAST:\"Last " + f + "\\r\" ")
-    sCover.add( name, "$LINE_WIDTH_PRIMARY$", '')
-    files.append(g)
-
-    command_line = s.str()
-
-    gt = { "command": command_def + command_line,
-           "files": files }
-    plot = { "type": "CPUstate/" + name }
-    Plots["subplots"]["plots"].append( {"type": "CPUstate/" + name} )
+    Plots["subplots"]["plots"].append( plot )
 
     Config["types"]["CPUstate/" + name] = gt
-    Plots["type"] = "CPUstate/" + name 
+    Plots["type"] = fullname
 
-    gt = { "command": command_def + sCover.str(),
-           "files": files }
+    gt, plot, fullname = maketypesplot( "CPUstate", name, g, Title="CPU sleep",
+                                        extra_command='--upper-limit 100 --lower-limit 0 --rigid',
+                                        scale_data = "10,/", SkipLegend = True )
+
     Config["types"]["CPUstate/" + name + "/cover"] = gt
     Config["cover"].append( "CPUstate/" + name + "/cover" )
 
@@ -442,100 +558,66 @@ if os.path.exists( "cpusleep" ):
 if len( glob.glob( "df-*" ) ) > 0:
     Plots = { "subplots": { "title": "Storage details", "plots": [ ] } }
 
-    for gd in glob.glob( "df-*" ):
+    for gd in sorter( "df-*", "^df-(.*)", ["root"] ):
         part_name = re.search( "^df-(.*)", gd ).group(1)
+        
+        s = StackOrLines( cs, "Storage", part_name, isStack = True, t = "AREA",
+                          extra_command = '--lower-limit 0' )
 
-        command_def = '-t "Storage ' + part_name +  '" --lower-limit 0 ' + defColors
-        command_line = ""
-        command_def += makeheads(4+1)
-        files = []
-        s = StackOrLines( cs, isStack = True, t = "AREA" )
-
-        allGs = []
-        for g in glob.glob( gd + "/*.rrd" ): allGs.append(g)
-        allGs.reverse() # to get free as a last
-
-        for g in allGs:
+        for g in sorter( gd + "/*.rrd", "^df-.*/df_complex-(.*).rrd", front = ["used"], end=["free"] ):
             name = re.search( "^df-.*/df_complex-(.*).rrd", g ).group(1)
-            command_def += "DEF:" + name + "=" + g + ":value:AVERAGE "
-            s.add( name, "$LINE_WIDTH_PRIMARY$", "\"" + name + '\\l"',
-                   "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"%4.1lf%S\" GPRINT:"+name+":MIN:\"%4.1lf%S\" GPRINT:"+name+":MAX:\"%4.1lf%S\" GPRINT:"+name+":LAST:\"%4.1lf%S\\r\" " )
-            files.append(g)
+            s.add( name, g )
 
-        command_line = s.str()
+        gt, plot, fullname = s.compose()
+        
+        Config["types"][fullname] = gt
+        Plots["subplots"]["plots"].append( plot )
+        if not Plots.has_key("type"): Plots["type"] = fullname
 
-        Config["types"]["Storage/" + part_name] = { "command": command_def + command_line,
-                                                    "files": files }
-
-        Plots["subplots"]["plots"].append( {"type": "Storage/" + part_name} )
 
     # disk access rates
-    Human = { "DEFAULT": "",
-              "Disk/io_time": "I/O time",
-              "Disk/merged": "Merged operations",
-              "Disk/octets": "Traffic",
-              "Disk/ops": "Operations",
-              "Disk/time": "Average time per operation"
-
-    }
-
     DiskStats = { "time": [ "read", "write" ],
                   "octets": [ "read", "write" ],
                   "ops": [ "read", "write" ],
                   "merged": [ "read", "write" ],
                   "io_time": [ "io_time" ],
-
     }
 
-    for gd in glob.glob( "disk-*" ):
+    DiskScale = { "DEFAULT": None,
+                  "io_time": "10,/", # from ms/s to %: 1ms / 1000ms * 100%
+    }
+    
+    for gd in sorter( "disk-*" ):
         dname = re.search( "^disk-(.*)", gd ).group(1)
         if re.search( "(.*)p.*", dname ) is not None:
             continue # skip partitions
 
-        for g in glob.glob( gd + "/disk_*.rrd" ):
+        for g in sorter( gd + "/disk_*.rrd" ):
             name = re.search( "^disk-.*/disk_(.*).rrd", g ).group(1)
             if name == "time":
                 continue # skip this stat, not sure what it means [units]
 
             if name in DiskStats.keys():
-                f = getf("Disk/" + name)
-                u = getunit("Disk/" + name)
-                frm = f + u
+                s = StackOrLines( cs, "Disk/" + dname, name, minmax=True,
+                                  Title = dname + ': ' + gethuman("Disk/"+name),
+                                  Unit = getunit("Disk/" + name),
+                                  HeadSize = gethead( "Disk/" + name ),
+                                  extra_command = "--lower-limit 0")
 
-                command_def = '-t "' + dname + ': ' + getit("Disk/"+name, Human)
-                if len(u) > 0: command_def += ", " + u
-                command_def += '" --lower-limit 0 ' + defColors + makeheads(5)
-                command_line = ""
-                files = [g]
-
-                s = StackOrLines( cs, minmax=True )
                 for li, load_type in  enumerate(DiskStats[ name ]):
-                    lname = load_type
-
-                    command_def += "DEF:" + lname + "=" + g + ":" + lname + ":AVERAGE "
-                    command_def += "DEF:" + lname + "_min=" + g + ":" + lname + ":MIN "
-                    command_def += "DEF:" + lname + "_max=" + g + ":" + lname + ":MAX "
-                    command_def += "CDEF:" + lname + "_max_min_delta=" + lname + "_max," + lname + "_min,- "
-                    s.add( lname, "$LINE_WIDTH_PRIMARY$", '"' + lname + '\\l"',
-                           "COMMENT:\\u GPRINT:"+lname+":AVERAGE:\"" + f + "\" GPRINT:"+lname+"_min:MIN:\"" + f +
-                           "\" GPRINT:"+lname+"_max:MAX:\"" + f + "\" GPRINT:"+lname+":LAST:\"" + f + "\\r\" ")
-
-                command_line = s.str()
-
-                gt = { "command": command_def + command_line,
-                       "files": files }
-                plot = { "type": "Disk/" + dname + "/" + name }
-
+                    s.add( load_type, g, Format = getf("Disk/" + name), var_name = load_type, scale_data=getit( load_type, DiskScale ) )
+                
+                gt, plot, fullname = s.compose()
+                
             else:
-                gt, plot = maketypesplot( name, g, Type = "Disk/" + dname,
-                                          Title = dname + ': ' + getit("Disk/"+name, Human),
-                                          Format = getf("Disk/" + name),
-                                          Unit = getunit("Disk/" + name) )
+                gt, plot, fullname = maketypesplot( "Disk/" + dname, name, g, 
+                                                    Title = dname + ': ' + getit("Disk/"+name, Human),
+                                                    Format = getf("Disk/" + name),
+                                                    Unit = getunit("Disk/" + name) )
 
-            Config["types"]["Disk/" + dname + "/" + name] = gt
+            Config["types"][fullname] = gt
             Plots["subplots"]["plots"].append( plot )        
 
-    Plots["type"] = "Storage/root"
     Config["page"]["plots"].append( Plots )
 
 
@@ -543,73 +625,46 @@ if len( glob.glob( "df-*" ) ) > 0:
 # Memory
 
 if os.path.exists( "memory" ):
-    Plots = { "subplots": { "title": "Memory details", "plots": [ { "type": "Memory/overview" } ] } }
+    Plots = { "subplots": { "title": "Memory details", "plots": [ ] } }
 
     # Memory overview
-    command_def = '-t "Memory overview, bytes" --lower-limit 0 ' + defColors
-    command_line = ""
-    files = []
-    s = StackOrLines( cs, isStack = True, t = "AREA" )
+    s = StackOrLines( cs, "Memory", "Overview", isStack = True, t = "AREA", extra_command="--lower-limit 0"  )
 
-    memory_fr = [ 0, ["slab_unrecl", "slab_recl", "used", "buffered", "system"] ]
-    memory_end = [ len(memory_fr) + 100, ["cached", "free"] ]
-    memory_other = len(memory_fr) + 50
-    memory = []
-    for g in glob.glob( "memory/*.rrd" ):
-        m = re.search( "^memory/.*-(.*).rrd", g ).group(1)
-        for k in [ memory_fr, memory_end ] :
-            if m in k[1]:
-                memory.append( [ k[0] + k[1].index( m ), g ] )
-        if m not in memory_fr[1] and m not in memory_end[1]:
-            memory.append( [ memory_other, g ] )
+    memory = sorter( "memory/*.rrd", "^memory/.*-(.*).rrd",
+                     ["slab_unrecl", "slab_recl", "used", "buffered", "system"],
+                     ["cached", "free"] )
 
-    memory.sort()
-
-    command_def += makeheads(4+1)
-    for gt in memory:
-        g = gt[1]
+    for g in memory:
         name = re.search( "^memory/.*-(.*).rrd", g ).group(1)
-        command_def += "DEF:" + name + "=" + g + ":value:AVERAGE "
-        s.add( name, "$LINE_WIDTH_PRIMARY$", "\"" + name + '\\l"',
-               "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"%4.0lf%S\" GPRINT:"+name+":MIN:\"%4.0lf%S\" GPRINT:"+name+":MAX:\"%4.0lf%S\" GPRINT:"+name+":LAST:\"%4.0lf%S\\r\" " )
-        files.append(g)
+        s.add( name, g )
 
-    command_line = s.str()
+    gt, plot, fullname = s.compose()
 
-    Config["types"]["Memory/overview"] = { "command": command_def + command_line,
-                                           "files": files }
+    Config["types"][fullname] = gt
+    Plots["type"] = fullname
+    Plots["subplots"]["plots"].append( plot )
 
     # Memory overview: cover
-    command_def = '-t "Memory, B" --lower-limit 0 ' + defColors
-    command_line = ""
-    files = []
-    s = StackOrLines( cs, isStack = True, t = "AREA" )
+    s = StackOrLines( cs, "Memory", "Overview", Title = "Memory, B", Unit = "", SkipLegend = True, isStack = True, t = "AREA", extra_command="--lower-limit 0"  )
 
-    for gt in memory:
-        g = gt[1]
+    for g in memory:
         name = re.search( "^memory/.*-(.*).rrd", g ).group(1)
-        command_def += "DEF:" + name + "=" + g + ":value:AVERAGE "
-        s.add( name, "$LINE_WIDTH_PRIMARY$", '""' )
-        files.append(g)
+        s.add( name, g )
 
-    command_line = s.str()
-
-    Config["types"]["Memory/overview/cover"] = { "command": command_def + command_line,
-                                                 "files": files }
+    gt, plot, fullname = s.compose()
+    
+    Config["types"]["Memory/overview/cover"] = gt
     Config["cover"].append( "Memory/overview/cover" )
 
     # detailed plots
     memory.reverse()
-    for gm in memory:
-        g = gm[1]
+    for g in memory:
         name = re.search( "^memory/.*-(.*).rrd", g ).group(1)
-        gt, plot = maketypesplot( name, g, "Memory" )
+        gt, plot, fullname = maketypesplot( "Memory", name, g )
 
-        Config["types"]["Memory/" + name] = gt
+        Config["types"][fullname] = gt
         Plots["subplots"]["plots"].append( plot )
 
-
-    Plots["type"] = "Memory/overview"
     Config["page"]["plots"].append( Plots )
 
 ######################################################################################
@@ -617,9 +672,9 @@ if len( glob.glob("interface-*") ) > 0:
 
     Plots = { "subplots": { "title": "Network details", "plots": [ ] } }
 
-    for CNet in glob.glob("interface-*/if_octets.rrd"):
+    for CNet in sorter("interface-*/if_octets.rrd", "^interface-(.*)/if_octets.rrd", [], ["lo"]):
         intname = re.search( "^interface-(.*)/if_octets.rrd", CNet ).group(1)
-
+            
         SubPlots = { "subplots": { "title": "Network details: " + intname, "plots": [ ] } }
 
         for g in glob.glob("interface-" + intname + "/if_*.rrd"):
@@ -635,7 +690,7 @@ if len( glob.glob("interface-*") ) > 0:
             command_line = ""
             command_extra = ""
             files = [g]
-            s = StackOrLines( cs, minmax=True )
+            s = StackOrLinesOld( cs, minmax=True )
             for li, data_type in  enumerate([ "tx", "rx" ]):
                 frm = f + u
                 humandt = { "tx": "Outgoing", "rx": "Incoming" }[data_type]
@@ -671,55 +726,37 @@ if len( glob.glob("interface-*") ) > 0:
 ######################################################################################
 # Load
 if os.path.exists( "load" ):
-    Plots = { "subplots": { "title": "Load details", "plots": [ { "type": "Load/load" } ] } }
+    Plots = { "subplots": { "title": "Load details", "plots": [ ] } }
 
-    command_def = '-t "Load" --lower-limit 0 ' + defColors + makeheads(5)
-    command_line = ""
-    files = ["load/load.rrd"]
-    s = StackOrLines( cs, minmax=True )
+    s = StackOrLines( cs, "Load", "load", Title="Load",
+                      minmax=True, extra_command='--lower-limit 0' )
+
     for li, load_type in  enumerate([ "shortterm", "midterm", "longterm" ]):
         Type = "Load"
         name = load_type
         g = "load/load.rrd"
 
-        fullname = Type + "/" + name
+        s.add( name, g, var_name=name )
 
-        f = getf(fullname)
-        u = getunit(fullname)
-        frm = f + u
-
-        command_def += "DEF:" + name + "=" + g + ":" + name + ":AVERAGE "
-        command_def += "DEF:" + name + "_min=" + g + ":" + name + ":MIN "
-        command_def += "DEF:" + name + "_max=" + g + ":" + name + ":MAX "
-        command_def += "CDEF:" + name + "_max_min_delta=" + name + "_max," + name + "_min,- "
-        s.add( name, "$LINE_WIDTH_PRIMARY$", '"' + name + '\\l"',
-               "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"" + f + "\" GPRINT:"+name+"_min:MIN:\"" + f +
-               "\" GPRINT:"+name+"_max:MAX:\"" + f + "\" GPRINT:"+name+":LAST:\"" + f + "\\r\" ")
-
-    command_line = s.str()
-
-    gt = { "command": command_def + command_line,
-           "files": files }
-    plot = { "type": fullname }
-
-    Config["types"]["Load/load"] = gt
-
-    Plots["type"] = "Load/load"
-
+    gt, plot, fullname = s.compose()
+    
+    Config["types"][fullname] = gt
+    Plots["type"] = fullname
+    Plots["subplots"]["plots"].append( plot )
     #### Other Load related graphs
 
     g = "contextswitch/contextswitch.rrd"
     if os.path.exists(g):
         name = "context_switch"
-        gt, plot = maketypesplot( name, g, "Context", "Context switch" )
-        Config["types"]["Context/" + name] = gt
+        gt, plot, fullname = maketypesplot( "Context", name, g, "Context switch", extra_command='--lower-limit 0' )
+        Config["types"][fullname] = gt
         Plots["subplots"]["plots"].append( plot )
 
     g = "entropy/entropy.rrd"
     if os.path.exists(g):
         name = "entropy"
-        gt, plot = maketypesplot( name, g, "Entropy", "Entropy" )
-        Config["types"]["Entropy/" + name] = gt
+        gt, plot, fullname = maketypesplot( "Entropy", name, g, "Entropy", extra_command='--lower-limit 0' )
+        Config["types"][fullname] = gt
         Plots["subplots"]["plots"].append( plot )
 
     Config["page"]["plots"].append( Plots )
@@ -728,73 +765,38 @@ if os.path.exists( "load" ):
 ######################################################################################
 # Processes
 if os.path.exists( "processes" ):
-    Plots = { "subplots": { "title": "Processes details", "plots": [ { "type": "Processes/overview" } ] } }
+    Plots = { "subplots": { "title": "Processes details", "plots": [ ] } }
 
     # Processes overview
-    command_def = '-t "Processes overview, state" --lower-limit 0 ' + defColors
-    command_line = ""
-    files = []
-    s = StackOrLines( cs, isStack = True, t = "AREA" )
-
-    processes_fr = [ 0, ["zombies", "paging", "blocked", "running"] ]
-    processes_end = [ len(processes_fr) + 100, ["stopped", "sleeping"] ]
-    processes_other = len(processes_fr) + 50
-    processes = []
-    for g in glob.glob( "processes/ps_state-*.rrd" ):
-        m = re.search( "^processes/ps_state-(.*).rrd", g ).group(1)
-        for k in [ processes_fr, processes_end ] :
-            if m in k[1]:
-                processes.append( [ k[0] + k[1].index( m ), g ] )
-        if m not in processes_fr[1] and m not in processes_end[1]:
-            processes.append( [ processes_other, g ] )
-
-    processes.sort()
-
-    command_def += makeheads(4+1)
-    for gt in processes:
-        g = gt[1]
+    s = StackOrLines( cs, "Processes", "Overview", isStack = True, t = "AREA", extra_command = '--lower-limit 0' )
+    processes = sorter( "processes/ps_state-*.rrd", "^processes/ps_state-(.*).rrd",
+                        ["zombies", "paging", "blocked", "running"], ["stopped", "sleeping"] )
+    for g in processes:
         name = re.search( "^processes/ps_state-(.*).rrd", g ).group(1)
-        command_def += "DEF:" + name + "=" + g + ":value:AVERAGE "
-        s.add( name, "$LINE_WIDTH_PRIMARY$", "\"" + name + '\\l"',
-               "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"%5.0lf\" GPRINT:"+name+":MIN:\"%5.0lf\" GPRINT:"+name+":MAX:\"%5.0lf\" GPRINT:"+name+":LAST:\"%5.0lf\\r\" " )
-        files.append(g)
+        s.add( name, g )
 
-    command_line = s.str()
+    gt, plot, fullname = s.compose()
 
-    Config["types"]["Processes/overview"] = { "command": command_def + command_line,
-                                              "files": files }
-
+    Config["types"][fullname] = gt
+    Plots["type"] = fullname
+    Plots["subplots"]["plots"].append( plot )
+    
     # detailed plots
     g = "processes/fork_rate.rrd"
     name = "fork_rate"
-    gt, plot = maketypesplot( name, g, "Processes", "Fork rate, 1/s" )
-    Config["types"]["Processes/" + name] = gt
+    gt, plot, fullname = maketypesplot( "Processes", name, g, "Fork rate, 1/s" )
+    Config["types"][fullname] = gt
     Plots["subplots"]["plots"].append( plot )
 
     processes.reverse()
-    for gm in processes:
-        g = gm[1]
+    for g in processes:
         name = re.search( "^processes/.*-(.*).rrd", g ).group(1)
-        gt, plot = maketypesplot( name, g, "Processes" )
+        gt, plot, fullname = maketypesplot( "Processes", name, g )
 
-        Config["types"]["Processes/" + name] = gt
+        Config["types"][fullname] = gt
         Plots["subplots"]["plots"].append( plot )
 
     # detailed plots for selected processes
-
-    Human = { "DEFAULT": "",
-              "Processes/cputime": "CPU time",
-              "Processes/stacksize": "Stack size",
-              "Processes/vm": "Virtual memory",
-              "Processes/data": "Data size",
-              "Processes/code": "Code size",
-              "Processes/rss": "Resident segment size",
-              "Processes/pagefaults": "Page faults",
-              "Processes/disk_ops": "Disk operations",
-              "Processes/disk_octets": "Disk traffic",
-              "Processes/count": "# processes/threads",
-
-    }
 
     ProcStats = { "cputime": [ "user", "syst" ],
                   "pagefaults": [ "minflt", "majflt" ],
@@ -804,54 +806,44 @@ if os.path.exists( "processes" ):
 
     }
 
-    for gp in glob.glob("processes-*"):
+    ProcScale = { "DEFAULT": None,
+                  "cputime": "10000,/", # from micros/s to %: 1us / 1000000us * 100%
+    }
+    for gp in sorter("processes-*"):
         procname = re.search("^processes-(.*)", gp).group(1)
         myplots = { "subplots": {"plots": [], "title": "Process " + procname } }
 
-        for g in glob.glob("processes-" + procname + "/*rrd"):
+        for g in sorter("processes-" + procname + "/*rrd"):
             name = re.search( "^processes-" + procname + "/ps_(.*).rrd", g ).group(1)
 
             if name in ProcStats.keys():
                 f = getf("Processes/" + name)
                 u = getunit("Processes/" + name)
-                frm = f + u
 
-                command_def = '-t "' + procname + ': ' + getit("Processes/"+name, Human)
-                if len(u) > 0: command_def += ", " + u
-                command_def += '" --lower-limit 0 ' + defColors + makeheads(5)
-                command_line = ""
-                files = [g]
+                s = StackOrLines( cs, "Processes/"+procname, name,
+                                  Title = procname + ': ' + gethuman("Processes/"+name),
+                                  HeadSize = gethead("Processes/"+name),
+                                  extra_command = '--lower-limit 0',
+                                  Unit = u,
+                                  minmax=True )
 
-                s = StackOrLines( cs, minmax=True )
                 for li, load_type in  enumerate(ProcStats[ name ]):
-                    lname = load_type
+                    s.add( load_type, g, var_name = load_type, Format=f, scale_data=getit(name,ProcScale)  )
 
-                    command_def += "DEF:" + lname + "=" + g + ":" + lname + ":AVERAGE "
-                    command_def += "DEF:" + lname + "_min=" + g + ":" + lname + ":MIN "
-                    command_def += "DEF:" + lname + "_max=" + g + ":" + lname + ":MAX "
-                    command_def += "CDEF:" + lname + "_max_min_delta=" + lname + "_max," + lname + "_min,- "
-                    s.add( lname, "$LINE_WIDTH_PRIMARY$", '"' + lname + '\\l"',
-                           "COMMENT:\\u GPRINT:"+lname+":AVERAGE:\"" + f + "\" GPRINT:"+lname+"_min:MIN:\"" + f +
-                           "\" GPRINT:"+lname+"_max:MAX:\"" + f + "\" GPRINT:"+lname+":LAST:\"" + f + "\\r\" ")
-
-                command_line = s.str()
-
-                gt = { "command": command_def + command_line,
-                       "files": files }
-                plot = { "type": "Processes/" + procname + "/" + name }
+                gt, plot, fullname = s.compose()
 
             else:
-                gt, plot = maketypesplot( name, g, Type = "Processes/" + procname,
-                                          Title = procname + ': ' + getit("Processes/"+name, Human),
-                                          Format = getf("Processes/" + name),
-                                          Unit = getunit("Processes/" + name) )
+                gt, plot, fullname = maketypesplot( "Processes/" + procname, name, g, 
+                                                    Title = procname + ': ' + getit("Processes/"+name, Human),
+                                                    Format = getf("Processes/" + name),
+                                                    Unit = getunit("Processes/" + name),
+                                                    scale_data=getit(name,ProcScale) )
 
-            Config["types"]["Processes/" + procname + "/" + name] = gt
+            Config["types"][fullname] = gt
             myplots["subplots"]["plots"].append( plot )
         myplots["type"] = "Processes/" + procname + "/cputime"
         Plots["subplots"]["plots"].append( myplots )
 
-    Plots["type"] = "Processes/overview"
     Config["page"]["plots"].append( Plots )
 
 
@@ -862,32 +854,14 @@ Plots = { }
 
 
 ###################################################
-# uptime needs some math
+# uptime 
 g = "uptime/uptime.rrd"
-if os.path.exists(g):
+if os.path.exists(g):    
     name = "uptime"
-    f = getf(name)
-    u = getunit(name)
-    frm = f + u
+    gt, plot, fullname = maketypesplot( "Uptime", "uptime", g, Title="Uptime", scale_data="86400,/" )
 
-    command_def = '-t "Uptime, days" ' + defColors
-    command_line = ""
-    files = []
-    s = StackOrLines(csSingle)
-    command_def += "DEF:" + name + "_data=" + g + ":value:AVERAGE "
-    command_def += "CDEF:" + name + "=" + name + "_data,86400,/ "
-    s.add( name, "$LINE_WIDTH_PRIMARY$", '"\\l"',
-           "COMMENT:\\u GPRINT:"+name+":LAST:\"Current " + frm + "\\r\" ")
-    files.append(g)
-
-    command_line = s.str()
-
-    gt = { "command": command_def + command_line,
-           "files": files }
-    plot = { "type": "Uptime/" + name }
-
-    Config["types"]["Uptime/" + name] = gt
-    Plots["type"] = "Uptime/" + name 
+    Config["types"][fullname] = gt
+    Plots["type"] = fullname
 
     # Add all Misc plots: depends on uptime
     Config["page"]["plots"].append( Plots )
