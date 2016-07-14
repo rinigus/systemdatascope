@@ -100,6 +100,10 @@
         <source>Welcome</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Empty page with undefined title</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MessageAboutPL</name>
