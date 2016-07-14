@@ -476,7 +476,7 @@ if os.path.exists( "cpu" ):
     CpuPlots["type"] = fullname
 
     # CPU overview : cover
-    s = StackOrLines( csTr, "CPU", "Overview", isStack = True, t = "AREA", SkipLegend = True )
+    s = StackOrLines( csTr, "CPU", "Overview", Title="CPU", isStack = True, t = "AREA", extra_command = "--upper-limit 100 --lower-limit 0 --rigid", SkipLegend = True )
 
     for g in cpustates:
         name = re.search( "^cpu.*/.*-(.*).rrd", g ).group(1)
