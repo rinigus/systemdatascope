@@ -43,6 +43,7 @@ Units = { "DEFAULT": "",
           #"Disk/time": "1/s",
           "Storage": "bytes",
           "Uptime/uptime": "days",
+          "CPUstate/cpusleep": "%",
 }
 
 Formats = { "DEFAULT": "%5.2lf",
@@ -61,7 +62,7 @@ Formats = { "DEFAULT": "%5.2lf",
             "Processes/rss": "%5.1lf%S",
             "Processes/stacksize": "%5.1lf%S",
             "Processes/vm": "%5.1lf%S",
-            "Processes/cputime": "%4.0lf%S",
+            "Processes/cputime": "%5.3lf",
             "Processes/disk_ops": "%4.0lf%S",
             "Processes/disk_octets": "%4.0lf%S",
             "Processes": "%5.1lf",
@@ -461,7 +462,7 @@ if os.path.exists( "cpu" ):
 
     # CPU overview
     
-    s = StackOrLines( csTr, "CPU", "Overview", isStack = True, t = "AREA" )
+    s = StackOrLines( csTr, "CPU", "Overview", isStack = True, t = "AREA", extra_command = "--upper-limit 100 --lower-limit 0 --rigid" )
     cpustates = sorter( "cpu/*.rrd", "^cpu.*/.*-(.*).rrd",
                         ["interrupt", "softirq", "steal", "wait", "system"], 
                         ["user", "nice", "idle"] )
