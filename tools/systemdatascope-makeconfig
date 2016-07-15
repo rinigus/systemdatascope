@@ -123,7 +123,7 @@ Human = { "DEFAULT": None,
           "Processes/pagefaults": "Page faults",
           "Processes/disk_ops": "Disk operations",
           "Processes/disk_octets": "Disk traffic",
-          "Processes/count": "# processes/threads",
+          "Processes/count": "# processes",
 }
 
 ######################################################################################
@@ -445,7 +445,7 @@ Config["variables"] = {
     "COLOR_LINE_SINGLE_SUB": "#0000FF80",
 
     "LINE_WIDTH_PRIMARY": "3",
-    "LINE_WIDTH_SECONDARY": "1"    
+    "LINE_WIDTH_SECONDARY": "1",
     }
 
 Config["page"] = {
@@ -531,6 +531,8 @@ if os.path.exists( "statefs_battery" ):
               "charge": "--upper-limit 100 --lower-limit 0 --rigid",
               "timelow": "--lower-limit 0",
               "timefull": "--lower-limit 0",
+              "current": "HRULE:0$COLOR_LINE_SINGLE_SUB$",
+              "power_battery": "HRULE:0$COLOR_LINE_SINGLE_SUB$",
               }
 
     for g in sorter( "statefs_battery/*.rrd" ):
@@ -653,10 +655,16 @@ if len( glob.glob( "df-*" ) ) > 0:
                 continue # skip this stat, not sure what it means [units]
 
             if name in DiskStats.keys():
-                s = StackOrLines( cs, "Disk/" + dname, name, minmax=True,
+                col = cs
+                h = gethead( "Disk/" + name )
+                if len( DiskStats[ name ] ) == 1:
+                    col = csSingle
+                    h = None
+                
+                s = StackOrLines( col, "Disk/" + dname, name, minmax=True,
                                   Title = dname + ': ' + gethuman("Disk/"+name),
                                   Unit = getunit("Disk/" + name),
-                                  HeadSize = gethead( "Disk/" + name ),
+                                  HeadSize = h,
                                   extra_command = "--lower-limit 0")
 
                 for li, load_type in  enumerate(DiskStats[ name ]):
