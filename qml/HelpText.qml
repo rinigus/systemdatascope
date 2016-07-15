@@ -31,7 +31,7 @@ Note that when you select Run, GUI may revert back Help screen or graph list.</l
 </ol>
 
 <p>If it all worked, you are all set and can proceed monitoring your system. To see the generated outline of graphs
-and other info regarding GUI, go to Status (Sailfish only at present). In Status, you could also copy the state to
+and other info regarding GUI, go to Status. In Status, you could also copy the state to
 clipboard via pulley menu.  If you wish to know more, something failed, or you want to
 tune it, read on. </p>
 
