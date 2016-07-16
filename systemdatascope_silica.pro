@@ -37,7 +37,6 @@ SOURCES += \
     src/configurator.cpp
 
 OTHER_FILES += \
-    rpm/systemdatascope.changes.in \
     rpm/systemdatascope.spec \
     rpm/systemdatascope.yaml \
     translations/*.ts \
@@ -83,5 +82,6 @@ DISTFILES += \
     qml/HelpText.qml \
     qml/AppHelp.qml \
     qml/Platform/MessageErrorPL.qml \
-    qml/AppStatus.qml
+    qml/AppStatus.qml \
+    rpm/systemdatascope.changes
 
