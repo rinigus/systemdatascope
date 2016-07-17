@@ -51,6 +51,7 @@ Units = { "DEFAULT": "",
           "Storage": "bytes",
           "Uptime/uptime": "days",
           "CPUstate/cpusleep": "%",
+          "Radio/Cellular": "%",
 }
 
 Formats = { "DEFAULT": "%5.2lf",
@@ -87,6 +88,7 @@ Formats = { "DEFAULT": "%5.2lf",
             "CPU/Overview": "%6.0lf",
             "CPU": "%0.0lf",
             "Storage": "%6.1lf%S",
+            "Radio/Cellular": "%3.0lf",
 }
 
 Heads = { "DEFAULT": None,
@@ -124,6 +126,7 @@ Human = { "DEFAULT": None,
           "Processes/disk_ops": "Disk operations",
           "Processes/disk_octets": "Disk traffic",
           "Processes/count": "# processes",
+          "Radio/Cellular": "Cellular signal strength",
 }
 
 ######################################################################################
@@ -786,6 +789,27 @@ if len( glob.glob("interface-*") ) > 0:
 
     Config["page"]["plots"].append( Plots )
 
+
+######################################################################################
+if os.path.exists( "statefs_cellular" ):
+
+    Plots = { "subplots": { "title": "Radio details", "plots": [ ] } }
+
+    s = StackOrLines( cs, "Radio", "Cellular",
+                      minmax = True,
+                      extra_command = "--upper-limit 100 --lower-limit 0 --rigid" )
+    for g in sorter( "statefs_cellular/signal_strength-*.rrd" ):
+        name = re.search( "^statefs_cellular/signal_strength-(.*).rrd", g ).group(1)
+        s.add( name, g )
+    gt, plot, fullname = s.compose()
+
+    Config["types"][fullname] = gt
+    Plots["subplots"]["plots"].append( plot )
+    Plots["type"] = fullname
+
+    Config["page"]["plots"].append( Plots )
+
+    
 ######################################################################################
 # Load
 if os.path.exists( "load" ):
