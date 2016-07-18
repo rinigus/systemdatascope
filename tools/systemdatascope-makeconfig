@@ -331,7 +331,7 @@ class StackOrLines:
             if self.gt == "LINE": s += i["width"]
             s += ":" + i["name"] + color + ":"
             if not self.SkipLegend:
-                if len(self.lines) > 1:
+                if len(self.lines) > 1 or self.HeadSize is not None:
                     s += '"' + i["name"] + '\\l"'
                 else:
                     s += '" \\l"'
