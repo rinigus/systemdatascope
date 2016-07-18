@@ -11,11 +11,11 @@ StatusPL {
 
         if (settings.track_connectd_service)
         {
-            stat += "<b>collectd status:</b><br>"
+            stat += "<b>collectd status:</b><br><small>"
             var s = service.status
             s = s.replace(/\n/g, "<br>")
             stat += s
-            stat += "<br><br>";
+            stat += "</small><br><br>";
         }
 
         stat += "<b>RRDtool:</b> " + (appWindow.stateRRDRunning ? "Running" : "Stopped") + "<br><br>" +
