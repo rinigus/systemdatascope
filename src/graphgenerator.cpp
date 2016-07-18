@@ -243,7 +243,7 @@ void Generator::registerImageType(QString type, QString command_json)
         }
     }
 
-    qDebug() << "New type registered: " << type << " : " << command.toString();
+    // qDebug() << "New type registered: " << type << " : " << command.toString();
 
     // Register with some default options
     m_image_types[type] = command.toString();

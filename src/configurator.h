@@ -51,7 +51,7 @@ public:
     /// @param temp set true if the directory should be suggested in /tmp or similar location
     Q_INVOKABLE QString suggestDirectory(bool temp);
 
-    Q_INVOKABLE QString isDirectoryOK(QString dir); ///< Checks if directory is [possibly] keeping collectd RRD files
+    Q_INVOKABLE QString isDirectoryOK(QString dir, bool must_be_there); ///< Checks if directory is [possibly] keeping collectd RRD files
 
     /// \brief Generate configuration using makeconfig script
     ///

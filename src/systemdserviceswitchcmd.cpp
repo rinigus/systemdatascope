@@ -1,5 +1,6 @@
 #include "systemdserviceswitchcmd.h"
 #include <QProcess>
+#include <QDebug>
 
 #define SCTL "systemctl"
 
@@ -47,7 +48,22 @@ void SystemDServiceSwitchCmd::updateState()
                 emit runningChanged();
             }
         }
+    }
 
+    // update status
+    {
+        QStringList args(m_extra); args << "status" << m_service_name;
+        QProcess proc;
+        proc.start( SCTL, args );
+        if ( proc.waitForStarted() && proc.waitForFinished() )
+        {
+            QString out( proc.readAll() );
+            if ( m_status != out )
+            {
+                m_status = out;
+                emit statusChanged();
+            }
+        }
     }
 }
 

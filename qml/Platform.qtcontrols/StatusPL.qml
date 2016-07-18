@@ -16,7 +16,7 @@ PagePL {
             anchors.left: parent.left
             anchors.right: parent.right
 
-            spacing: Theme.paddingLarge
+            spacing: 10
 
             Text {
                 text: qsTr("Status")

@@ -19,6 +19,7 @@ class SystemDServiceSwitchCmd : public QObject
 
     Q_PROPERTY(bool enabled READ enabled NOTIFY enabledChanged) ///< when true, service is enabled on boot
     Q_PROPERTY(bool running READ running NOTIFY runningChanged) ///< when true, service is enabled on boot
+    Q_PROPERTY(QString status READ status NOTIFY statusChanged) ///< when true, service is enabled on boot
 
 public:
     explicit SystemDServiceSwitchCmd(QString servicename, QObject *parent = 0);
@@ -26,6 +27,7 @@ public:
 
     Q_INVOKABLE bool enabled() const { return m_enabled; } ///< true if the service enabled
     Q_INVOKABLE bool running() const { return m_running; } ///< true if the service enabled
+    Q_INVOKABLE QString status() const { return m_status; } ///< service status
 
     Q_INVOKABLE void setEnable(bool e);    ///< Enable or disable the service on boot
     Q_INVOKABLE void setRun(bool r);       ///< Start (true) or stop (false) the service
@@ -42,6 +44,7 @@ public:
 signals:
     void enabledChanged();
     void runningChanged();
+    void statusChanged();
 
 public slots:
 
@@ -53,6 +56,7 @@ protected:
     QStringList m_extra;
     bool m_enabled = false;
     bool m_running = false;
+    QString m_status;
     int m_timer_id = 0;
 };
 

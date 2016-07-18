@@ -59,13 +59,23 @@ QString Configurator::suggestDirectory(bool temp)
     return dir;
 }
 
-QString Configurator::isDirectoryOK(QString dirname)
+QString Configurator::isDirectoryOK(QString dirname, bool must_be_there)
 {
     // check if dir exists
-    if ( dirname.length() < 1 ) return "Error: Directory name is empty";
+    if ( dirname.length() < 1 )
+    {
+        if ( must_be_there )
+            return "Error: Directory name is empty";
+        else
+            return "Empty directory name; this is OK";
+    }
 
     QDir dir(dirname);
-    if (!dir.exists()) return "Error: Directory does not exists";
+    if (!dir.exists())
+    {
+        if (must_be_there) return "Error: Directory does not exists";
+        else return "Directory does not exist, but this is not an error. It should be created when needed.";
+    }
 
     // Let's see if there are RRD files organized as dir/files.rrd
     dir.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
@@ -219,7 +229,7 @@ void Configurator::makeConfiguration(QString dirname)
 QString Configurator::makeconfig_errorhead()
 {
     return QString("Called generator script: ") + MAKECONFIG_EXE + "\n" +
-                   "Called with directory as an argument: " + m_dirname + "\n\n";
+            "Called with directory as an argument: " + m_dirname + "\n\n";
 }
 
 void Configurator::makeconfig_stateChanged(QProcess::ProcessState newState)
@@ -247,8 +257,8 @@ void Configurator::makeconfig_stateChanged(QProcess::ProcessState newState)
                     config = config.left(maxl) + "\n... trimmed here ...";
 
                 emit errorConfigurator(
-                        makeconfig_errorhead() +
-                        QString("JSON Document parsing error or generated document is not an object: ") + config);
+                            makeconfig_errorhead() +
+                            QString("JSON Document parsing error or generated document is not an object: ") + config);
             }
 
             else
