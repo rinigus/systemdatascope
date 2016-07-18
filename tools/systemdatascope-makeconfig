@@ -52,6 +52,7 @@ Units = { "DEFAULT": "",
           "Uptime/uptime": "days",
           "CPUstate/cpusleep": "%",
           "Radio/Cellular": "%",
+          "Radio/Internet": "%",
 }
 
 Formats = { "DEFAULT": "%5.2lf",
@@ -89,6 +90,7 @@ Formats = { "DEFAULT": "%5.2lf",
             "CPU": "%0.0lf",
             "Storage": "%6.1lf%S",
             "Radio/Cellular": "%4.0lf",
+            "Radio/Internet": "%4.0lf",
 }
 
 Heads = { "DEFAULT": None,
@@ -105,6 +107,7 @@ Heads = { "DEFAULT": None,
           "Processes/disk_octets": 5,
           "Processes/disk_ops": 5,
           "Radio/Cellular": 4,
+          "Radio/Internet": 4,
 }
 
 Human = { "DEFAULT": None,
@@ -128,6 +131,7 @@ Human = { "DEFAULT": None,
           "Processes/disk_octets": "Disk traffic",
           "Processes/count": "# processes",
           "Radio/Cellular": "Cellular signal strength",
+          "Radio/Internet": "Internet signal strength",
 }
 
 ######################################################################################
@@ -816,6 +820,19 @@ if os.path.exists( "statefs_cellular" ):
     Config["types"][fullname] = gt
     Plots["subplots"]["plots"].append( plot )
     Plots["type"] = fullname
+
+    if os.path.exists( "statefs_internet" ):
+
+        s = StackOrLines( cs, "Radio", "Internet",
+                          minmax = True,
+                          extra_command = "--upper-limit 100 --lower-limit 0 --rigid" )
+        for g in sorter( "statefs_internet/signal_strength-*.rrd" ):
+            name = re.search( "^statefs_internet/signal_strength-(.*).rrd", g ).group(1)
+            s.add( name, g )
+        gt, plot, fullname = s.compose()
+
+        Config["types"][fullname] = gt
+        Plots["subplots"]["plots"].append( plot )
 
     Config["page"]["plots"].append( Plots )
 
