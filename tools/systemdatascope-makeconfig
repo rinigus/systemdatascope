@@ -88,7 +88,7 @@ Formats = { "DEFAULT": "%5.2lf",
             "CPU/Overview": "%6.0lf",
             "CPU": "%0.0lf",
             "Storage": "%6.1lf%S",
-            "Radio/Cellular": "%3.0lf",
+            "Radio/Cellular": "%4.0lf",
 }
 
 Heads = { "DEFAULT": None,
@@ -104,6 +104,7 @@ Heads = { "DEFAULT": None,
           "Processes/pagefaults": 5,
           "Processes/disk_octets": 5,
           "Processes/disk_ops": 5,
+          "Radio/Cellular": 4,
 }
 
 Human = { "DEFAULT": None,
@@ -253,6 +254,7 @@ class StackOrLines:
         
         command_def = '-t " '
         if Title is not None: command_def += Title
+        elif Human.has_key( self.fullname ): command_def += Human[ self.fullname ]
         else: command_def += Type + " " + name
 
         if len(self.u) > 0: command_def += ", " + self.u
@@ -620,12 +622,20 @@ if len( glob.glob( "df-*" ) ) > 0:
 
     for gd in sorter( "df-*", "^df-(.*)", ["root"] ):
         part_name = re.search( "^df-(.*)", gd ).group(1)
-        
+
+        # special treatment of tmp filesystem
+        # remove it if you don't need it
+        if part_name == "tmp":
+            skip_free = True
+        else:
+            skip_free = False
+
         s = StackOrLines( cs, "Storage", part_name, isStack = True, t = "AREA",
                           extra_command = '--lower-limit 0' )
 
         for g in sorter( gd + "/*.rrd", "^df-.*/df_complex-(.*).rrd", front = ["used"], end=["free"] ):
             name = re.search( "^df-.*/df_complex-(.*).rrd", g ).group(1)
+            if skip_free and name == "free": continue
             s.add( name, g )
 
         gt, plot, fullname = s.compose()
