@@ -91,6 +91,7 @@ Formats = { "DEFAULT": "%5.2lf",
             "Storage": "%6.1lf%S",
             "Radio/Cellular": "%4.0lf",
             "Radio/Internet": "%4.0lf",
+            "Radio/Bluetooth": "%4.2lf",
 }
 
 Heads = { "DEFAULT": None,
@@ -108,6 +109,7 @@ Heads = { "DEFAULT": None,
           "Processes/disk_ops": 5,
           "Radio/Cellular": 4,
           "Radio/Internet": 4,
+          "Radio/Bluetooth": 4,
 }
 
 Human = { "DEFAULT": None,
@@ -132,6 +134,7 @@ Human = { "DEFAULT": None,
           "Processes/count": "# processes",
           "Radio/Cellular": "Cellular signal strength",
           "Radio/Internet": "Internet signal strength",
+          "Radio/Bluetooth": "Bluetooth activity",
 }
 
 ######################################################################################
@@ -828,6 +831,20 @@ if os.path.exists( "statefs_cellular" ):
                           extra_command = "--upper-limit 100 --lower-limit 0 --rigid" )
         for g in sorter( "statefs_internet/signal_strength-*.rrd" ):
             name = re.search( "^statefs_internet/signal_strength-(.*).rrd", g ).group(1)
+            s.add( name, g )
+        gt, plot, fullname = s.compose()
+
+        Config["types"][fullname] = gt
+        Plots["subplots"]["plots"].append( plot )
+
+    if os.path.exists( "statefs_bluetooth" ):
+
+        s = StackOrLines( cs, "Radio", "Bluetooth",
+                          minmax = False,
+                          isStack = True,
+                          t = "AREA" )
+        for g in sorter( "statefs_bluetooth/*.rrd" ):
+            name = re.search( "^statefs_bluetooth/bluetooth_(.*).rrd", g ).group(1)
             s.add( name, g )
         gt, plot, fullname = s.compose()
 
