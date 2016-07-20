@@ -489,7 +489,7 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
     Plots = { "type": None, "subplots": { "title": "CPU details", "plots": [ ] } }
 
     if os.path.exists( "cpu" ) :
-        SubPlots = { "subplots": { "title": "CPU details", "plots": [ { "type": "CPU/Overview" } ] } }
+        SubPlots = { "subplots": { "title": "CPU usage", "plots": [ { "type": "CPU/Overview" } ] } }
 
         # CPU overview
 
