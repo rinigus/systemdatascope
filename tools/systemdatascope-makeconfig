@@ -843,7 +843,9 @@ if os.path.exists( "statefs_cellular" ):
                           minmax = False,
                           isStack = True,
                           t = "AREA" )
-        for g in sorter( "statefs_bluetooth/*.rrd" ):
+        for g in sorter( "statefs_bluetooth/*.rrd",
+                         "^statefs_bluetooth/bluetooth_(.*).rrd",
+                         front=["enabled"] ):
             name = re.search( "^statefs_bluetooth/bluetooth_(.*).rrd", g ).group(1)
             s.add( name, g )
         gt, plot, fullname = s.compose()
