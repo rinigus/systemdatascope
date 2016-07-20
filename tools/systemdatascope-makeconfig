@@ -484,47 +484,78 @@ defColors += "--color FONT$COLOR_FONT$ --color AXIS$COLOR_AXIS$ --color ARROW$CO
 
 ######################################################################################
 # CPU
-if os.path.exists( "cpu" ):
-    CpuPlots = { "subplots": { "title": "CPU details", "plots": [ { "type": "CPU/Overview" } ] } }
+if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
 
-    # CPU overview
-    
-    s = StackOrLines( csTr, "CPU", "Overview", isStack = True, t = "AREA", extra_command = "--upper-limit 100 --lower-limit 0 --rigid" )
-    cpustates = sorter( "cpu/*.rrd", "^cpu.*/.*-(.*).rrd",
-                        ["interrupt", "softirq", "steal", "wait", "system"], 
-                        ["user", "nice", "idle"] )
-    
-    for g in cpustates:
-        name = re.search( "^cpu.*/.*-(.*).rrd", g ).group(1)
-        s.add( name, g )
+    Plots = { "type": None, "subplots": { "title": "CPU details", "plots": [ ] } }
 
-    gt, plot, fullname = s.compose()
-    Config["types"][fullname] = gt
-    CpuPlots["type"] = fullname
+    if os.path.exists( "cpu" ) :
+        SubPlots = { "subplots": { "title": "CPU details", "plots": [ { "type": "CPU/Overview" } ] } }
 
-    # CPU overview : cover
-    s = StackOrLines( csTr, "CPU", "Overview", Title="CPU", isStack = True, t = "AREA", extra_command = "--upper-limit 100 --lower-limit 0 --rigid", SkipLegend = True )
+        # CPU overview
 
-    for g in cpustates:
-        name = re.search( "^cpu.*/.*-(.*).rrd", g ).group(1)
-        s.add( name, g )
+        s = StackOrLines( csTr, "CPU", "Overview", isStack = True, t = "AREA", extra_command = "--upper-limit 100 --lower-limit 0 --rigid" )
+        cpustates = sorter( "cpu/*.rrd", "^cpu.*/.*-(.*).rrd",
+                            ["interrupt", "softirq", "steal", "wait", "system"], 
+                            ["user", "nice", "idle"] )
 
-    gt, plot, fullname = s.compose()
+        for g in cpustates:
+            name = re.search( "^cpu.*/.*-(.*).rrd", g ).group(1)
+            s.add( name, g )
 
-    Config["types"]["CPU/Overview/cover"] = gt
-    Config["cover"].append( "CPU/Overview/cover" )
-
-    # Make CPU subplots
-    cpustates.reverse()
-    for g in cpustates:
-        name = re.search( "^cpu.*/.*-(.*).rrd", g ).group(1)
-        gt, plot, fullname = maketypesplot( "CPU", name, g, extra_command = "--upper-limit 100 --lower-limit 0 --rigid")
-
+        gt, plot, fullname = s.compose()
         Config["types"][fullname] = gt
-        CpuPlots["subplots"]["plots"].append( plot )
+        SubPlots["type"] = fullname
+        if Plots["type"] is None: Plots["type"] = fullname
+
+        # CPU overview : cover
+        s = StackOrLines( csTr, "CPU", "Overview", Title="CPU", isStack = True, t = "AREA", extra_command = "--upper-limit 100 --lower-limit 0 --rigid", SkipLegend = True )
+
+        for g in cpustates:
+            name = re.search( "^cpu.*/.*-(.*).rrd", g ).group(1)
+            s.add( name, g )
+
+        gt, plot, fullname = s.compose()
+
+        Config["types"]["CPU/Overview/cover"] = gt
+        Config["cover"].append( "CPU/Overview/cover" )
+
+        # Make CPU subplots
+        cpustates.reverse()
+        for g in cpustates:
+            name = re.search( "^cpu.*/.*-(.*).rrd", g ).group(1)
+            gt, plot, fullname = maketypesplot( "CPU", name, g, extra_command = "--upper-limit 100 --lower-limit 0 --rigid")
+
+            Config["types"][fullname] = gt
+            SubPlots["subplots"]["plots"].append( plot )
+
+        Plots["subplots"]["plots"].append( SubPlots )
+
+
+    if os.path.exists( "cpusleep" ):
+
+        ###################################################
+        # CPU sleep needs some math
+        g = "cpusleep/cpusleep.rrd"
+        name = "cpusleep"
+        gt, plot, fullname = maketypesplot( "CPUstate", name, g, Title="CPU sleep",
+                                            extra_command='--upper-limit 100 --lower-limit 0 --rigid',
+                                            scale_data = "10,/" )
+
+        Plots["subplots"]["plots"].append( plot )
+
+        Config["types"]["CPUstate/" + name] = gt
+        if Plots["type"] is None: Plots["type"] = fullname
+
+        gt, plot, fullname = maketypesplot( "CPUstate", name, g, Title="CPU sleep",
+                                            extra_command='--upper-limit 100 --lower-limit 0 --rigid',
+                                            scale_data = "10,/", SkipLegend = True )
+
+        Config["types"]["CPUstate/" + name + "/cover"] = gt
+        Config["cover"].append( "CPUstate/" + name + "/cover" )
+
 
     # Add all CPU plots
-    Config["page"]["plots"].append( CpuPlots )
+    Config["page"]["plots"].append( Plots )
 
 
 ######################################################################################
@@ -594,159 +625,141 @@ elif os.path.exists( "battery-0" ):
 ######################################################################################
 # CPU states 
 
-if os.path.exists( "cpusleep" ):
-    Plots = { "subplots": { "title": "CPU states", "plots": [ ] } }
-
-    ###################################################
-    # CPU sleep needs some math
-    g = "cpusleep/cpusleep.rrd"
-    name = "cpusleep"
-    gt, plot, fullname = maketypesplot( "CPUstate", name, g, Title="CPU sleep",
-                                        extra_command='--upper-limit 100 --lower-limit 0 --rigid',
-                                        scale_data = "10,/" )
-
-    Plots["subplots"]["plots"].append( plot )
-
-    Config["types"]["CPUstate/" + name] = gt
-    Plots["type"] = fullname
-
-    gt, plot, fullname = maketypesplot( "CPUstate", name, g, Title="CPU sleep",
-                                        extra_command='--upper-limit 100 --lower-limit 0 --rigid',
-                                        scale_data = "10,/", SkipLegend = True )
-
-    Config["types"]["CPUstate/" + name + "/cover"] = gt
-    Config["cover"].append( "CPUstate/" + name + "/cover" )
-
-    # Add all CPU state plots
-    Config["page"]["plots"].append( Plots )
-
 
 ######################################################################################
-# Storage
+# Storage & RAM
 
-if len( glob.glob( "df-*" ) ) > 0:
-    Plots = { "subplots": { "title": "Storage details", "plots": [ ] } }
+if len( glob.glob( "df-*" ) ) > 0 or os.path.exists( "memory" ):
+    Plots = { "type": None, "subplots": { "title": "Memory & Storage", "plots": [ ] } }
 
-    for gd in sorter( "df-*", "^df-(.*)", ["root"] ):
-        part_name = re.search( "^df-(.*)", gd ).group(1)
+    ######################################################################################
+    # Memory
+    if os.path.exists( "memory" ):
+        SubPlots = { "subplots": { "title": "Memory details", "plots": [ ] } }
 
-        # special treatment of tmp filesystem
-        # remove it if you don't need it
-        if part_name == "tmp":
-            skip_free = True
-        else:
-            skip_free = False
+        # Memory overview
+        s = StackOrLines( cs, "Memory", "Overview", isStack = True, t = "AREA", extra_command="--lower-limit 0"  )
 
-        s = StackOrLines( cs, "Storage", part_name, isStack = True, t = "AREA",
-                          extra_command = '--lower-limit 0' )
+        memory = sorter( "memory/*.rrd", "^memory/.*-(.*).rrd",
+                         ["slab_unrecl", "slab_recl", "used", "buffered", "system"],
+                         ["cached", "free"] )
 
-        for g in sorter( gd + "/*.rrd", "^df-.*/df_complex-(.*).rrd", front = ["used"], end=["free"] ):
-            name = re.search( "^df-.*/df_complex-(.*).rrd", g ).group(1)
-            if skip_free and name == "free": continue
+        for g in memory:
+            name = re.search( "^memory/.*-(.*).rrd", g ).group(1)
             s.add( name, g )
 
         gt, plot, fullname = s.compose()
-        
+
         Config["types"][fullname] = gt
-        Plots["subplots"]["plots"].append( plot )
-        if not Plots.has_key("type"): Plots["type"] = fullname
+        SubPlots["type"] = fullname
+        SubPlots["subplots"]["plots"].append( plot )
+        if Plots["type"] is None: Plots["type"] = fullname
 
+        # Memory overview: cover
+        s = StackOrLines( cs, "Memory", "Overview", Title = "Memory, B", Unit = "", SkipLegend = True, isStack = True, t = "AREA", extra_command="--lower-limit 0"  )
 
-    # disk access rates
-    DiskStats = { "time": [ "read", "write" ],
-                  "octets": [ "read", "write" ],
-                  "ops": [ "read", "write" ],
-                  "merged": [ "read", "write" ],
-                  "io_time": [ "io_time" ],
-    }
+        for g in memory:
+            name = re.search( "^memory/.*-(.*).rrd", g ).group(1)
+            s.add( name, g )
 
-    DiskScale = { "DEFAULT": None,
-                  "io_time": "10,/", # from ms/s to %: 1ms / 1000ms * 100%
-    }
-    
-    for gd in sorter( "disk-*" ):
-        dname = re.search( "^disk-(.*)", gd ).group(1)
-        if re.search( "(.*)p.*", dname ) is not None:
-            continue # skip partitions
+        gt, plot, fullname = s.compose()
 
-        for g in sorter( gd + "/disk_*.rrd" ):
-            name = re.search( "^disk-.*/disk_(.*).rrd", g ).group(1)
-            if name == "time":
-                continue # skip this stat, not sure what it means [units]
+        Config["types"]["Memory/overview/cover"] = gt
+        Config["cover"].append( "Memory/overview/cover" )
 
-            if name in DiskStats.keys():
-                col = cs
-                h = gethead( "Disk/" + name )
-                if len( DiskStats[ name ] ) == 1:
-                    col = csSingle
-                    h = None
-                
-                s = StackOrLines( col, "Disk/" + dname, name, minmax=True,
-                                  Title = dname + ': ' + gethuman("Disk/"+name),
-                                  Unit = getunit("Disk/" + name),
-                                  HeadSize = h,
-                                  extra_command = "--lower-limit 0")
-
-                for li, load_type in  enumerate(DiskStats[ name ]):
-                    s.add( load_type, g, Format = getf("Disk/" + name), var_name = load_type, scale_data=getit( load_type, DiskScale ) )
-                
-                gt, plot, fullname = s.compose()
-                
-            else:
-                gt, plot, fullname = maketypesplot( "Disk/" + dname, name, g, 
-                                                    Title = dname + ': ' + getit("Disk/"+name, Human),
-                                                    Format = getf("Disk/" + name),
-                                                    Unit = getunit("Disk/" + name) )
+        # detailed plots
+        memory.reverse()
+        for g in memory:
+            name = re.search( "^memory/.*-(.*).rrd", g ).group(1)
+            gt, plot, fullname = maketypesplot( "Memory", name, g )
 
             Config["types"][fullname] = gt
-            Plots["subplots"]["plots"].append( plot )        
+            SubPlots["subplots"]["plots"].append( plot )
 
-    Config["page"]["plots"].append( Plots )
-
-
-######################################################################################
-# Memory
-
-if os.path.exists( "memory" ):
-    Plots = { "subplots": { "title": "Memory details", "plots": [ ] } }
-
-    # Memory overview
-    s = StackOrLines( cs, "Memory", "Overview", isStack = True, t = "AREA", extra_command="--lower-limit 0"  )
-
-    memory = sorter( "memory/*.rrd", "^memory/.*-(.*).rrd",
-                     ["slab_unrecl", "slab_recl", "used", "buffered", "system"],
-                     ["cached", "free"] )
-
-    for g in memory:
-        name = re.search( "^memory/.*-(.*).rrd", g ).group(1)
-        s.add( name, g )
-
-    gt, plot, fullname = s.compose()
-
-    Config["types"][fullname] = gt
-    Plots["type"] = fullname
-    Plots["subplots"]["plots"].append( plot )
-
-    # Memory overview: cover
-    s = StackOrLines( cs, "Memory", "Overview", Title = "Memory, B", Unit = "", SkipLegend = True, isStack = True, t = "AREA", extra_command="--lower-limit 0"  )
-
-    for g in memory:
-        name = re.search( "^memory/.*-(.*).rrd", g ).group(1)
-        s.add( name, g )
-
-    gt, plot, fullname = s.compose()
+        Plots["subplots"]["plots"].append( SubPlots )
     
-    Config["types"]["Memory/overview/cover"] = gt
-    Config["cover"].append( "Memory/overview/cover" )
 
-    # detailed plots
-    memory.reverse()
-    for g in memory:
-        name = re.search( "^memory/.*-(.*).rrd", g ).group(1)
-        gt, plot, fullname = maketypesplot( "Memory", name, g )
+    ######################################################################################
+    # Storage
+    if len( glob.glob( "df-*" ) ) > 0:
+        SubPlots = { "subplots": { "title": "Storage details", "plots": [ ] } }
 
-        Config["types"][fullname] = gt
-        Plots["subplots"]["plots"].append( plot )
+        for gd in sorter( "df-*", "^df-(.*)", ["root"] ):
+            part_name = re.search( "^df-(.*)", gd ).group(1)
+
+            # special treatment of tmp filesystem
+            # remove it if you don't need it
+            if part_name == "tmp":
+                skip_free = True
+            else:
+                skip_free = False
+
+            s = StackOrLines( cs, "Storage", part_name, isStack = True, t = "AREA",
+                              extra_command = '--lower-limit 0' )
+
+            for g in sorter( gd + "/*.rrd", "^df-.*/df_complex-(.*).rrd", front = ["used"], end=["free"] ):
+                name = re.search( "^df-.*/df_complex-(.*).rrd", g ).group(1)
+                if skip_free and name == "free": continue
+                s.add( name, g )
+
+            gt, plot, fullname = s.compose()
+
+            Config["types"][fullname] = gt
+            SubPlots["subplots"]["plots"].append( plot )
+            if not SubPlots.has_key("type"): SubPlots["type"] = fullname
+            if Plots["type"] is None: Plots["type"] = fullname
+
+
+        # disk access rates
+        DiskStats = { "time": [ "read", "write" ],
+                      "octets": [ "read", "write" ],
+                      "ops": [ "read", "write" ],
+                      "merged": [ "read", "write" ],
+                      "io_time": [ "io_time" ],
+        }
+
+        DiskScale = { "DEFAULT": None,
+                      "io_time": "10,/", # from ms/s to %: 1ms / 1000ms * 100%
+        }
+
+        for gd in sorter( "disk-*" ):
+            dname = re.search( "^disk-(.*)", gd ).group(1)
+            if re.search( "(.*)p.*", dname ) is not None:
+                continue # skip partitions
+
+            for g in sorter( gd + "/disk_*.rrd" ):
+                name = re.search( "^disk-.*/disk_(.*).rrd", g ).group(1)
+                if name == "time":
+                    continue # skip this stat, not sure what it means [units]
+
+                if name in DiskStats.keys():
+                    col = cs
+                    h = gethead( "Disk/" + name )
+                    if len( DiskStats[ name ] ) == 1:
+                        col = csSingle
+                        h = None
+
+                    s = StackOrLines( col, "Disk/" + dname, name, minmax=True,
+                                      Title = dname + ': ' + gethuman("Disk/"+name),
+                                      Unit = getunit("Disk/" + name),
+                                      HeadSize = h,
+                                      extra_command = "--lower-limit 0")
+
+                    for li, load_type in  enumerate(DiskStats[ name ]):
+                        s.add( load_type, g, Format = getf("Disk/" + name), var_name = load_type, scale_data=getit( load_type, DiskScale ) )
+
+                    gt, plot, fullname = s.compose()
+
+                else:
+                    gt, plot, fullname = maketypesplot( "Disk/" + dname, name, g, 
+                                                        Title = dname + ': ' + getit("Disk/"+name, Human),
+                                                        Format = getf("Disk/" + name),
+                                                        Unit = getunit("Disk/" + name) )
+
+                Config["types"][fullname] = gt
+                SubPlots["subplots"]["plots"].append( plot )
+                
+        Plots["subplots"]["plots"].append( SubPlots )
 
     Config["page"]["plots"].append( Plots )
 
@@ -855,82 +868,90 @@ if os.path.exists( "statefs_cellular" ):
 
     Config["page"]["plots"].append( Plots )
 
-    
-######################################################################################
-# Load
-if os.path.exists( "load" ):
-    Plots = { "subplots": { "title": "Load details", "plots": [ ] } }
-
-    s = StackOrLines( cs, "Load", "load", Title="Load",
-                      minmax=True, extra_command='--lower-limit 0' )
-
-    for li, load_type in  enumerate([ "shortterm", "midterm", "longterm" ]):
-        Type = "Load"
-        name = load_type
-        g = "load/load.rrd"
-
-        s.add( name, g, var_name=name )
-
-    gt, plot, fullname = s.compose()
-    
-    Config["types"][fullname] = gt
-    Plots["type"] = fullname
-    Plots["subplots"]["plots"].append( plot )
-    #### Other Load related graphs
-
-    g = "contextswitch/contextswitch.rrd"
-    if os.path.exists(g):
-        name = "context_switch"
-        gt, plot, fullname = maketypesplot( "Context", name, g, "Context switch", extra_command='--lower-limit 0' )
-        Config["types"][fullname] = gt
-        Plots["subplots"]["plots"].append( plot )
-
-    g = "entropy/entropy.rrd"
-    if os.path.exists(g):
-        name = "entropy"
-        gt, plot, fullname = maketypesplot( "Entropy", name, g, "Entropy", extra_command='--lower-limit 0' )
-        Config["types"][fullname] = gt
-        Plots["subplots"]["plots"].append( plot )
-
-    Config["page"]["plots"].append( Plots )
-
 
 ######################################################################################
-# Processes
-if os.path.exists( "processes" ):
-    Plots = { "subplots": { "title": "Processes details", "plots": [ ] } }
+# Processes and Load
+if os.path.exists( "processes" ) or os.path.exists( "load" ):
+    Plots = { "type": None, "subplots": { "title": "Processes & Load", "plots": [ ] } }
 
-    # Processes overview
-    s = StackOrLines( cs, "Processes", "Overview", isStack = True, t = "AREA", extra_command = '--lower-limit 0' )
-    processes = sorter( "processes/ps_state-*.rrd", "^processes/ps_state-(.*).rrd",
-                        ["zombies", "paging", "blocked", "running"], ["stopped", "sleeping"] )
-    for g in processes:
-        name = re.search( "^processes/ps_state-(.*).rrd", g ).group(1)
-        s.add( name, g )
+    if os.path.exists( "processes" ):
 
-    gt, plot, fullname = s.compose()
+        SubPlots = { "type": None, "subplots": { "title": "Processes details", "plots": [ ] } }
+        
+        # Processes overview
+        s = StackOrLines( cs, "Processes", "Overview", isStack = True, t = "AREA", extra_command = '--lower-limit 0' )
+        processes = sorter( "processes/ps_state-*.rrd", "^processes/ps_state-(.*).rrd",
+                            ["zombies", "paging", "blocked", "running"], ["stopped", "sleeping"] )
+        for g in processes:
+            name = re.search( "^processes/ps_state-(.*).rrd", g ).group(1)
+            s.add( name, g )
 
-    Config["types"][fullname] = gt
-    Plots["type"] = fullname
-    Plots["subplots"]["plots"].append( plot )
-    
-    # detailed plots
-    g = "processes/fork_rate.rrd"
-    name = "fork_rate"
-    gt, plot, fullname = maketypesplot( "Processes", name, g, "Fork rate, 1/s" )
-    Config["types"][fullname] = gt
-    Plots["subplots"]["plots"].append( plot )
+        gt, plot, fullname = s.compose()
 
-    processes.reverse()
-    for g in processes:
-        name = re.search( "^processes/.*-(.*).rrd", g ).group(1)
-        gt, plot, fullname = maketypesplot( "Processes", name, g )
+        Config["types"][fullname] = gt
+        SubPlots["type"] = fullname
+        SubPlots["subplots"]["plots"].append( plot )
+        if Plots["type"] is None: Plots["type"] = fullname
 
+        # detailed plots
+        processes.reverse()
+        for g in processes:
+            name = re.search( "^processes/.*-(.*).rrd", g ).group(1)
+            gt, plot, fullname = maketypesplot( "Processes", name, g )
+
+            Config["types"][fullname] = gt
+            SubPlots["subplots"]["plots"].append( plot )
+            
+        Plots["subplots"]["plots"].append( SubPlots )
+        
+        # fork rate goes directly to Plot
+        g = "processes/fork_rate.rrd"
+        name = "fork_rate"
+        gt, plot, fullname = maketypesplot( "Processes", name, g, "Fork rate, 1/s" )
         Config["types"][fullname] = gt
         Plots["subplots"]["plots"].append( plot )
 
+    ######################################################################################
+    # Load
+    if os.path.exists( "load" ):
+        SubPlots = { "subplots": { "title": "Load details", "plots": [ ] } }
+
+        s = StackOrLines( cs, "Load", "load", Title="Load",
+                          minmax=True, extra_command='--lower-limit 0' )
+
+        for li, load_type in  enumerate([ "shortterm", "midterm", "longterm" ]):
+            Type = "Load"
+            name = load_type
+            g = "load/load.rrd"
+
+            s.add( name, g, var_name=name )
+
+        gt, plot, fullname = s.compose()
+
+        Config["types"][fullname] = gt
+        SubPlots["type"] = fullname
+        SubPlots["subplots"]["plots"].append( plot )
+        if Plots["type"] is None: Plots["type"] = fullname
+        #### Other Load related graphs
+
+        g = "contextswitch/contextswitch.rrd"
+        if os.path.exists(g):
+            name = "context_switch"
+            gt, plot, fullname = maketypesplot( "Context", name, g, "Context switch", extra_command='--lower-limit 0' )
+            Config["types"][fullname] = gt
+            SubPlots["subplots"]["plots"].append( plot )
+
+        g = "entropy/entropy.rrd"
+        if os.path.exists(g):
+            name = "entropy"
+            gt, plot, fullname = maketypesplot( "Entropy", name, g, "Entropy", extra_command='--lower-limit 0' )
+            Config["types"][fullname] = gt
+            SubPlots["subplots"]["plots"].append( plot )
+
+        Plots["subplots"]["plots"].append( SubPlots )
+
+        
     # detailed plots for selected processes
-
     ProcStats = { "cputime": [ "user", "syst" ],
                   "pagefaults": [ "minflt", "majflt" ],
                   "count": [ "processes", "threads" ],
