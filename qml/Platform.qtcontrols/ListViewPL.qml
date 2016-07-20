@@ -2,6 +2,7 @@ import QtQuick 2.0
 
 ListView {
     property string header_text: ""
+    property int pl_margin_bottom: 10
 
     header: Text {
         text: header_text

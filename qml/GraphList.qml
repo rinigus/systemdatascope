@@ -18,7 +18,7 @@ PagePL {
 
             anchors.left: parent.left
             anchors.right: parent.right
-            height: image.myHeight
+            height: image.myHeight + ((index == graphsModel-1)? mainList.pl_margin_bottom : 0)
 
             Image {
                 id: image
