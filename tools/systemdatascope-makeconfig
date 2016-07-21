@@ -768,6 +768,89 @@ if len( glob.glob("interface-*") ) > 0:
 
     Plots = { "subplots": { "title": "Network details", "plots": [ ] } }
 
+    # overall traffic
+    
+    command_def = '-t "Network traffic, bytes" ' + defColors #+ makeheads(7)
+    command_line = ""
+    command_extra = ""
+    files = []
+    s = StackOrLinesOld( cs, minmax=False, isStack=True, t="AREA" )
+    for li, DT in  enumerate([ ["tx", s, -1], ["rx", s, +1] ]):
+        data_type = DT[0]            
+        humandt = { "tx": "outgoing", "rx": "incoming" }[data_type]
+        first = True
+        
+        for g in sorter("interface-*/if_octets.rrd", "^interface-(.*)/if_octets.rrd", [], ["lo"]):
+            intname = re.search( "^interface-(.*)/if_octets.rrd", g ).group(1)
+
+            intname = intname.replace("-", "_")
+
+            if intname == "lo": # skip lo
+                continue
+
+            files.append(g)
+            name = re.search( "^interface-.*/if_(.*).rrd", g ).group(1)
+            f = "%5.0lf%s"
+
+            command_def += "DEF:" + intname + data_type + "_data=" + g + ":" + data_type + ":AVERAGE "
+            command_def += "CDEF:" + intname + data_type + "=" + intname + data_type + "_data," + str(DT[2]) + ",* "
+            command_def += "VDEF:" + intname + data_type + "_total=" + intname + data_type + "_data,TOTAL "
+
+            makeLine = first
+            
+            DT[1].add( intname + data_type, "$LINE_WIDTH_PRIMARY$", '"' + intname + " " + humandt + '\\l"',
+                       "COMMENT:\\u GPRINT:"+ intname + data_type+"_data:AVERAGE:\"Avr " + f +
+                       "\" GPRINT:"+ intname + data_type+"_data:LAST:\"Last " + f + "\\r\" " + " ",
+                       makeLine=makeLine )
+
+            command_extra += 'GPRINT:' + intname + data_type + '_total:"' + \
+                             intname + " " + humandt + ' Total %8.0lf%s' + getunit("NetworkTotal/" + name) + '\\r" '
+
+            first = False
+
+    command_line = s.str() + command_extra
+    # sin = StackOrLinesOld( cs, minmax=False, isStack=True, t="AREA" )
+    # sout = StackOrLinesOld( cs, minmax=False, isStack=True, t="AREA" )
+    # for g in sorter("interface-*/if_octets.rrd", "^interface-(.*)/if_octets.rrd", [], ["lo"]):
+    #     intname = re.search( "^interface-(.*)/if_octets.rrd", g ).group(1)
+
+    #     intname = intname.replace("-", "_")
+
+    #     if intname == "lo": # skip lo
+    #         continue
+        
+    #     files.append(g)
+    #     name = re.search( "^interface-.*/if_(.*).rrd", g ).group(1)
+    #     f = getf("Network/" + name)
+
+    #     for li, DT in  enumerate([ ["tx", sout, -1], ["rx",sin, +1] ]):
+    #         data_type = DT[0]            
+    #         humandt = { "tx": "outgoing", "rx": "incoming" }[data_type]
+
+    #         command_def += "DEF:" + intname + data_type + "_data=" + g + ":" + data_type + ":AVERAGE "
+    #         command_def += "CDEF:" + intname + data_type + "=" + intname + data_type + "_data," + str(DT[2]) + ",* "
+    #         command_def += "VDEF:" + intname + data_type + "_total=" + intname + data_type + "_data,TOTAL "
+
+    #         DT[1].add( intname + data_type, "$LINE_WIDTH_PRIMARY$", '"' + intname + " " + humandt + '\\l"',
+    #                    "COMMENT:\\u GPRINT:"+ intname + data_type+"_data:AVERAGE:\"" + f +
+    #                    "\" GPRINT:"+ intname + data_type+"_data:LAST:\"" + f + "\\r\" " + " " 
+    #         )
+
+    #         command_extra += 'GPRINT:' + intname + data_type + '_total:"' + \
+    #                          intname + " " + humandt + ' Total %8.0lf%s' + getunit("NetworkTotal/" + name) + '\\r" ' 
+
+    # command_line = sin.str() + sout.str() + command_extra
+
+    fullname = "Network/Overall_traffic"
+    gt = { "command": command_def + command_line,
+           "files": files }
+    plot = { "type": fullname }
+
+    Config["types"][fullname] = gt
+    Plots["subplots"]["plots"].append( plot )
+    Plots["type"] = fullname
+
+    # interface one by one
     for CNet in sorter("interface-*/if_octets.rrd", "^interface-(.*)/if_octets.rrd", [], ["lo"]):
         intname = re.search( "^interface-(.*)/if_octets.rrd", CNet ).group(1)
             
