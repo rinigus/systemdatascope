@@ -34,31 +34,33 @@ Dialog {
 
             TextSwitch {
                 id: guiTrackCollectd
-                checked: trackCollecd
+                checked: settings.track_connectd_service
                 text: qsTr("Use " + programName + " to enable/disable collectd")
                 //anchors.left: grid.left
             }
 
             TextSwitch {
+                id: guiRunCollectd
                 text: qsTr("Run collectd")
                 enabled: guiTrackCollectd.checked
                 checked: service.running
                 //anchors.left: grid.left
 
-                onCheckedChanged: {
-                    if ( guiTrackCollectd.checked ) service.setRun(checked)
-                }
+//                onCheckedChanged: {
+//                    if ( guiTrackCollectd.checked ) service.setRun(checked)
+//                }
             }
 
             TextSwitch {
+                id: guiEnableCollectd
                 text: qsTr("Enable collectd on boot")
                 enabled: guiTrackCollectd.checked
                 checked: service.enabled
                 //anchors.left: grid.left
 
-                onCheckedChanged: {
-                    if ( guiTrackCollectd.checked ) service.setEnable(checked)
-                }
+//                onCheckedChanged: {
+//                    if ( guiTrackCollectd.checked ) service.setEnable(checked)
+//                }
             }
 
             Column {
@@ -68,7 +70,7 @@ Dialog {
                 TextField {
                     id: guiFolderWhileRunning;
                     width: parent.width
-                    text: folderWhileRunning;
+                    text: settings.workingdir_collectd_running
                     label: qsTr("collectd folder while running")
                 }
                 Label {
@@ -88,7 +90,7 @@ Dialog {
                 TextField {
                     id: guiFolderWhileStopped;
                     width: parent.width
-                    text: folderWhileStopped;
+                    text: settings.workingdir_collectd_stopped
                     label: qsTr("collectd folder while stopped")
                 }
                 Label {
@@ -102,7 +104,7 @@ Dialog {
 
             TextField {
                 id: guiUpdateGraphsInterval
-                text: updateGraphsInterval
+                text: settings.updates_period
                 width: parent.width
                 label: qsTr("Update graphs interval [seconds]")
                 validator: IntValidator { bottom: 1 }
@@ -111,7 +113,7 @@ Dialog {
 
             TextField {
                 id: guiGraphHeight
-                text: graphHeight
+                text: settings.graph_base_height
                 width: parent.width
                 label: qsTr("Graph height in pixels")
                 validator: IntValidator { bottom: 30 }
@@ -121,7 +123,7 @@ Dialog {
             TextField {
                 label: qsTr("Graphs: Title font size")
                 id: guiGraphFSZTitle
-                text: graphFSZTitle
+                text: settings.graph_font_size_title
                 width: parent.width
                 validator: IntValidator { bottom: 4 }
                 inputMethodHints: Qt.ImhFormattedNumbersOnly
@@ -130,7 +132,7 @@ Dialog {
             TextField {
                 label: qsTr("Graphs: Axis font size")
                 id: guiGraphFSZAxis
-                text: graphFSZAxis
+                text: settings.graph_font_size_axis
                 validator: IntValidator { bottom: 4 }
                 width: parent.width
                 inputMethodHints: Qt.ImhFormattedNumbersOnly
@@ -139,7 +141,7 @@ Dialog {
             TextField {
                 label: qsTr("Graphs: Unit font size")
                 id: guiGraphFSZUnit
-                text: graphFSZUnit
+                text: settings.graph_font_size_unit
                 validator: IntValidator { bottom: 4 }
                 width: parent.width
                 inputMethodHints: Qt.ImhFormattedNumbersOnly
@@ -148,7 +150,7 @@ Dialog {
             TextField {
                 label: qsTr("Graphs: Legend font size")
                 id: guiGraphFSZLegend
-                text: graphFSZLegend
+                text: settings.graph_font_size_legend
                 validator: IntValidator { bottom: 4 }
                 width: parent.width
                 inputMethodHints: Qt.ImhFormattedNumbersOnly
@@ -225,31 +227,52 @@ Dialog {
         VerticalScrollDecorator {}
     }
 
-    function prop2gui()
+//    function prop2gui()
+//    {
+//        // keep URL as it was in the dialog, to allow to fix the typos. Same for the directories
+
+//        guiTrackCollectd.checked = trackCollecd
+//        guiUpdateGraphsInterval.text = updateGraphsInterval
+//        guiGraphHeight.text = graphHeight
+//        guiGraphFSZTitle.text = graphFSZTitle
+//        guiGraphFSZAxis.text = graphFSZAxis
+//        guiGraphFSZUnit.text = graphFSZUnit
+//        guiGraphFSZLegend.text = graphFSZLegend
+//    }
+
+//    function gui2props()
+//    {
+//        folderWhileRunning = guiFolderWhileRunning.text
+//        folderWhileStopped = guiFolderWhileStopped.text
+//        trackCollecd = guiTrackCollectd.checked
+
+//        if (guiUpdateGraphsInterval.acceptableInput) updateGraphsInterval = parseInt(guiUpdateGraphsInterval.text, 10)
+//        if (guiGraphHeight.acceptableInput) graphHeight = parseInt(guiGraphHeight.text, 10)
+//        if (guiGraphFSZTitle.acceptableInput) graphFSZTitle = parseInt(guiGraphFSZTitle.text, 10)
+//        if (guiGraphFSZAxis.acceptableInput) graphFSZAxis = parseInt(guiGraphFSZAxis.text, 10)
+//        if (guiGraphFSZUnit.acceptableInput) graphFSZUnit = parseInt(guiGraphFSZUnit.text, 10)
+//        if (guiGraphFSZLegend.acceptableInput) graphFSZLegend = parseInt(guiGraphFSZLegend.text, 10)
+//    }
+
+    onAccepted:
     {
-        // keep URL as it was in the dialog, to allow to fix the typos. Same for the directories
+        settings.workingdir_collectd_running = guiFolderWhileRunning.text
+        settings.workingdir_collectd_stopped = guiFolderWhileStopped.text
+        settings.track_connectd_service = guiTrackCollectd.checked
 
-        guiTrackCollectd.checked = trackCollecd
-        guiUpdateGraphsInterval.text = updateGraphsInterval
-        guiGraphHeight.text = graphHeight
-        guiGraphFSZTitle.text = graphFSZTitle
-        guiGraphFSZAxis.text = graphFSZAxis
-        guiGraphFSZUnit.text = graphFSZUnit
-        guiGraphFSZLegend.text = graphFSZLegend
-    }
+        if (guiUpdateGraphsInterval.acceptableInput) settings.updates_period = parseInt(guiUpdateGraphsInterval.text, 10)
+        if (guiGraphHeight.acceptableInput) settings.graph_base_height = parseInt(guiGraphHeight.text, 10)
+        if (guiGraphFSZTitle.acceptableInput) settings.graph_font_size_title = parseInt(guiGraphFSZTitle.text, 10)
+        if (guiGraphFSZAxis.acceptableInput) settings.graph_font_size_axis = parseInt(guiGraphFSZAxis.text, 10)
+        if (guiGraphFSZUnit.acceptableInput) settings.graph_font_size_unit = parseInt(guiGraphFSZUnit.text, 10)
+        if (guiGraphFSZLegend.acceptableInput) settings.graph_font_size_legend = parseInt(guiGraphFSZLegend.text, 10)
 
-    function gui2props()
-    {
-        folderWhileRunning = guiFolderWhileRunning.text
-        folderWhileStopped = guiFolderWhileStopped.text
-        trackCollecd = guiTrackCollectd.checked
+        if ( guiTrackCollectd.checked && guiEnableCollectd.checked != service.enabled )
+            service.setEnable(guiEnableCollectd.checked)
+        if ( guiTrackCollectd.checked && guiRunCollectd.checked != service.running )
+            service.setRun(guiRunCollectd.checked)
 
-        if (guiUpdateGraphsInterval.acceptableInput) updateGraphsInterval = parseInt(guiUpdateGraphsInterval.text, 10)
-        if (guiGraphHeight.acceptableInput) graphHeight = parseInt(guiGraphHeight.text, 10)
-        if (guiGraphFSZTitle.acceptableInput) graphFSZTitle = parseInt(guiGraphFSZTitle.text, 10)
-        if (guiGraphFSZAxis.acceptableInput) graphFSZAxis = parseInt(guiGraphFSZAxis.text, 10)
-        if (guiGraphFSZUnit.acceptableInput) graphFSZUnit = parseInt(guiGraphFSZUnit.text, 10)
-        if (guiGraphFSZLegend.acceptableInput) graphFSZLegend = parseInt(guiGraphFSZLegend.text, 10)
+        appWindow.setConfig()
     }
 }
 

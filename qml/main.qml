@@ -125,6 +125,7 @@ ApplicationWindowPL {
     }
 
     onAppSettings: {
+        service.updateState()
         appWindow.pushPage(Qt.resolvedUrl("AppSettings.qml"))
     }
 
