@@ -22,6 +22,7 @@ ApplicationWindow {
     signal appAbout()
     signal appHelp()
     signal appStatus()
+    signal appSetConfig()
 
     // Settings
     allowedOrientations : Orientation.All
@@ -34,6 +35,7 @@ ApplicationWindow {
 
     function pushPage(pageInstance, pageProperties, animate) {
         pageStack.completeAnimation()
+        //console.log("Pushing new " + pageStack.depth + " " + pageStack.busy)
         pageStack.push(pageInstance, pageProperties)
         return pageInstance
     }
@@ -44,14 +46,36 @@ ApplicationWindow {
     }
 
     function popAll() {
+        //console.log("Popping all "+ pageStack.busy)
         pageStack.clear()
     }
 
-//    Connections {
-//        target: service
-//        onRunningChanged: {  }
-//        onEnabledChanged: {  }
-//    }
+    Timer {
+        id: transitionChecker
+        interval: 250 // 0.25 s
+        running: false
+        repeat: true
+        onTriggered: {
+            appWindowBase.appSetConfig()
+        }
+    }
+
+    onAppSetConfig: {
+        if ( pageStack.busy ) // wait till the transition ends
+        {
+            //console.log("Wait for it")
+            transitionChecker.running = true
+            return
+        }
+        transitionChecker.running = false
+        appWindow.setConfig()
+    }
+
+    //    Connections {
+    //        target: service
+    //        onRunningChanged: {  }
+    //        onEnabledChanged: {  }
+    //    }
 
     Component.onCompleted: {
 

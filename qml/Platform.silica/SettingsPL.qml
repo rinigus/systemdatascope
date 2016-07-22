@@ -3,17 +3,19 @@ import Sailfish.Silica 1.0
 
 Dialog {
 
-//    property string folderWhileRunning: ""
-//    property string folderWhileStopped: ""
+    //    property string folderWhileRunning: ""
+    //    property string folderWhileStopped: ""
 
-//    property int graphHeight: 400
-//    property int graphFSZTitle: 14
-//    property int graphFSZAxis: 14
-//    property int graphFSZUnit: 14
-//    property int graphFSZLegend: 14
-//    property int updateGraphsInterval: 30
+    //    property int graphHeight: 400
+    //    property int graphFSZTitle: 14
+    //    property int graphFSZAxis: 14
+    //    property int graphFSZUnit: 14
+    //    property int graphFSZLegend: 14
+    //    property int updateGraphsInterval: 30
 
-//    property bool trackCollecd: false
+    //    property bool trackCollecd: false
+
+    property bool applyOnInactive: false
 
     allowedOrientations : Orientation.All
 
@@ -219,35 +221,43 @@ Dialog {
         VerticalScrollDecorator {}
     }
 
-//    function prop2gui()
-//    {
-//        // keep URL as it was in the dialog, to allow to fix the typos. Same for the directories
+    //    function prop2gui()
+    //    {
+    //        // keep URL as it was in the dialog, to allow to fix the typos. Same for the directories
 
-//        guiTrackCollectd.checked = trackCollecd
-//        guiUpdateGraphsInterval.text = updateGraphsInterval
-//        guiGraphHeight.text = graphHeight
-//        guiGraphFSZTitle.text = graphFSZTitle
-//        guiGraphFSZAxis.text = graphFSZAxis
-//        guiGraphFSZUnit.text = graphFSZUnit
-//        guiGraphFSZLegend.text = graphFSZLegend
-//    }
+    //        guiTrackCollectd.checked = trackCollecd
+    //        guiUpdateGraphsInterval.text = updateGraphsInterval
+    //        guiGraphHeight.text = graphHeight
+    //        guiGraphFSZTitle.text = graphFSZTitle
+    //        guiGraphFSZAxis.text = graphFSZAxis
+    //        guiGraphFSZUnit.text = graphFSZUnit
+    //        guiGraphFSZLegend.text = graphFSZLegend
+    //    }
 
-//    function gui2props()
-//    {
-//        folderWhileRunning = guiFolderWhileRunning.text
-//        folderWhileStopped = guiFolderWhileStopped.text
-//        trackCollecd = guiTrackCollectd.checked
+    //    function gui2props()
+    //    {
+    //        folderWhileRunning = guiFolderWhileRunning.text
+    //        folderWhileStopped = guiFolderWhileStopped.text
+    //        trackCollecd = guiTrackCollectd.checked
 
-//        if (guiUpdateGraphsInterval.acceptableInput) updateGraphsInterval = parseInt(guiUpdateGraphsInterval.text, 10)
-//        if (guiGraphHeight.acceptableInput) graphHeight = parseInt(guiGraphHeight.text, 10)
-//        if (guiGraphFSZTitle.acceptableInput) graphFSZTitle = parseInt(guiGraphFSZTitle.text, 10)
-//        if (guiGraphFSZAxis.acceptableInput) graphFSZAxis = parseInt(guiGraphFSZAxis.text, 10)
-//        if (guiGraphFSZUnit.acceptableInput) graphFSZUnit = parseInt(guiGraphFSZUnit.text, 10)
-//        if (guiGraphFSZLegend.acceptableInput) graphFSZLegend = parseInt(guiGraphFSZLegend.text, 10)
-//    }
+    //        if (guiUpdateGraphsInterval.acceptableInput) updateGraphsInterval = parseInt(guiUpdateGraphsInterval.text, 10)
+    //        if (guiGraphHeight.acceptableInput) graphHeight = parseInt(guiGraphHeight.text, 10)
+    //        if (guiGraphFSZTitle.acceptableInput) graphFSZTitle = parseInt(guiGraphFSZTitle.text, 10)
+    //        if (guiGraphFSZAxis.acceptableInput) graphFSZAxis = parseInt(guiGraphFSZAxis.text, 10)
+    //        if (guiGraphFSZUnit.acceptableInput) graphFSZUnit = parseInt(guiGraphFSZUnit.text, 10)
+    //        if (guiGraphFSZLegend.acceptableInput) graphFSZLegend = parseInt(guiGraphFSZLegend.text, 10)
+    //    }
 
     onAccepted:
     {
+        applyOnInactive = true
+    }
+
+    onStatusChanged:
+    {
+        if (status != PageStatus.Inactive || !applyOnInactive)
+            return
+
         settings.workingdir_collectd_running = guiFolderWhileRunning.text
         settings.workingdir_collectd_stopped = guiFolderWhileStopped.text
         settings.track_connectd_service = guiTrackCollectd.checked
@@ -264,7 +274,8 @@ Dialog {
         if ( guiTrackCollectd.checked && guiRunCollectd.checked != service.running )
             service.setRun(guiRunCollectd.checked)
 
-        appWindow.setConfig()
+        applyOnInactive = false
+
+        appWindow.appSetConfig()
     }
 }
-

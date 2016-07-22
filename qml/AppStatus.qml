@@ -14,6 +14,7 @@ StatusPL {
             stat += "<b>collectd status:</b><br><small>"
             var s = service.status
             s = s.replace(/\n/g, "<br>")
+            s = s.replace(/ /g, "&nbsp;")
             stat += s
             stat += "</small><br><br>";
         }
