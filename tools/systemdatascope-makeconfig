@@ -776,7 +776,9 @@ class Interface2Human:
         # collect all interface names
         interfaces = []
         for g in glob.glob("interface-*"):
-            interfaces.append( re.search( "^interface-(.*)", g ).group(1) )
+            intname = re.search( "^interface-(.*)", g ).group(1)
+            intname = intname.replace("-", "_")
+            interfaces.append( intname )
 
         # how many cellular & wlan ifaces we have?
         ncell = 0
@@ -826,7 +828,6 @@ if len( glob.glob("interface-*") ) > 0:
         
         for g in sorter("interface-*/if_octets.rrd", "^interface-(.*)/if_octets.rrd", [], ["lo"]):
             intname = re.search( "^interface-(.*)/if_octets.rrd", g ).group(1)
-
             intname = intname.replace("-", "_")
 
             if intname == "lo": # skip lo
@@ -866,7 +867,8 @@ if len( glob.glob("interface-*") ) > 0:
     # interface one by one
     for CNet in sorter("interface-*/if_octets.rrd", "^interface-(.*)/if_octets.rrd", [], ["lo"]):
         intname = re.search( "^interface-(.*)/if_octets.rrd", CNet ).group(1)
-            
+        intname = intname.replace("-", "_")
+        
         SubPlots = { "subplots": { "title": "Network details: " + int2hum.str(intname), "plots": [ ] } }
 
         for g in glob.glob("interface-" + intname + "/if_*.rrd"):
