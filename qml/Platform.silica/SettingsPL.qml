@@ -45,10 +45,6 @@ Dialog {
                 enabled: guiTrackCollectd.checked
                 checked: service.running
                 //anchors.left: grid.left
-
-//                onCheckedChanged: {
-//                    if ( guiTrackCollectd.checked ) service.setRun(checked)
-//                }
             }
 
             TextSwitch {
@@ -57,10 +53,6 @@ Dialog {
                 enabled: guiTrackCollectd.checked
                 checked: service.enabled
                 //anchors.left: grid.left
-
-//                onCheckedChanged: {
-//                    if ( guiTrackCollectd.checked ) service.setEnable(checked)
-//                }
             }
 
             Column {
