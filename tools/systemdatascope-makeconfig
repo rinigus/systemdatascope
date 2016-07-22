@@ -92,6 +92,7 @@ Formats = { "DEFAULT": "%5.2lf",
             "Radio/Cellular": "%4.0lf",
             "Radio/Internet": "%4.0lf",
             "Radio/Bluetooth": "%4.2lf",
+            "Radio/active": "%4.2lf",
 }
 
 Heads = { "DEFAULT": None,
@@ -110,6 +111,7 @@ Heads = { "DEFAULT": None,
           "Radio/Cellular": 4,
           "Radio/Internet": 4,
           "Radio/Bluetooth": 4,
+          "Radio/active": 4,
 }
 
 Human = { "DEFAULT": None,
@@ -135,6 +137,7 @@ Human = { "DEFAULT": None,
           "Radio/Cellular": "Cellular signal strength",
           "Radio/Internet": "Internet signal strength",
           "Radio/Bluetooth": "Bluetooth activity",
+          "Radio/active": "Active radio(s)",
 }
 
 ######################################################################################
@@ -763,11 +766,52 @@ if len( glob.glob( "df-*" ) ) > 0 or os.path.exists( "memory" ):
 
     Config["page"]["plots"].append( Plots )
 
+
 ######################################################################################
+# Network interfaces
+
+class Interface2Human:
+
+    def __init__(self):
+        # collect all interface names
+        interfaces = []
+        for g in glob.glob("interface-*"):
+            interfaces.append( re.search( "^interface-(.*)", g ).group(1) )
+
+        # how many cellular & wlan ifaces we have?
+        ncell = 0
+        nwlan = 0
+        for i in interfaces:
+            if i.find("rmnet") == 0: ncell += 1
+            elif i.find("wlan") == 0: nwlan += 1
+
+        # build dictionary
+        self.translate = {}
+        for i in interfaces:
+            if i == "lo": t = "local"
+            elif i.find("rmnet") == 0:
+                t = "cellular"
+                if ncell > 1:
+                    if i.find("rmnet_") == 0: t += i[ len("rmnet_"): ]
+                    else: t += i[ len("rmnet"): ]
+
+            elif i.find("wlan") == 0:
+                if nwlan > 1: t = i
+                else: t = "wlan"
+
+            else: t = i
+
+            self.translate[i] = t
+
+    def str(self, i):
+        return self.translate[i]
+        
+
 if len( glob.glob("interface-*") ) > 0:
 
     Plots = { "subplots": { "title": "Network details", "plots": [ ] } }
-
+    int2hum = Interface2Human()
+    
     # overall traffic
     
     command_def = '-t "Network traffic, bytes" ' + defColors #+ makeheads(7)
@@ -798,48 +842,17 @@ if len( glob.glob("interface-*") ) > 0:
 
             makeLine = first
             
-            DT[1].add( intname + data_type, "$LINE_WIDTH_PRIMARY$", '"' + intname + " " + humandt + '\\l"',
+            DT[1].add( intname + data_type, "$LINE_WIDTH_PRIMARY$", '"' + int2hum.str(intname) + " " + humandt + '\\l"',
                        "COMMENT:\\u GPRINT:"+ intname + data_type+"_data:AVERAGE:\"Avr " + f +
                        "\" GPRINT:"+ intname + data_type+"_data:LAST:\"Last " + f + "\\r\" " + " ",
                        makeLine=makeLine )
 
             command_extra += 'GPRINT:' + intname + data_type + '_total:"' + \
-                             intname + " " + humandt + ' Total %8.0lf%s' + getunit("NetworkTotal/" + name) + '\\r" '
+                             int2hum.str(intname) + " " + humandt + ' Total %8.0lf%s' + getunit("NetworkTotal/" + name) + '\\r" '
 
             first = False
 
     command_line = s.str() + command_extra
-    # sin = StackOrLinesOld( cs, minmax=False, isStack=True, t="AREA" )
-    # sout = StackOrLinesOld( cs, minmax=False, isStack=True, t="AREA" )
-    # for g in sorter("interface-*/if_octets.rrd", "^interface-(.*)/if_octets.rrd", [], ["lo"]):
-    #     intname = re.search( "^interface-(.*)/if_octets.rrd", g ).group(1)
-
-    #     intname = intname.replace("-", "_")
-
-    #     if intname == "lo": # skip lo
-    #         continue
-        
-    #     files.append(g)
-    #     name = re.search( "^interface-.*/if_(.*).rrd", g ).group(1)
-    #     f = getf("Network/" + name)
-
-    #     for li, DT in  enumerate([ ["tx", sout, -1], ["rx",sin, +1] ]):
-    #         data_type = DT[0]            
-    #         humandt = { "tx": "outgoing", "rx": "incoming" }[data_type]
-
-    #         command_def += "DEF:" + intname + data_type + "_data=" + g + ":" + data_type + ":AVERAGE "
-    #         command_def += "CDEF:" + intname + data_type + "=" + intname + data_type + "_data," + str(DT[2]) + ",* "
-    #         command_def += "VDEF:" + intname + data_type + "_total=" + intname + data_type + "_data,TOTAL "
-
-    #         DT[1].add( intname + data_type, "$LINE_WIDTH_PRIMARY$", '"' + intname + " " + humandt + '\\l"',
-    #                    "COMMENT:\\u GPRINT:"+ intname + data_type+"_data:AVERAGE:\"" + f +
-    #                    "\" GPRINT:"+ intname + data_type+"_data:LAST:\"" + f + "\\r\" " + " " 
-    #         )
-
-    #         command_extra += 'GPRINT:' + intname + data_type + '_total:"' + \
-    #                          intname + " " + humandt + ' Total %8.0lf%s' + getunit("NetworkTotal/" + name) + '\\r" ' 
-
-    # command_line = sin.str() + sout.str() + command_extra
 
     fullname = "Network/Overall_traffic"
     gt = { "command": command_def + command_line,
@@ -854,7 +867,7 @@ if len( glob.glob("interface-*") ) > 0:
     for CNet in sorter("interface-*/if_octets.rrd", "^interface-(.*)/if_octets.rrd", [], ["lo"]):
         intname = re.search( "^interface-(.*)/if_octets.rrd", CNet ).group(1)
             
-        SubPlots = { "subplots": { "title": "Network details: " + intname, "plots": [ ] } }
+        SubPlots = { "subplots": { "title": "Network details: " + int2hum.str(intname), "plots": [ ] } }
 
         for g in glob.glob("interface-" + intname + "/if_*.rrd"):
             name = re.search( "^interface-.*/if_(.*).rrd", g ).group(1)
@@ -865,7 +878,7 @@ if len( glob.glob("interface-*") ) > 0:
             if name == "octets": hname = "traffic"
             else: hname = name
 
-            command_def = '-t "Network ' + intname + ' ' + hname + ", " + u + '" --lower-limit 0 ' + defColors + makeheads(7)
+            command_def = '-t "' + int2hum.str(intname) + ' ' + hname + ", " + u + '" --lower-limit 0 ' + defColors + makeheads(7)
             command_line = ""
             command_extra = ""
             files = [g]
@@ -928,6 +941,27 @@ if os.path.exists( "statefs_cellular" ):
         for g in sorter( "statefs_internet/signal_strength-*.rrd" ):
             name = re.search( "^statefs_internet/signal_strength-(.*).rrd", g ).group(1)
             s.add( name, g )
+        gt, plot, fullname = s.compose()
+
+        Config["types"][fullname] = gt
+        Plots["subplots"]["plots"].append( plot )
+
+    if len( glob.glob("radio-*") ) > 1:
+
+        s = StackOrLines( cs, "Radio", "active",
+                          minmax = False,
+                          isStack = True,                          
+                          t = "AREA" )
+        
+        for dtype in sorter( "radio-*" ):
+            names = sorter( dtype + "/" + "active-*.rrd" )
+            simple = ( len(names) == 1 )
+            for g in names:
+                name = re.search( "^radio-(.*)", dtype ).group(1)
+                if not simple:
+                    name += "_" +  re.search( "^" + dtype + "/active-(.*).rrd", g).group(1)
+            
+                s.add( name, g )
         gt, plot, fullname = s.compose()
 
         Config["types"][fullname] = gt
