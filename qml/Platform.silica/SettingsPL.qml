@@ -3,17 +3,17 @@ import Sailfish.Silica 1.0
 
 Dialog {
 
-    property string folderWhileRunning: ""
-    property string folderWhileStopped: ""
+//    property string folderWhileRunning: ""
+//    property string folderWhileStopped: ""
 
-    property int graphHeight: 400
-    property int graphFSZTitle: 14
-    property int graphFSZAxis: 14
-    property int graphFSZUnit: 14
-    property int graphFSZLegend: 14
-    property int updateGraphsInterval: 30
+//    property int graphHeight: 400
+//    property int graphFSZTitle: 14
+//    property int graphFSZAxis: 14
+//    property int graphFSZUnit: 14
+//    property int graphFSZLegend: 14
+//    property int updateGraphsInterval: 30
 
-    property bool trackCollecd: false
+//    property bool trackCollecd: false
 
     allowedOrientations : Orientation.All
 
