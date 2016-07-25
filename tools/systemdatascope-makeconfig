@@ -53,6 +53,7 @@ Units = { "DEFAULT": "",
           "CPUstate/cpusleep": "%",
           "Radio/Cellular": "%",
           "Radio/Internet": "%",
+          "Suspend": "1/s",
 }
 
 Formats = { "DEFAULT": "%5.2lf",
@@ -93,6 +94,7 @@ Formats = { "DEFAULT": "%5.2lf",
             "Radio/Internet": "%4.0lf",
             "Radio/Bluetooth": "%4.2lf",
             "Radio/active": "%4.2lf",
+            "Suspend": "%4.2lf",
 }
 
 Heads = { "DEFAULT": None,
@@ -112,6 +114,7 @@ Heads = { "DEFAULT": None,
           "Radio/Internet": 4,
           "Radio/Bluetooth": 4,
           "Radio/active": 4,
+          "Suspend/Overview": 4,
 }
 
 Human = { "DEFAULT": None,
@@ -544,10 +547,10 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
                                             extra_command='--upper-limit 100 --lower-limit 0 --rigid',
                                             scale_data = "10,/" )
 
-        Plots["subplots"]["plots"].append( plot )
-
         Config["types"]["CPUstate/" + name] = gt
         if Plots["type"] is None: Plots["type"] = fullname
+        CpuSleepPlots = { "type": fullname,
+                          "subplots": { "title": "CPU sleep details", "plots": [ {"type": fullname} ] } }
 
         gt, plot, fullname = maketypesplot( "CPUstate", name, g, Title="CPU sleep",
                                             extra_command='--upper-limit 100 --lower-limit 0 --rigid',
@@ -555,6 +558,64 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
 
         Config["types"]["CPUstate/" + name + "/cover"] = gt
         Config["cover"].append( "CPUstate/" + name + "/cover" )
+
+        # CPU sleep subplots
+        if os.path.exists("suspend"):
+
+            # success/failed graph
+            s = StackOrLines( cs, "Suspend", "Overview", isStack = True, t = "AREA", extra_command = "--lower-limit 0" )
+            for name in ["fail", "success"]:
+                g = "suspend/attempts-" + name + ".rrd"
+                s.add( name, g )
+            
+            gt, plot, fullname = s.compose()
+            Config["types"][fullname] = gt
+
+            SuspendPlots = { "type": fullname,
+                             "subplots": { "title": "CPU suspend details", "plots": [ {"type": fullname} ] } }
+
+            for g in sorter("suspend/attempts-*.rrd",
+                            "^suspend/attempts-(.*).rrd",
+                            ["success", "fail"] ):
+                name = re.search( "^suspend/attempts-(.*).rrd", g ).group(1)
+                gt, plot, fullname = maketypesplot( "Suspend", name, g, 
+                                                    extra_command='--lower-limit 0' )
+
+                Config["types"][fullname] = gt
+                SuspendPlots["subplots"]["plots"].append( plot )
+            
+            CpuSleepPlots["subplots"]["plots"].append( SuspendPlots )
+
+            ##############################################
+            # graph showing the duration of a single sleep
+
+            command_def = '-t "Duration of a single suspend, s" ' + defColors #+ makeheads(7)
+            command_line = ""
+            command_extra = ""
+            files = ["cpusleep/cpusleep.rrd", "suspend/attempts-success.rrd"]
+            s = StackOrLinesOld( csSingle, minmax=False )
+            command_def += "DEF:cpusleep_data=cpusleep/cpusleep.rrd:value:AVERAGE "
+            command_def += "DEF:suspend_data=suspend/attempts-success.rrd:value:AVERAGE "
+            command_def += "CDEF:sleep_per_suspend_ms=cpusleep_data,suspend_data,/ "
+            command_def += "CDEF:sleep_sus=sleep_per_suspend_ms,1000,/ "
+            s.add( "sleep_sus", "$LINE_WIDTH_PRIMARY$", '"\\l"' ,
+                   "COMMENT:\\u GPRINT:sleep_sus:AVERAGE:\"Avr %4.2lf%s"
+                   "\" GPRINT:sleep_sus:LAST:\"Last %4.2lf%s\\r\" " + " ")
+
+            command_line = s.str() + command_extra
+
+            fullname = "CPUstate/Sleep_per_suspend"
+            gt = { "command": command_def + command_line,
+                   "files": files }
+            plot = { "type": fullname }
+
+            Config["types"][fullname] = gt
+            CpuSleepPlots["subplots"]["plots"].append( plot )
+            # single sleep duration: done
+            ##############################################
+        
+        Plots["subplots"]["plots"].append( CpuSleepPlots )
+
 
 
     # Add all CPU plots
