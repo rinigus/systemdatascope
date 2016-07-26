@@ -910,7 +910,9 @@ if len( glob.glob("interface-*") ) > 0:
                        makeLine=makeLine )
 
             command_extra += 'GPRINT:' + intname + data_type + '_total:"' + \
-                             int2hum.str(intname) + " " + humandt + ' Total %8.0lf%s' + getunit("NetworkTotal/" + name) + '\\r" '
+                             int2hum.str(intname) + " " + humandt + ' Total %8.0lf%s' + getunit("NetworkTotal/" + name) + '\\r" ' \
+                             + "HRULE:0$COLOR_LINE_SINGLE_SUB$ "
+            
 
             first = False
 
