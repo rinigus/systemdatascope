@@ -54,6 +54,7 @@ Units = { "DEFAULT": "",
           "Radio/Cellular": "%",
           "Radio/Internet": "%",
           "Suspend": "1/s",
+          "CPUfreq/values": "Hz",
 }
 
 Formats = { "DEFAULT": "%5.2lf",
@@ -95,6 +96,7 @@ Formats = { "DEFAULT": "%5.2lf",
             "Radio/Bluetooth": "%4.2lf",
             "Radio/active": "%4.2lf",
             "Suspend": "%4.2lf",
+            "CPUfreq/values": "%4.0lf%S",
 }
 
 Heads = { "DEFAULT": None,
@@ -115,6 +117,7 @@ Heads = { "DEFAULT": None,
           "Radio/Bluetooth": 4,
           "Radio/active": 4,
           "Suspend/Overview": 4,
+          "CPUfreq/values": 5,
 }
 
 Human = { "DEFAULT": None,
@@ -141,6 +144,7 @@ Human = { "DEFAULT": None,
           "Radio/Internet": "Internet signal strength",
           "Radio/Bluetooth": "Bluetooth activity",
           "Radio/active": "Active radio(s)",
+          "CPUfreq/values": "CPU frequency",
 }
 
 ######################################################################################
@@ -409,18 +413,22 @@ class StackOrLinesOld:
 
 ######################################################################################
 
-def sorter(glob_arg, re_search = None, front = [], end = []):
+def sorter(glob_arg, re_search = None, front = [], end = [], useNumericInt = False):
     a = []
     for g in glob.glob( glob_arg ):
         if re_search is not None: m = re.search( re_search, g ).group(1)
         else: m = g
+
+        if useNumericInt: m = int(m)
+        
         added = False
         for k in [ [0,front], [10000,end] ] :
             if m in k[1]:
                 a.append( [ k[0] + k[1].index( m ), g ] )
                 added = True
         if not added:
-            a.append( [ 5000, g ] )
+            if not useNumericInt: a.append( [ 5000, g ] )
+            else: a.append( [ 5000 + m, g ] )
 
     a.sort()
     r = []
@@ -616,6 +624,54 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
         
         Plots["subplots"]["plots"].append( CpuSleepPlots )
 
+    # CPU frequency
+    if len(glob.glob("cpufreq*")) > 0:
+        SubPlots = { "subplots": { "title": "CPU frequency details", "plots": [ ] } }
+        
+        # distributions 
+        if len(glob.glob("cpufreq*/time_in_state*.rrd")) > 0:
+
+            for D in sorter( "cpufreq*", front=["cpufreq"]):
+                if len(glob.glob(D + "/time_in_state*.rrd")) > 0:
+
+                    if D == "cpufreq": ht = ""
+                    else: ht = ": CPU " + re.search("^cpufreq-(.*)", D).group(1)
+
+                    # CPU frequency distribution overview
+                    s = StackOrLines( cs, "CPUfreq", "Overview " + ht,
+                                      Title = "Used frequencies" + ht,
+                                      Unit="%", HeadSize = 5,
+                                      t = "AREA", isStack = True )
+
+                    srted = sorter( D + "/time_in_state-*.rrd", "^" + D + "/time_in_state-(.*).rrd", useNumericInt = True )
+                    srted.reverse()
+                    for g in srted:
+                        name = str( int(re.search( "^" + D + "/time_in_state-(.*).rrd", g ).group(1))/1000 ) + "MHz"
+                        s.add( name, g, scale_data="100,*", Format="%4.0lf%s" )
+
+                    gt, plot, fullname = s.compose()
+                    Config["types"][fullname] = gt
+                    if not SubPlots.has_key("type"): SubPlots["type"] = fullname
+                    SubPlots["subplots"]["plots"].append( plot )
+                    
+        # single shot measurements
+        if len(glob.glob("cpufreq/cpufreq-*.rrd")) > 1:
+            s = StackOrLines( cs, "CPUfreq", "values", minmax=True, extra_command="--lower-limit 0"  )
+            for g in sorter( "cpufreq/cpufreq-*.rrd", "^cpufreq/cpufreq-(.*).rrd", useNumericInt = True ):
+                name = "cpu_" + re.search( "^cpufreq/cpufreq-(.*).rrd", g ).group(1)
+                s.add( name, g )
+
+            gt, plot, fullname = s.compose()
+            Config["types"][fullname] = gt
+            if not SubPlots.has_key("type"): SubPlots["type"] = fullname
+            SubPlots["subplots"]["plots"].append( plot )
+
+
+        # add frequency plots
+        if len(SubPlots["subplots"]["plots"]) > 1:
+            Plots["subplots"]["plots"].append( SubPlots )
+        else:
+            Plots["subplots"]["plots"].append( { "type": SubPlots["type"] } )
 
 
     # Add all CPU plots
