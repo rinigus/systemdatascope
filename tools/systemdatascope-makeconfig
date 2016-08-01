@@ -97,6 +97,7 @@ Formats = { "DEFAULT": "%5.2lf",
             "Radio/active": "%4.2lf",
             "Suspend": "%4.2lf",
             "CPUfreq/values": "%4.0lf%S",
+            "CPUidle/values": "%4.0lf%S",
 }
 
 Heads = { "DEFAULT": None,
@@ -118,6 +119,7 @@ Heads = { "DEFAULT": None,
           "Radio/active": 4,
           "Suspend/Overview": 4,
           "CPUfreq/values": 5,
+          "CPUidle/values": 5,
 }
 
 Human = { "DEFAULT": None,
@@ -144,7 +146,7 @@ Human = { "DEFAULT": None,
           "Radio/Internet": "Internet signal strength",
           "Radio/Bluetooth": "Bluetooth activity",
           "Radio/active": "Active radio(s)",
-          "CPUfreq/values": "CPU frequency",
+          "CPUidle/values": "CPU idle state",
 }
 
 ######################################################################################
@@ -668,6 +670,39 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
 
 
         # add frequency plots
+        if len(SubPlots["subplots"]["plots"]) > 1:
+            Plots["subplots"]["plots"].append( SubPlots )
+        else:
+            Plots["subplots"]["plots"].append( { "type": SubPlots["type"] } )
+
+    ###############################################################################
+    # CPU idle
+    if len(glob.glob("cpuidle*")) > 0:
+        SubPlots = { "subplots": { "title": "CPU idle states details", "plots": [ ] } }
+        
+        for D in sorter( "cpuidle*", front=["cpuidle"]):
+            if len(glob.glob(D + "/time_in_state*.rrd")) > 0:
+
+                if D == "cpuidle": ht = ""
+                else: ht = ": CPU " + re.search("^cpuidle-(.*)", D).group(1)
+
+                # CPU idle distribution overview
+                s = StackOrLines( cs, "CPUidle", "Overview " + ht,
+                                  Title = "Used idle states" + ht,
+                                  Unit="%", HeadSize = 5,
+                                  t = "AREA", isStack = True )
+
+                srted = sorter( D + "/time_in_state-*.rrd", "^" + D + "/time_in_state-(.*).rrd" )
+                for g in srted:
+                    name = re.search( "^" + D + "/time_in_state-(.*).rrd", g ).group(1)
+                    s.add( name, g, scale_data="100,*", Format="%4.0lf%s" )
+
+                gt, plot, fullname = s.compose()
+                Config["types"][fullname] = gt
+                if not SubPlots.has_key("type"): SubPlots["type"] = fullname
+                SubPlots["subplots"]["plots"].append( plot )
+                    
+        # add idle plots
         if len(SubPlots["subplots"]["plots"]) > 1:
             Plots["subplots"]["plots"].append( SubPlots )
         else:
