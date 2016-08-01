@@ -290,8 +290,9 @@ class StackOrLines:
     #                          "var_name": var_name,
     #     } )
         
-    def add(self, name, g, width="$LINE_WIDTH_PRIMARY$", makeLine=False, var_name = "value", Format = None, scale_data = None):
+    def add(self, name, g, width="$LINE_WIDTH_PRIMARY$", makeLine=False, var_name = "value", labelName = None, Format = None, scale_data = None):
         if Format is None: Format = getf( self.fullname + "/" + name )
+        if labelName is None: labelName = name
         self.lines.append( { "name": name,
                              "g": g,
                              "width": width,
@@ -299,6 +300,7 @@ class StackOrLines:
                              "var_name": var_name,
                              "format": Format,
                              "scale_data": scale_data,
+                             "labelName": labelName,
         } )
         
     def compose(self):
@@ -347,7 +349,7 @@ class StackOrLines:
             s += ":" + i["name"] + color + ":"
             if not self.SkipLegend:
                 if len(self.lines) > 1 or self.HeadSize is not None:
-                    s += '"' + i["name"] + '\\l"'
+                    s += '"' + i["labelName"] + '\\l"'
                 else:
                     s += '" \\l"'
                     
@@ -643,7 +645,7 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
                     s = StackOrLines( cs, "CPUfreq", "Overview " + ht,
                                       Title = "Used frequencies" + ht,
                                       Unit="%", HeadSize = 5,
-                                      t = "AREA", isStack = True )
+                                      t = "AREA", isStack = True, extra_command = "--lower-limit 0" )
 
                     srted = sorter( D + "/time_in_state-*.rrd", "^" + D + "/time_in_state-(.*).rrd", useNumericInt = True )
                     srted.reverse()
@@ -679,7 +681,23 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
     # CPU idle
     if len(glob.glob("cpuidle*")) > 0:
         SubPlots = { "subplots": { "title": "CPU idle states details", "plots": [ ] } }
-        
+
+        # # make local dictionary
+        # idleName2Desc = {}
+        # for d in glob.glob("/sys/devices/system/cpu/cpu*/cpuidle/state*"):
+        #     f = open(d + "/name", "r")
+        #     name = f.readline()
+        #     name = name.strip()
+        #     for c in [" ", "-", "/"]: name = name.replace(c, "_")
+        #     f.close()
+
+        #     f = open(d + "/desc", "r")
+        #     desc = f.readline()
+        #     desc = desc.strip()
+        #     f.close()
+
+        #     idleName2Desc[name] = desc
+
         for D in sorter( "cpuidle*", front=["cpuidle"]):
             if len(glob.glob(D + "/time_in_state*.rrd")) > 0:
 
@@ -690,12 +708,12 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
                 s = StackOrLines( cs, "CPUidle", "Overview " + ht,
                                   Title = "Used idle states" + ht,
                                   Unit="%", HeadSize = 5,
-                                  t = "AREA", isStack = True )
+                                  t = "AREA", isStack = True, extra_command = "--lower-limit 0" )
 
                 srted = sorter( D + "/time_in_state-*.rrd", "^" + D + "/time_in_state-(.*).rrd" )
                 for g in srted:
                     name = re.search( "^" + D + "/time_in_state-(.*).rrd", g ).group(1)
-                    s.add( name, g, scale_data="100,*", Format="%4.0lf%s" )
+                    s.add( name , g, scale_data="100,*", Format="%4.0lf%s" ) #, labelName = name + "[" + idleName2Desc[name] + "]" )
 
                 gt, plot, fullname = s.compose()
                 Config["types"][fullname] = gt
