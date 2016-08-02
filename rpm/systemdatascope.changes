@@ -5,6 +5,11 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Tue Aug 02 2016 Rinigus <rinigus.git@gmail.com> 0.2.7-1
+- Support for cpufreq plugin
+- Support for cpuidle plugin
+- Support for suspend plugin
+
 * Sat Jul 23 2016 Rinigus <rinigus.git@gmail.com> 0.2.5-1
 - Support for radio plugin
 - Support for statefs_bluetooth
