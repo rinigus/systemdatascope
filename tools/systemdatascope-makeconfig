@@ -553,7 +553,7 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
 
         ###################################################
         # CPU sleep needs some math
-        g = "cpusleep/cpusleep.rrd"
+        g = "cpusleep/total_time_in_ms.rrd"
         name = "cpusleep"
         gt, plot, fullname = maketypesplot( "CPUstate", name, g, Title="CPU sleep",
                                             extra_command='--upper-limit 100 --lower-limit 0 --rigid',
@@ -604,9 +604,9 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
             command_def = '-t "Duration of a single suspend, s" ' + defColors #+ makeheads(7)
             command_line = ""
             command_extra = ""
-            files = ["cpusleep/cpusleep.rrd", "suspend/attempts-success.rrd"]
+            files = ["cpusleep/total_time_in_ms.rrd", "suspend/attempts-success.rrd"]
             s = StackOrLinesOld( csSingle, minmax=False )
-            command_def += "DEF:cpusleep_data=cpusleep/cpusleep.rrd:value:AVERAGE "
+            command_def += "DEF:cpusleep_data=cpusleep/total_time_in_ms.rrd:value:AVERAGE "
             command_def += "DEF:suspend_data=suspend/attempts-success.rrd:value:AVERAGE "
             command_def += "CDEF:sleep_per_suspend_ms=cpusleep_data,suspend_data,/ "
             command_def += "CDEF:sleep_sus=sleep_per_suspend_ms,1000,/ "
