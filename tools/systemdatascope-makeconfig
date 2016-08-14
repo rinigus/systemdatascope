@@ -633,10 +633,10 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
         SubPlots = { "subplots": { "title": "CPU frequency details", "plots": [ ] } }
         
         # distributions 
-        if len(glob.glob("cpufreq*/time_in_state*.rrd")) > 0:
+        if len(glob.glob("cpufreq*/total_time_in_ms*.rrd")) > 0:
 
             for D in sorter( "cpufreq*", front=["cpufreq"]):
-                if len(glob.glob(D + "/time_in_state*.rrd")) > 0:
+                if len(glob.glob(D + "/total_time_in_ms*.rrd")) > 0:
 
                     if D == "cpufreq": ht = ""
                     else: ht = ": CPU " + re.search("^cpufreq-(.*)", D).group(1)
@@ -647,11 +647,11 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
                                       Unit="%", HeadSize = 5,
                                       t = "AREA", isStack = True, extra_command = "--lower-limit 0" )
 
-                    srted = sorter( D + "/time_in_state-*.rrd", "^" + D + "/time_in_state-(.*).rrd", useNumericInt = True )
+                    srted = sorter( D + "/total_time_in_ms-*.rrd", "^" + D + "/total_time_in_ms-(.*).rrd", useNumericInt = True )
                     srted.reverse()
                     for g in srted:
-                        name = str( int(re.search( "^" + D + "/time_in_state-(.*).rrd", g ).group(1))/1000 ) + "MHz"
-                        s.add( name, g, scale_data="100,*", Format="%4.0lf%s" )
+                        name = str( int(re.search( "^" + D + "/total_time_in_ms-(.*).rrd", g ).group(1))/1000 ) + "MHz"
+                        s.add( name, g, scale_data="0.1,*", Format="%4.0lf%s" )
 
                     gt, plot, fullname = s.compose()
                     Config["types"][fullname] = gt
