@@ -699,7 +699,7 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
         #     idleName2Desc[name] = desc
 
         for D in sorter( "cpuidle*", front=["cpuidle"]):
-            if len(glob.glob(D + "/time_in_state*.rrd")) > 0:
+            if len(glob.glob(D + "/total_time_in_ms-*.rrd")) > 0:
 
                 if D == "cpuidle": ht = ""
                 else: ht = ": CPU " + re.search("^cpuidle-(.*)", D).group(1)
@@ -710,10 +710,10 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
                                   Unit="%", HeadSize = 5,
                                   t = "AREA", isStack = True, extra_command = "--lower-limit 0" )
 
-                srted = sorter( D + "/time_in_state-*.rrd", "^" + D + "/time_in_state-(.*).rrd" )
+                srted = sorter( D + "/total_time_in_ms-*.rrd", "^" + D + "/total_time_in_ms-(.*).rrd" )
                 for g in srted:
-                    name = re.search( "^" + D + "/time_in_state-(.*).rrd", g ).group(1)
-                    s.add( name , g, scale_data="100,*", Format="%4.0lf%s" ) #, labelName = name + "[" + idleName2Desc[name] + "]" )
+                    name = re.search( "^" + D + "/total_time_in_ms-(.*).rrd", g ).group(1)
+                    s.add( name , g, scale_data="10,*", Format="%4.0lf%s" ) #, labelName = name + "[" + idleName2Desc[name] + "]" )
 
                 gt, plot, fullname = s.compose()
                 Config["types"][fullname] = gt
