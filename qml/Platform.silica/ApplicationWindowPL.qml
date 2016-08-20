@@ -149,6 +149,7 @@ ApplicationWindow {
                 anchors.right: parent.right
                 anchors.top: parent.top
                 height: parent.height*0.8
+                fillMode: Image.PreserveAspectFit
 
                 function askImage() {
                     if ( cover_list == null )
