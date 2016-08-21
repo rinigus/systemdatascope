@@ -309,4 +309,19 @@ ApplicationWindowPL {
         }
     }
 
+    Connections {
+        target: grapher
+        onProgressChanged: {
+            var p = grapher.progress;
+            var w = getProgressFullWidth();
+
+            if (p < 0) {
+                setProgressState(false, w);
+            }
+            else {
+                var g = 0.05 * w
+                setProgressState( true, g + (1-g) * p * w );
+            }
+        }
+    }
 }

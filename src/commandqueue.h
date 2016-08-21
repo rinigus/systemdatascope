@@ -29,6 +29,7 @@ public:
     void add(const Command &command);
     bool get(Command &command);
 
+    int size() const;
 
 protected:
     QHash< QString, Command > m_commands;       ///< commands stored as a key/command pair

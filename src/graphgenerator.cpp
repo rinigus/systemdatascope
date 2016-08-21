@@ -95,6 +95,8 @@ void Generator::stateChanged(QProcess::ProcessState state)
 /// RRDTOOL command processings
 void Generator::commandRun()
 {
+    calcProgress();
+
     if ( m_rrdtool_busy || !m_ready ) return; ///< RRDTOOL is processing a command or is not ready
     if ( !m_command_queue.get( m_command_current ) ) return; ///< No commands in queue
 
@@ -108,8 +110,8 @@ void Generator::commandRun()
     m_rrdtool_output = QString();
     //m_rrdtool_output_skip_lines = 0;
 
-//    // the first response line in graph command is the image size
-//    if ( m_command_current.is_graph ) m_rrdtool_output_skip_lines = 1;
+    //    // the first response line in graph command is the image size
+    //    if ( m_command_current.is_graph ) m_rrdtool_output_skip_lines = 1;
 
     com.append("\n");
     m_rrdtool->write(com.toLatin1());
@@ -122,10 +124,10 @@ void Generator::readFromProcess()
 
     // check for ERROR. NB! works for cd and graph commands. some listings could do damage,
     // if file named ERROR is in the listed directory
-//    if ( m_rrdtool_output.count('\n') > m_rrdtool_output_skip_lines ||
-//         m_rrdtool_output.indexOf("ERROR") >= 0 )
-        if ( m_rrdtool_output.indexOf("OK u:") >= 0 ||
-             m_rrdtool_output.indexOf("ERROR") >= 0 )
+    //    if ( m_rrdtool_output.count('\n') > m_rrdtool_output_skip_lines ||
+    //         m_rrdtool_output.indexOf("ERROR") >= 0 )
+    if ( m_rrdtool_output.indexOf("OK u:") >= 0 ||
+         m_rrdtool_output.indexOf("ERROR") >= 0 )
     {
         //qDebug() << "RRDTOOL returned: " << m_rrdtool_output;
 
@@ -171,6 +173,8 @@ void Generator::chdir(QString dir)
 ///
 void Generator::imageCallback(int tocall, QString fname, QSize size, QString id)
 {
+    m_progress_images_done++;
+
     qDebug() << QTime::currentTime().toString("h:mm:ss") <<  " callback for " << tocall << " [" << id << "]: " << fname;
     newImage(tocall, "file://" + fname);
 
@@ -183,6 +187,8 @@ void Generator::imageSizeTypeCallback(QString size_key, QString fname,
                                       int caller, QString type, double from, double duration, QSize size, bool full_size
                                       )
 {
+    m_progress_images_done++;
+
     QImage im(fname);
     m_image_type_size[size_key] = im.height();
 
@@ -202,6 +208,29 @@ static QString timestr(double t)
     else
         time = QString::number(t, 'f', 0);
     return time;
+}
+
+/////////////////////////////////////////////////////////////////////////
+/// Image generation progress handling
+///
+void Generator::calcProgress()
+{
+    double p;
+    int todo = m_command_queue.size();
+
+    if ( todo == 0 )
+    {
+        m_progress_images_done = 0;
+        p = -1;
+    }
+    else
+        p = ((double)m_progress_images_done) / (todo + m_progress_images_done);
+
+    if ( p != m_progress )
+    {
+        m_progress = p;
+        emit progressChanged();
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////

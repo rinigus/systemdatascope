@@ -168,19 +168,37 @@ ApplicationWindow {
         }
     }
 
-    StackView {
-        anchors.fill : parent
-        id : pageStack
+    Item {
+        anchors.fill: parent
+        id: containerItem
 
-        MouseArea {
-            anchors.fill: parent
-            acceptedButtons: Qt.RightButton
-            onClicked: {
-                if (mouse.button == Qt.RightButton)
-                {
-                    appWindow.popPage()
+        StackView {
+            anchors.fill : parent
+            id : pageStack
+
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.RightButton
+                onClicked: {
+                    if (mouse.button == Qt.RightButton)
+                    {
+                        appWindow.popPage()
+                    }
                 }
             }
+        }
+
+        Rectangle {
+            id: progress
+
+            z: 100
+            anchors.top: parent.top
+            anchors.left: parent.left
+
+            height: 5
+            width: parent.width
+            color: "steelblue"
+            visible: true
         }
     }
 
@@ -240,6 +258,17 @@ ApplicationWindow {
         {
             guiCollectDStat.text = ""
         }
+    }
+
+    function getProgressFullWidth()
+    {
+        return progress.parent.width
+    }
+
+    function setProgressState(visible, width)
+    {
+        progress.width = width
+        progress.visible = visible
     }
 
     Connections {

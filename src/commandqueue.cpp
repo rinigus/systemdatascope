@@ -38,3 +38,8 @@ bool CommandQueue::get(Command &command)
     command = m_commands.take(id);
     return true;
 }
+
+int CommandQueue::size() const
+{
+    return m_queue.size();
+}

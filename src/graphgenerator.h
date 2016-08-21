@@ -25,11 +25,20 @@ class Generator : public QObject
 
     Q_PROPERTY(bool ready READ ready NOTIFY readyChanged) ///< when true, RRDTOOL is working
 
+    /// Reports progress of the image generation
+    ///
+    /// Values between 0 and 1 are when there are images generated. When there are
+    /// no image generation requests, returns negative value.
+    ///
+    Q_PROPERTY(double progress READ progress NOTIFY progressChanged)
+
 public:
     explicit Generator(QObject *parent = 0);
     ~Generator();
 
     bool ready() { return m_ready; }
+
+    double progress() { return m_progress; }
 
     Q_INVOKABLE void setImageCacheTimeout(double timeout);
 
@@ -61,6 +70,7 @@ public:
 
 signals:
     void readyChanged();
+    void progressChanged();
     void errorRRDTool(QString error_text);
     void newImage( int imageFor, QString fname); ///< Emitted when new image has been generated
 
@@ -85,6 +95,7 @@ protected:
                                int caller, QString type, double from, double duration,
                                QSize size, bool full_size);
 
+    void calcProgress();
 
 protected:
     QDir m_current_dir;                             ///< Current working directory
@@ -109,6 +120,9 @@ protected:
 
     double m_timeout = 120; ///< Time to keep images in cache
     //int m_timer_id = 0;
+
+    double m_progress = -1;
+    int m_progress_images_done = 0; // has to be int since size in Qt returns int
 };
 
 }
