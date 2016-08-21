@@ -91,6 +91,32 @@ ApplicationWindow {
         statusUpdate()
     }
 
+    // Progress bar to show image generation
+    //
+    Rectangle {
+        id: progress
+
+        z: 100
+        anchors.top: pageStack.top
+        anchors.left: pageStack.left
+
+        height: 5
+        width: pageStack.width
+        color: "steelblue"
+        visible: true
+    }
+
+    function getProgressFullWidth()
+    {
+        return pageStack.width
+    }
+
+    function setProgressState(visible, width)
+    {
+        progress.width = width
+        progress.visible = visible
+    }
+
     //////////////////////////////////////////////////////////////////////
     /// Functions and objects dealing with cover
 
