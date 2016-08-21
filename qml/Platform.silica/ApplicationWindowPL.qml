@@ -102,7 +102,7 @@ ApplicationWindow {
         imageCover.askImage()
     }
 
-    cover:     Component {
+    cover: Component {
         CoverBackground {
             id: cover
 
