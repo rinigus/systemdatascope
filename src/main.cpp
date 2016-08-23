@@ -77,6 +77,7 @@ int main(int argc, char *argv[])
     return app->exec();
 
 #else
+    engine.addImageProvider( Graph::Generator::imageProviderName(), &grapher );
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
 
     return app.exec();

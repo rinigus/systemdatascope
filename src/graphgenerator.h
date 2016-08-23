@@ -4,10 +4,12 @@
 #include <QObject>
 #include <QProcess>
 #include <QDir>
-#include <QTemporaryDir>
 #include <QSize>
 #include <QHash>
 #include <QColor>
+#include <QImage>
+#include <QQuickImageProvider>
+#include <QMutex>
 
 #include <functional>
 
@@ -19,7 +21,7 @@ namespace Graph
 
 /// \brief Generates RRD plots
 ///
-class Generator : public QObject
+class Generator : public QObject, public QQuickImageProvider
 {
     Q_OBJECT
 
@@ -31,6 +33,9 @@ class Generator : public QObject
     /// no image generation requests, returns negative value.
     ///
     Q_PROPERTY(double progress READ progress NOTIFY progressChanged)
+
+public:
+    static QString imageProviderName() { return "rrd_generator"; }
 
 public:
     explicit Generator(QObject *parent = 0);
@@ -68,11 +73,14 @@ public:
     ///
     Q_INVOKABLE void getImage(int caller, QString plot_type, double from, double duration, QSize size, bool full_size, QString current_fname);
 
+    // used to retrieve images by QML
+    virtual QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
+
 signals:
     void readyChanged();
     void progressChanged();
     void errorRRDTool(QString error_text);
-    void newImage( int imageFor, QString fname); ///< Emitted when new image has been generated
+    void newImage(int imageFor, QString fname); ///< Emitted when new image has been generated
 
 public slots:
 
@@ -99,8 +107,8 @@ protected:
 
 protected:
     QDir m_current_dir;                             ///< Current working directory
-    QTemporaryDir m_dir;                            ///< Directory holding images
-    QHash< QString, ImageFile > m_image_cache;      ///< Image cache
+    QHash< QString, ImageFile > m_image_cache;         ///< Image cache
+    QMutex m_mutex;                                /// mutex protecting access to m_image_cache
 
     QHash< QString, QString > m_image_types;        ///< Image type -> command map
     QHash< QString, int > m_image_type_size;        ///< Keeps full image sizes for each type separately
@@ -111,7 +119,7 @@ protected:
     bool m_ready = false;
     bool m_rrdtool_busy = false;
 
-    QString m_rrdtool_output;
+    QByteArray m_rrdtool_output;
     CommandQueue m_command_queue;
     Command m_command_current;
     //int m_rrdtool_output_skip_lines = 0;

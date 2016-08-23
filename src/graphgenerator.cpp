@@ -3,6 +3,8 @@
 #include <QPointer>
 #include <QDebug>
 #include <QImage>
+#include <QTime>
+#include <QMutexLocker>
 
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -18,11 +20,9 @@ using namespace Graph;
 
 Generator::Generator(QObject *parent) :
     QObject(parent),
+    QQuickImageProvider(QQmlImageProviderBase::Image),
     m_current_dir(".")
 {
-    // Continue only if temp dir creation was fine
-    if ( !m_dir.isValid() ) return;
-
     QString progname = RRDTOOL_EXE;
     QStringList arguments;
     arguments << "-";
@@ -107,7 +107,7 @@ void Generator::commandRun()
     //qDebug() << "Sending command: " + com;
 
     m_rrdtool_busy = true;
-    m_rrdtool_output = QString();
+    m_rrdtool_output = QByteArray();
     //m_rrdtool_output_skip_lines = 0;
 
     //    // the first response line in graph command is the image size
@@ -175,10 +175,14 @@ void Generator::imageCallback(int tocall, QString fname, QSize size, QString id)
 {
     m_progress_images_done++;
 
-    qDebug() << QTime::currentTime().toString("h:mm:ss") <<  " callback for " << tocall << " [" << id << "]: " << fname;
-    newImage(tocall, "file://" + fname);
+    QImage im; im.loadFromData(m_rrdtool_output);
+    {
+        QMutexLocker lk(&m_mutex);
+        m_image_cache[id].setImage(im);
+    }
 
-    m_image_cache[id].setImage(fname, size);
+    qDebug() << QTime::currentTime().toString("h:mm:ss") <<  " callback for " << tocall << " [" << id << "]: " << fname;
+    newImage(tocall, "image://" + imageProviderName() + "/" + fname);
 }
 
 
@@ -189,13 +193,11 @@ void Generator::imageSizeTypeCallback(QString size_key, QString fname,
 {
     m_progress_images_done++;
 
-    QImage im(fname);
+    QImage im; im.loadFromData(m_rrdtool_output);
+    //qDebug() << "Loading from data: " << im.loadFromData(m_rrdtool_output);
     m_image_type_size[size_key] = im.height();
 
     qDebug() << "Image height for " << size_key << " : " << im.height();
-
-    m_image_cache[size_key].setImage(fname, size); // to delete as any other cache file
-
     getImage(caller, type, from, duration, size, full_size, "");
 }
 
@@ -289,6 +291,8 @@ bool Generator::isTypeRegistered(QString type)
 
 void Generator::dropAllImageTypes()
 {
+    QMutexLocker lk(&m_mutex);
+
     m_image_types = QHash<QString, QString >();
     m_image_type_size = QHash<QString, int>();
     m_image_cache = QHash< QString, ImageFile >();
@@ -333,26 +337,24 @@ void Generator::getImage(int caller, QString type, double from, double duration,
     comm.graph_id = type + " " + timing;
 
     // check if we have it in cache and it hasn't expired
-    if (m_image_cache.contains(comm.graph_id) &&
-            m_image_cache[comm.graph_id].getImageSize() == size &&
-            m_image_cache[comm.graph_id].secsTo(QDateTime::currentDateTimeUtc()) < m_timeout)
     {
-        QString cache_fname = "file://" + m_image_cache[comm.graph_id].getFilename();
-        if ( cache_fname == current_fname ) // nothing to do, you have this image already
+        QMutexLocker lk(&m_mutex);
+        if (m_image_cache.contains(comm.graph_id) &&
+                m_image_cache[comm.graph_id].getImageSize() == size &&
+                m_image_cache[comm.graph_id].secsTo(QDateTime::currentDateTimeUtc()) < m_timeout)
+        {
+            qDebug() << QTime::currentTime().toString("h:mm:ss") <<  " Found in cache: " << comm.graph_id;
+            newImage(caller, comm.graph_id + "/" + QString::number(m_next_image_index));
             return;
-
-        qDebug() << QTime::currentTime().toString("h:mm:ss") <<  " Found in cache: " << comm.graph_id;
-        newImage(caller, cache_fname );
-        return;
+        }
     }
 
     // ////////////////////////////
     // we have to create new image
 
-    QDir d(m_dir.path());
-    QString fname( d.filePath( QString::number(m_next_image_index) + ".png" ));
+    QString fname = comm.graph_id + "/" + QString::number(m_next_image_index);
 
-    comm.command = "graph " + fname + " ";
+    comm.command = "graph - ";
 
     QString size_key = QString::number(size.height()) + " : " + type;
     if ( full_size || m_image_type_size.contains(size_key) ) // We are ready to go
@@ -412,6 +414,8 @@ void Generator::setImageCacheTimeout(double timeout)
 void Generator::checkCache()
 {
     QDateTime now = QDateTime::currentDateTimeUtc();
+    QMutexLocker lk(&m_mutex);
+
     for (bool erased = true; erased; )
     {
         erased = false;
@@ -425,6 +429,34 @@ void Generator::checkCache()
             }
         }
     }
+}
+
+
+///////////////////////////////////////////////////////////
+/// Image provider
+///
+
+QImage Generator::requestImage(const QString &id_fname, QSize *size, const QSize &requestedSize)
+{
+    QMutexLocker lk(&m_mutex);
+
+    QString id = id_fname.left( id_fname.lastIndexOf("/") );
+
+    //qDebug() << "Image provider called: " << id_fname << " : " << id;
+
+    QImage im = m_image_cache.value(id).getImage();
+
+    if (size)
+        *size = im.size();
+
+    if ( (requestedSize.width() > 0 ||
+          requestedSize.height() > 0) && im.size() != requestedSize )
+    {
+        qDebug() << "Image sizes don't match: " << id << " req=" << requestedSize << " avail=" << im.size();
+        return im.scaled(requestedSize);
+    }
+
+    return im;
 }
 
 //void Generator::timerEvent(QTimerEvent *)
