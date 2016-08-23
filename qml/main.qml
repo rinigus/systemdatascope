@@ -319,8 +319,8 @@ ApplicationWindowPL {
                 setProgressState(false, w);
             }
             else {
-                var g = 0.05 * w
-                setProgressState( true, g + (1-g) * p * w );
+                var g = 0.05
+                setProgressState( true, (g + (1-g) * p) * w );
             }
         }
     }
