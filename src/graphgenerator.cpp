@@ -344,7 +344,7 @@ void Generator::getImage(int caller, QString type, double from, double duration,
                 m_image_cache[comm.graph_id].secsTo(QDateTime::currentDateTimeUtc()) < m_timeout)
         {
             qDebug() << QTime::currentTime().toString("h:mm:ss") <<  " Found in cache: " << comm.graph_id;
-            newImage(caller, comm.graph_id + "/" + QString::number(m_next_image_index));
+            newImage(caller, "image://" + imageProviderName() + "/" + comm.graph_id + "/" + QString::number(m_next_image_index));
             return;
         }
     }

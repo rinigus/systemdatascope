@@ -41,6 +41,7 @@ int main(int argc, char *argv[])
     QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
     QScopedPointer<QQuickView> v(SailfishApp::createView());
     QQmlContext *rootContext = v->rootContext();
+    QQmlEngine *engine = v->engine();
 
 #else
 
@@ -49,8 +50,9 @@ int main(int argc, char *argv[])
     app.setOrganizationDomain("gui.for.collectd.org");
     app.setApplicationName("SystemDataScope");
 
-    QQmlApplicationEngine engine;
-    QQmlContext *rootContext = engine.rootContext();
+    QQmlApplicationEngine engine_obj;
+    QQmlEngine *engine = &engine_obj;
+    QQmlContext *rootContext = engine_obj.rootContext();
 
 #endif
 
@@ -69,6 +71,8 @@ int main(int argc, char *argv[])
     rootContext->setContextProperty("programName", "SystemDataScope");
     rootContext->setContextProperty("programVersion", APP_VERSION);
 
+    engine->addImageProvider( Graph::Generator::imageProviderName(), &grapher );
+
     // Start the application.
 #ifdef IS_SAILFISH_OS
 
@@ -77,7 +81,6 @@ int main(int argc, char *argv[])
     return app->exec();
 
 #else
-    engine.addImageProvider( Graph::Generator::imageProviderName(), &grapher );
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
 
     return app.exec();
