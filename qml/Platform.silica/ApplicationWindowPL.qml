@@ -100,7 +100,7 @@ ApplicationWindow {
         anchors.top: pageStack.top
         anchors.left: pageStack.left
 
-        height: 5
+        height: Math.max(5, Screen.height*0.0075)
         width: pageStack.width
         color: "steelblue"
         visible: true
