@@ -20,9 +20,6 @@ Generator::Generator(QObject *parent) :
     QObject(parent),
     m_current_dir(".")
 {
-    // Continue only if temp dir creation was fine
-    if ( !m_dir.isValid() ) return;
-
     QString progname = RRDTOOL_EXE;
     QStringList arguments;
     arguments << "-";
@@ -107,7 +104,7 @@ void Generator::commandRun()
     //qDebug() << "Sending command: " + com;
 
     m_rrdtool_busy = true;
-    m_rrdtool_output = QString();
+    m_rrdtool_output = QByteArray();
     //m_rrdtool_output_skip_lines = 0;
 
     //    // the first response line in graph command is the image size
@@ -171,32 +168,32 @@ void Generator::chdir(QString dir)
 /////////////////////////////////////////////////////////////////////////
 /// Image callback
 ///
-void Generator::imageCallback(int tocall, QString fname, QSize size, QString id)
+void Generator::imageCallback(int tocall, int index, QSize req_size, QSize real_size, QString id)
 {
     m_progress_images_done++;
 
-    qDebug() << QTime::currentTime().toString("h:mm:ss") <<  " callback for " << tocall << " [" << id << "]: " << fname;
-    newImage(tocall, "file://" + fname);
+    qDebug() << QTime::currentTime().toString("h:mm:ss") <<  " callback for " << tocall << " [" << id << "]: " << index;
 
-    m_image_cache[id].setImage(fname, size);
+    QByteArray d = "data:image/png;base64," + m_rrdtool_output.toBase64();
+    newImage(tocall, d, index, real_size);
+
+    m_image_cache[id].setImage(d, req_size, real_size, index);
 }
 
 
-void Generator::imageSizeTypeCallback(QString size_key, QString fname,
+void Generator::imageSizeTypeCallback(QString size_key,
                                       // these are arguments for getImage
                                       int caller, QString type, double from, double duration, QSize size, bool full_size
                                       )
 {
     m_progress_images_done++;
 
-    QImage im(fname);
+    QImage im; im.loadFromData(m_rrdtool_output);
     m_image_type_size[size_key] = im.height();
 
     qDebug() << "Image height for " << size_key << " : " << im.height();
 
-    m_image_cache[size_key].setImage(fname, size); // to delete as any other cache file
-
-    getImage(caller, type, from, duration, size, full_size, "");
+    getImage(caller, type, from, duration, size, full_size, -1);
 }
 
 
@@ -305,7 +302,7 @@ void Generator::setFontSize(QString type, int size)
 /////////////////////////////////////////////////////////////////////////
 /// Registration of image requests
 ///
-void Generator::getImage(int caller, QString type, double from, double duration, QSize size, bool full_size, QString current_fname)
+void Generator::getImage(int caller, QString type, double from, double duration, QSize size, bool full_size, int current_id)
 {
     // check sanity
     if (size.width() < 1 || size.height() < 1) return; // called when initializing image, will call again soon
@@ -334,38 +331,35 @@ void Generator::getImage(int caller, QString type, double from, double duration,
 
     // check if we have it in cache and it hasn't expired
     if (m_image_cache.contains(comm.graph_id) &&
-            m_image_cache[comm.graph_id].getImageSize() == size &&
+            m_image_cache[comm.graph_id].getImageReqSize() == size &&
             m_image_cache[comm.graph_id].secsTo(QDateTime::currentDateTimeUtc()) < m_timeout)
     {
-        QString cache_fname = "file://" + m_image_cache[comm.graph_id].getFilename();
-        if ( cache_fname == current_fname ) // nothing to do, you have this image already
-            return;
+        ImageFile &ifile = m_image_cache[comm.graph_id];
+        if ( ifile.getId() == current_id )
+            return; // nothing to do - you have this image already
 
         qDebug() << QTime::currentTime().toString("h:mm:ss") <<  " Found in cache: " << comm.graph_id;
-        newImage(caller, cache_fname );
+        newImage(caller, ifile.getFilename(), ifile.getId(), ifile.getImageRealSize());
         return;
     }
 
     // ////////////////////////////
     // we have to create new image
+    int index = m_next_image_index;
 
-    QDir d(m_dir.path());
-    QString fname( d.filePath( QString::number(m_next_image_index) + ".png" ));
-
-    comm.command = "graph " + fname + " ";
+    comm.command = "graph - ";
 
     QString size_key = QString::number(size.height()) + " : " + type;
     if ( full_size || m_image_type_size.contains(size_key) ) // We are ready to go
     {
         comm.command += "--full-size-mode --width=" + QString::number(size.width());
+        QSize real_size = size;
+        if (!full_size)
+            real_size.setHeight(m_image_type_size[size_key]);
 
-        if (full_size)
-            comm.command += " --height="  + QString::number(size.height()) + " ";
-        else
-            comm.command += " --height=" + QString::number( m_image_type_size[size_key] ) + " ";
-
+        comm.command += " --height="  + QString::number(real_size.height()) + " ";
         comm.callback = std::bind(&Generator::imageCallback, this, caller,
-                                  fname, size, comm.graph_id);
+                                  index, size, real_size, comm.graph_id);
     }
     else // we have to make a test graph first, to determine the full height of the image
     {
@@ -374,12 +368,12 @@ void Generator::getImage(int caller, QString type, double from, double duration,
         // Correction: there could be problems with long legends. So, let's keep full size
         comm.command +=
                 //" --width=" + QString::number(std::min( size.width(), 100 ) ) +
-                " --width=" + QString::number( size.width() ) +
+                " --width=" + QString::number(size.width()) +
                 " --height="  + QString::number(size.height()) + " ";
 
         // callback will first register the size and later call this method again
         // to retrieve an image
-        comm.callback = std::bind(&Generator::imageSizeTypeCallback, this, size_key, fname,
+        comm.callback = std::bind(&Generator::imageSizeTypeCallback, this, size_key,
                                   caller, type, from, duration, size, full_size );
     }
 

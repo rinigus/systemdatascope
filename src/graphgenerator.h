@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QProcess>
 #include <QDir>
-#include <QTemporaryDir>
 #include <QSize>
 #include <QHash>
 #include <QColor>
@@ -66,13 +65,13 @@ public:
     ///
     /// @param caller QML Image Id of the calling QML object. When image is ready, this Id would be used in emitted signal
     ///
-    Q_INVOKABLE void getImage(int caller, QString plot_type, double from, double duration, QSize size, bool full_size, QString current_fname);
+    Q_INVOKABLE void getImage(int caller, QString plot_type, double from, double duration, QSize size, bool full_size, int current_id);
 
 signals:
     void readyChanged();
     void progressChanged();
     void errorRRDTool(QString error_text);
-    void newImage( int imageFor, QString fname); ///< Emitted when new image has been generated
+    void newImage(int imageFor, QByteArray fname, int iIndex, QSize iRealSize); ///< Emitted when new image has been generated
 
 public slots:
 
@@ -88,9 +87,9 @@ protected:
 
     /// \brief Called when image is ready as a callback function
     ///
-    void imageCallback(int tocall, QString fname, QSize size, QString id);
+    void imageCallback(int tocall, int index, QSize size, QSize real_size, QString id);
 
-    void imageSizeTypeCallback(QString size_key, QString fname,
+    void imageSizeTypeCallback(QString size_key,
                                // the followin options are an arguments for getImage
                                int caller, QString type, double from, double duration,
                                QSize size, bool full_size);
@@ -99,7 +98,6 @@ protected:
 
 protected:
     QDir m_current_dir;                             ///< Current working directory
-    QTemporaryDir m_dir;                            ///< Directory holding images
     QHash< QString, ImageFile > m_image_cache;      ///< Image cache
 
     QHash< QString, QString > m_image_types;        ///< Image type -> command map
@@ -111,12 +109,12 @@ protected:
     bool m_ready = false;
     bool m_rrdtool_busy = false;
 
-    QString m_rrdtool_output;
+    QByteArray m_rrdtool_output;
     CommandQueue m_command_queue;
     Command m_command_current;
     //int m_rrdtool_output_skip_lines = 0;
 
-    size_t m_next_image_index = 0;
+    int m_next_image_index = 0;
 
     double m_timeout = 120; ///< Time to keep images in cache
     //int m_timer_id = 0;
