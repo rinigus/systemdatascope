@@ -26,6 +26,7 @@ PagePL {
                 property int myCallbackId: -1
                 property bool update_skipped_since_invisible: false
                 property int myHeight: 0
+                property int imageIndex: -1
 
                 source: ""
 
@@ -39,7 +40,7 @@ PagePL {
                             myCallbackId = appWindow.getCallbackId()
 
                         grapher.getImage(myCallbackId, graphDefs.plots[index].type, settings.timewindow_from, settings.timewindow_duration,
-                                         Qt.size(width,settings.graph_base_height), false, source )
+                                         Qt.size(width,settings.graph_base_height), false, imageIndex )
                     }
                 }
 
@@ -56,13 +57,14 @@ PagePL {
                     onNewImage: {
                         if (imageFor == image.myCallbackId)
                         {
-                            // console.log("Image received: ", imageFor, fname)
+                            console.log("Image received: ", imageFor, iIndex)
                             image.source = fname
+                            image.imageIndex = iIndex
 
-                            var sh = image.sourceSize.height
+                            var sh = iRealSize.height
                             if (image.myHeight != sh)
                             {
-                                //console.log("Changing height " + imageFor + ": " + image.myHeight + " -> " + sh)
+                                console.log("Changing height " + imageFor + ": " + image.myHeight + " -> " + sh)
                                 image.myHeight = sh
                                 graphHeightCache[index] = sh
                             }
@@ -71,8 +73,8 @@ PagePL {
                             else indicator.visible = false
 
                             // ask for new image if the width doesn't match
-                            if (image.sourceSize.width != width) {
-                                // console.log("onNI: " + graphDefs.plots[index].type + " width difference " + width + " " + image.sourceSize.width)
+                            if (iRealSize.width != width) {
+                                console.log("onNI: " + graphDefs.plots[index].type + " width difference " + width + " " + iRealSize.width)
                                 image.askImage()
                             }
                         }

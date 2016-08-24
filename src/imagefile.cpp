@@ -5,34 +5,11 @@
 
 using namespace Graph;
 
-size_t Graph::ImageFile::total_size = 0;
-
-void ImageFile::deleteFile()
+void ImageFile::setImage(QByteArray fname, QSize req_size, QSize real_size, int id)
 {
-    if ( m_filename.length() == 0 ) return;
-
-    total_size -= m_size;
-    m_size = 0;
-
-    QFileInfo info(m_filename);
-    if (info.exists())
-        QFile::remove(m_filename);
-}
-
-
-void ImageFile::setImage(QString fname, QSize imsize)
-{
-    deleteFile(); // cleanup
-
     m_filename = fname;
-    m_image_size = imsize;
-
-    QFileInfo info(m_filename);
-    if (info.exists())
-    {
-        m_size = info.size();
-        total_size += m_size;
-    }
-
+    m_req_size = req_size;
+    m_real_size = real_size;
+    m_id = id;
     m_time = QDateTime::currentDateTimeUtc();
 }
