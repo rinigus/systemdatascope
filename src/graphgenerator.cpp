@@ -338,10 +338,17 @@ void Generator::getImage(int caller, QString type, double from, double duration,
 
     // check if we have it in cache and it hasn't expired
     {
-        QMutexLocker lk(&m_mutex);
-        if (m_image_cache.contains(comm.graph_id) &&
-                m_image_cache[comm.graph_id].getImageSize() == size &&
-                m_image_cache[comm.graph_id].secsTo(QDateTime::currentDateTimeUtc()) < m_timeout)
+        bool found_in_cache = false;
+        {
+            // to ensure that we unlock mutex before sending signal
+            QMutexLocker lk(&m_mutex);
+            if (m_image_cache.contains(comm.graph_id) &&
+                    m_image_cache[comm.graph_id].getImageSize() == size &&
+                    m_image_cache[comm.graph_id].secsTo(QDateTime::currentDateTimeUtc()) < m_timeout)
+                found_in_cache = true;
+        }
+
+        if (found_in_cache)
         {
             qDebug() << QTime::currentTime().toString("h:mm:ss") <<  " Found in cache: " << comm.graph_id;
             newImage(caller, "image://" + imageProviderName() + "/" + comm.graph_id + "/" + QString::number(m_next_image_index));
