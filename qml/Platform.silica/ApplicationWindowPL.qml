@@ -95,25 +95,65 @@ ApplicationWindow {
     //
     Rectangle {
         id: progress
+        property int progHeight: Math.max(3, Screen.height*0.0075)
+        property double currentProgress: 0.0
 
         z: 100
-        anchors.top: pageStack.top
-        anchors.left: pageStack.left
+        x: 0
+        y: 0
 
-        height: Math.max(5, Screen.height*0.0075)
-        width: pageStack.width
+        height: 0
+        width: 0
         color: "steelblue"
-        visible: true
+        visible: false
+
+        function changeSize(sz)
+        {
+            currentProgress = sz
+            drawBar()
+        }
+
+        function drawBar()
+        {
+            if (appWindowBase.orientation == Orientation.Portrait) {
+                x = 0
+                y = 0
+                height = progHeight
+                width = Screen.width * currentProgress
+            }
+            else if (appWindowBase.orientation == Orientation.Landscape) {
+                x = Screen.width - progHeight
+                y = 0
+                height = Screen.height * currentProgress
+                width = progHeight
+            }
+            else if (appWindowBase.orientation == Orientation.PortraitInverted) {
+                height = progHeight
+                width = Screen.width * currentProgress
+                x = Screen.width - width
+                y = Screen.height - height
+            }
+            else if (appWindowBase.orientation == Orientation.LandscapeInverted) {
+                height = Screen.height * currentProgress
+                width = progHeight
+                x = 0
+                y = Screen.height - height
+            }
+        }
+    }
+
+    onOrientationChanged: {
+        progress.drawBar()
     }
 
     function getProgressFullWidth()
     {
-        return pageStack.width
+        return 1.0
     }
 
     function setProgressState(visible, width)
     {
-        progress.width = width
+        progress.changeSize(width)
         progress.visible = visible
     }
 
