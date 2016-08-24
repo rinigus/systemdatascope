@@ -4,6 +4,7 @@ import Sailfish.Silica 1.0
 SilicaListView {
     property string header_text: ""
     property int pl_margin_bottom: Theme.paddingLarge
+    property int pl_space_between_items_small: Theme.paddingSmall
 
     header: Column {
         width: parent.width

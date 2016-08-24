@@ -18,7 +18,8 @@ PagePL {
 
             anchors.left: parent.left
             anchors.right: parent.right
-            height: image.myHeight + ((index == graphsModel-1)? mainList.pl_margin_bottom : 0)
+            height: image.myHeight + ((indicator_text.visible)? indicator_text.height + mainList.pl_space_between_items_small : 0) +
+                                      ((index == graphsModel-1)? mainList.pl_margin_bottom : 0)
 
             Image {
                 id: image
@@ -67,7 +68,11 @@ PagePL {
                                 graphHeightCache[index] = sh
                             }
 
-                            if (graphDefs.plots[index].subplots) indicator.visible = true
+                            if (graphDefs.plots[index].subplots) {
+                                indicator_text.visible = true
+                                indicator_graph.visible = true
+                                indicator_text.text = graphDefs.plots[index].subplots.title
+                            }
                             else indicator.visible = false
 
                             // ask for new image if the width doesn't match
@@ -102,10 +107,19 @@ PagePL {
             }
 
             IndicatorPL {
-                id: indicator
+                id: indicator_graph
                 anchors.verticalCenter: image.verticalCenter
                 anchors.right: image.right
                 visible: false
+            }
+
+            TextPL {
+                id: indicator_text
+                visible: false
+                y: image.myHeight + mainList.pl_space_between_items_small
+                anchors.right: parent.right
+                text: ""
+                font.bold: true
             }
 
             MouseArea {
