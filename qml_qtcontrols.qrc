@@ -21,5 +21,6 @@
         <file>qml/Platform/MessageErrorPL.qml</file>
         <file>qml/AppStatus.qml</file>
         <file>qml/Platform/StatusPL.qml</file>
+        <file>qml/Platform/ListItemGraphPL.qml</file>
     </qresource>
 </RCC>
