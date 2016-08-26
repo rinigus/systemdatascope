@@ -13,113 +13,93 @@ PagePL {
     Component {
         id: graphPlotDelegate
 
-        Item {
+        ListItemGraphPL {
             id: container
 
             anchors.left: parent.left
             anchors.right: parent.right
-            height: image.myHeight + ((indicator_text.visible)? indicator_text.height + mainList.pl_space_between_items_small : 0) +
-                                      ((index == graphsModel-1)? mainList.pl_margin_bottom : 0)
+            //height: myHeight + ((index == graphsModel-1)? mainList.pl_margin_bottom : 0)
 
-            Image {
-                id: image
+            property int myCallbackId: -1
+            property bool update_skipped_since_invisible: false
+            property real myHeight: 0
+            property real imageIndex: -1
+            property real myWidth: 0
 
-                property int myCallbackId: -1
-                property bool update_skipped_since_invisible: false
-                property int myHeight: 0
+            function askImage() {
+                // continue only if we are active
+                if ( appWindow.isActive() ) {
+                    if (myCallbackId <= 0)
+                        myCallbackId = appWindow.getCallbackId()
 
-                source: ""
-
-                anchors.left: parent.left
-                anchors.right: parent.right
-
-                function askImage() {
-                    // continue only if we are active
-                    if ( appWindow.isActive() ) {
-                        if (myCallbackId <= 0)
-                            myCallbackId = appWindow.getCallbackId()
-
-                        grapher.getImage(myCallbackId, graphDefs.plots[index].type, settings.timewindow_from, settings.timewindow_duration,
-                                         Qt.size(width,settings.graph_base_height), false, source )
-                    }
+                    grapher.getImage(myCallbackId, graphDefs.plots[index].type, settings.timewindow_from, settings.timewindow_duration,
+                                     Qt.size(width,settings.graph_base_height), false, imageIndex )
                 }
+            }
 
-                Connections {
-                    target: appWindow
-                    onUpdateGraphs: {
-                        if ( visible ) image.askImage()
-                        else image.update_skipped_since_invisible = true
-                    }
+            Connections {
+                target: appWindow
+                onUpdateGraphs: {
+                    if ( visible ) askImage()
+                    else update_skipped_since_invisible = true
                 }
+            }
 
-                Connections {
-                    target: grapher
-                    onNewImage: {
-                        if (imageFor == image.myCallbackId)
+            Connections {
+                target: grapher
+                onNewImage: {
+                    if (imageFor == myCallbackId)
+                    {
+                        //console.log("Image received: ", imageFor, iIndex)
+                        imageIndex = iIndex
+
+                        var sh = iRealSize.height
+                        if (getSize() != sh)
                         {
-                            // console.log("Image received: ", imageFor, fname)
-                            image.source = fname
+                            //console.log("Changing height " + imageFor + ": " + image.myHeight + " -> " + sh)
+                            setSize(sh)
+                            graphHeightCache[index] = sh
+                        }
 
-                            var sh = image.sourceSize.height
-                            if (image.myHeight != sh)
-                            {
-                                //console.log("Changing height " + imageFor + ": " + image.myHeight + " -> " + sh)
-                                image.myHeight = sh
-                                graphHeightCache[index] = sh
-                            }
+                        setSource(fname)
 
-                            if (graphDefs.plots[index].subplots) {
-                                indicator_text.visible = true
-                                indicator_graph.visible = true
-                                indicator_text.text = graphDefs.plots[index].subplots.title
-                            }
-                            else indicator.visible = false
-
-                            // ask for new image if the width doesn't match
-                            if (image.sourceSize.width != width) {
-                                // console.log("onNI: " + graphDefs.plots[index].type + " width difference " + width + " " + image.sourceSize.width)
-                                image.askImage()
-                            }
+                        // ask for new image if the width doesn't match
+                        if (iRealSize.width != width) {
+                            //console.log("onNI: " + graphDefs.plots[index].type + " width difference " + width + " " + iRealSize.width)
+                            image.askImage()
+                            myWidth = iRealSize.width
                         }
                     }
                 }
-
-                onWidthChanged: {
-                    if ( visible ) image.askImage()
-                    else image.update_skipped_since_invisible = true
-                }
-
-                Component.onCompleted: {
-                    if (graphHeightCache.length > index && graphHeightCache[index] != null)
-                        image.myHeight = graphHeightCache[index]
-
-                    image.askImage()
-                }
-
-                onVisibleChanged: {
-                    if (visible && (update_skipped_since_invisible || sourceSize.width != width))
-                    {
-                        // console.log("onVC: " + graphDefs.plots[index].type + " " + width + " " + image.sourceSize.width)
-                        update_skipped_since_invisible = false
-                        image.askImage()
-                    }
-                }
             }
 
-            IndicatorPL {
-                id: indicator_graph
-                anchors.verticalCenter: image.verticalCenter
-                anchors.right: image.right
-                visible: false
+            onWidthChanged: {
+                if ( visible ) askImage()
+                else update_skipped_since_invisible = true
             }
 
-            TextPL {
-                id: indicator_text
-                visible: false
-                y: image.myHeight + mainList.pl_space_between_items_small
-                anchors.right: parent.right
-                text: ""
-                font.bold: true
+            Component.onCompleted: {
+                if (graphDefs.plots[index].subplots)
+                    setHeading(graphDefs.plots[index].subplots.title, true)
+                else
+                    setHeading("", false)
+
+                if (index == graphsModel-1)
+                    extraSpacing = true
+
+                if (graphHeightCache.length > index && graphHeightCache[index] != null)
+                    setSize(graphHeightCache[index])
+
+                askImage()
+            }
+
+            onVisibleChanged: {
+                if (visible && (update_skipped_since_invisible || myWidth != width))
+                {
+                    // console.log("onVC: " + graphDefs.plots[index].type + " " + width + " " + image.sourceSize.width)
+                    update_skipped_since_invisible = false
+                    askImage()
+                }
             }
 
             MouseArea {
