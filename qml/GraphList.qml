@@ -59,8 +59,8 @@ PagePL {
 
                         // ask for new image if the width doesn't match
                         if (getWidth() != width) {
-                            //console.log("onNI: " + graphDefs.plots[index].type + " width difference " + width + " " + iRealSize.width)
-                            image.askImage()
+                            //console.log("onNI: " + graphDefs.plots[index].type + " width difference " + width + " " + getWidth())
+                            askImage()
                         }
                     }
                 }
