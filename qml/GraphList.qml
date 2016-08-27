@@ -53,7 +53,7 @@ PagePL {
                         var sh = getSize()
                         if (sh != graphHeightCache[index])
                         {
-                            console.log("Changing height " + imageFor + ": " + " -> " + sh)
+                            //console.log("Changing height " + imageFor + ": " + " -> " + sh)
                             graphHeightCache[index] = sh
                         }
 
