@@ -8,7 +8,7 @@
 namespace Graph
 {
 
-/// \brief Image file tracking objeck
+/// \brief Image file tracking object
 ///
 /// Allows access to the image file name, its size, and deletes the image
 /// file on destruction. No copy operator or constructor are allowed - it has to be
