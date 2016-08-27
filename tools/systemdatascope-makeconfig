@@ -1261,13 +1261,13 @@ if os.path.exists( "processes" ) or os.path.exists( "load" ):
         for g in sorter("processes-" + procname + "/*rrd"):
             name = re.search( "^processes-" + procname + "/ps_(.*).rrd", g ).group(1)
 
+            title_start = ""
+            if name=="cputime": title_start += procname + ': '
+                
             if name in ProcStats.keys():
                 f = getf("Processes/" + name)
                 u = getunit("Processes/" + name)
 
-                title_start = ""
-                if name=="cputime": title_start += procname + ': '
-                
                 s = StackOrLines( cs, "Processes/"+procname, name,
                                   Title = title_start + gethuman("Processes/"+name),
                                   HeadSize = gethead("Processes/"+name),
@@ -1282,7 +1282,7 @@ if os.path.exists( "processes" ) or os.path.exists( "load" ):
 
             else:
                 gt, plot, fullname = maketypesplot( "Processes/" + procname, name, g, 
-                                                    Title = procname + ': ' + getit("Processes/"+name, Human),
+                                                    Title = title_start + getit("Processes/"+name, Human),
                                                     Format = getf("Processes/" + name),
                                                     Unit = getunit("Processes/" + name),
                                                     scale_data=getit(name,ProcScale) )
