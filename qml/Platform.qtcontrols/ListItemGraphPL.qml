@@ -58,18 +58,24 @@ Item {
         return image.imageHeight
     }
 
-    function setSource(sname, h) {
+    function getWidth() {
+        return image.sourceSize.width
+    }
+
+    function setSource(sname) {
         image.source = sname
+        image.imageHeight = image.sourceSize.height
+        calcMyHeight()
+    }
+
+    function getSource() {
+        return image.source
     }
     
     function setHeading(txt, vis) {
         indicator_text.text = txt
         indicator_graph.visible = vis
         indicator_text.visible = vis
-    }
-
-    Component.onCompleted: {
-        calcMyHeight()
     }
 }
 

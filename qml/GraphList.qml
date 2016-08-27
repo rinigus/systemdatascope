@@ -22,9 +22,6 @@ PagePL {
 
             property int myCallbackId: -1
             property bool update_skipped_since_invisible: false
-            property real myHeight: 0
-            property real imageIndex: -1
-            property real myWidth: 0
 
             function askImage() {
                 // continue only if we are active
@@ -33,7 +30,7 @@ PagePL {
                         myCallbackId = appWindow.getCallbackId()
 
                     grapher.getImage(myCallbackId, graphDefs.plots[index].type, settings.timewindow_from, settings.timewindow_duration,
-                                     Qt.size(width,settings.graph_base_height), false, imageIndex )
+                                     Qt.size(width,settings.graph_base_height), false, getSource() )
                 }
             }
 
@@ -51,23 +48,19 @@ PagePL {
                     if (imageFor == myCallbackId)
                     {
                         //console.log("Image received: ", imageFor, iIndex)
-                        imageIndex = iIndex
+                        setSource(fname)
 
-                        var sh = iRealSize.height
-                        if (getSize() != sh)
+                        var sh = getSize()
+                        if (sh != graphHeightCache[index])
                         {
-                            //console.log("Changing height " + imageFor + ": " + image.myHeight + " -> " + sh)
-                            setSize(sh)
+                            console.log("Changing height " + imageFor + ": " + " -> " + sh)
                             graphHeightCache[index] = sh
                         }
 
-                        setSource(fname)
-
                         // ask for new image if the width doesn't match
-                        if (iRealSize.width != width) {
+                        if (getWidth() != width) {
                             //console.log("onNI: " + graphDefs.plots[index].type + " width difference " + width + " " + iRealSize.width)
                             image.askImage()
-                            myWidth = iRealSize.width
                         }
                     }
                 }
@@ -94,7 +87,7 @@ PagePL {
             }
 
             onVisibleChanged: {
-                if (visible && (update_skipped_since_invisible || myWidth != width))
+                if (visible && (update_skipped_since_invisible || getWidth() != width))
                 {
                     // console.log("onVC: " + graphDefs.plots[index].type + " " + width + " " + image.sourceSize.width)
                     update_skipped_since_invisible = false
