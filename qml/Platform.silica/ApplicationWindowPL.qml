@@ -87,8 +87,6 @@ ApplicationWindow {
             "COLOR_LINE_SINGLE": Theme.highlightColor,
             "COLOR_LINE_SINGLE_SUB": Theme.secondaryHighlightColor
         }
-
-        statusUpdate()
     }
 
     // Progress bar to show image generation
@@ -164,8 +162,10 @@ ApplicationWindow {
 
     function setCover()
     {
-        cover_list = appWindow.graphConfig[ "cover" ]
-        imageCover.askImage()
+        if ( appWindow.graphConfig ) {
+            cover_list = appWindow.graphConfig[ "cover" ]
+            imageCover.askImage()
+        }
     }
 
     cover: Component {
