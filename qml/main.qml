@@ -43,6 +43,8 @@ ApplicationWindowPL {
 
         property real cover_timewindow_duration: 60*60
         property int cover_index: 0
+
+        property string last_run_version: ""
     }
 
     // Main GUI List
@@ -56,7 +58,6 @@ ApplicationWindowPL {
     }
 
     Component.onCompleted: {
-
         settings.timewindow_from = 0
 
         // Settings
@@ -67,6 +68,14 @@ ApplicationWindowPL {
             settings.workingdir_collectd_stopped = configurator.suggestDirectory(false);
 
         setConfig()
+
+        // check if it is new version
+        if (settings.last_run_version !== programVersion) {
+            console.log("New version installed. Last run version: " + settings.last_run_version + " / new version: " + programVersion)
+            // placeholder for changelog showing
+
+            settings.last_run_version = programVersion
+        }
     }
 
     // Signal handlers: Timewindow
