@@ -59,6 +59,7 @@ rm -rf %{buildroot}
 %qmake5_install
 
 # >> install post
+chmod 755 %{buildroot}%{_bindir}/systemdatascope-makeconfig
 # << install post
 
 desktop-file-install --delete-original       \
