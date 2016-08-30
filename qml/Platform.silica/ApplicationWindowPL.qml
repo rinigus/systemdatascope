@@ -164,7 +164,7 @@ ApplicationWindow {
     {
         if ( appWindow.graphConfig ) {
             cover_list = appWindow.graphConfig[ "cover" ]
-            imageCover.askImage()
+            if ('undefined' !== typeof imageCover) imageCover.askImage()
         }
     }
 
