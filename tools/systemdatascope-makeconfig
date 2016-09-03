@@ -734,7 +734,7 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
 ######################################################################################
 # Battery 
 
-if os.path.exists( "statefs_battery" ):
+if os.path.exists( "battery-0" ):
     BatteryPlots = { "subplots": { "title": "Battery details", "plots": [ ] } }
 
     Factors = { "DEFAULT": None,
@@ -751,8 +751,8 @@ if os.path.exists( "statefs_battery" ):
               "power_battery": "HRULE:0$COLOR_LINE_SINGLE_SUB$",
               }
 
-    for g in sorter( "statefs_battery/*.rrd" ):
-        name = re.search( "^statefs_battery/(.*).rrd", g ).group(1)
+    for g in sorter( "battery-0/*.rrd" ):
+        name = re.search( "^battery-0/(.*).rrd", g ).group(1)
         gt, plot, fullname = maketypesplot( "Battery", name, g,
                                             Title = getit("Battery/"+name, Human),
                                             extra_command = getit(name, Extra),
@@ -767,7 +767,7 @@ if os.path.exists( "statefs_battery" ):
 
     # Cover
     gt, plot, fullname = maketypesplot( "Battery", "charge",
-                                        "statefs_battery/charge.rrd",
+                                        "battery-0/charge.rrd",
                                         Title = "Battery",
                                         extra_command = getit("capacity", Extra),
                                         SkipLegend = True )
@@ -775,24 +775,24 @@ if os.path.exists( "statefs_battery" ):
     Config["cover"].append( "Battery/charge/cover" )
 
 
-elif os.path.exists( "battery-0" ):
-    BatteryPlots = { "subplots": { "title": "Battery details", "plots": [ ] } }
+# elif os.path.exists( "battery-0" ):
+#     BatteryPlots = { "subplots": { "title": "Battery details", "plots": [ ] } }
 
-    for g in sorter( "battery-0/*.rrd", "^battery.*/(.*).rrd" ):
-        name = re.search( "^battery.*/(.*).rrd", g ).group(1)
-        gt, plot, fullname = maketypesplot( "Battery", name, g )
+#     for g in sorter( "battery-0/*.rrd", "^battery.*/(.*).rrd" ):
+#         name = re.search( "^battery.*/(.*).rrd", g ).group(1)
+#         gt, plot, fullname = maketypesplot( "Battery", name, g )
 
-        Config["types"][fullname] = gt
-        BatteryPlots["subplots"]["plots"].append( plot )
+#         Config["types"][fullname] = gt
+#         BatteryPlots["subplots"]["plots"].append( plot )
 
-    # Add all Battery plots
-    BatteryPlots["type"] = "Battery/voltage"
-    Config["page"]["plots"].append( BatteryPlots )
+#     # Add all Battery plots
+#     BatteryPlots["type"] = "Battery/voltage"
+#     Config["page"]["plots"].append( BatteryPlots )
 
-    # Cover
-    gt, plot, fullname = maketypesplot( "Battery", "voltage", "battery-0/voltage.rrd", Title = "Battery", SkipLegend = True )
-    Config["types"]["Battery/voltage/cover"] = gt
-    Config["cover"].append( "Battery/voltage/cover" )
+#     # Cover
+#     gt, plot, fullname = maketypesplot( "Battery", "voltage", "battery-0/voltage.rrd", Title = "Battery", SkipLegend = True )
+#     Config["types"]["Battery/voltage/cover"] = gt
+#     Config["cover"].append( "Battery/voltage/cover" )
 
 
 ######################################################################################
