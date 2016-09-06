@@ -23,11 +23,11 @@ Units = { "DEFAULT": "",
           "Battery/charge": "%",
           "Battery/capacity": "%",
           "Battery/current": "A",
-          "Battery/energy": "Wh",
+          "Battery/energy_wh": "Wh",
           "Battery/power_battery": "W",
           "Battery/temperature": "C",
-          "Battery/timelow": "h",
-          "Battery/timefull": "h",
+          "Battery/duration-low": "h",
+          "Battery/duration-full": "h",
           "Context/context_switch": "1/s",
           "Entropy/entropy": "bits",
           "Memory": "bytes",
@@ -61,7 +61,7 @@ Formats = { "DEFAULT": "%5.2lf",
             "Battery/charge": "%3.1lf",
             "Battery/capacity": "%3.1lf",
             "Battery/temperature": "%3.1lf",
-            "Battery/energy": "%3.2lf",
+            "Battery/energy_wh": "%3.2lf",
             "Battery/power_battery": "%3.2lf",
             "Battery/voltage": "%1.3lf%S",
             "Battery/current": "%1.0lf%S",
@@ -124,8 +124,9 @@ Heads = { "DEFAULT": None,
 
 Human = { "DEFAULT": None,
           "Battery/power_battery": "Battery power consumption",
-          "Battery/timefull": "Battery: time to full",
-          "Battery/timelow": "Battery: time to low",
+          "Battery/energy_wh": "Battery energy",
+          "Battery/duration-full": "Battery: time to full",
+          "Battery/duration-low": "Battery: time to low",
           "Disk/io_time": "I/O time",
           "Disk/merged": "Merged operations",
           "Disk/octets": "Traffic",
@@ -738,15 +739,21 @@ if os.path.exists( "battery-0" ):
     BatteryPlots = { "subplots": { "title": "Battery details", "plots": [ ] } }
 
     Factors = { "DEFAULT": None,
-                "timelow": "3600,/",
-                "timefull": "3600,/",
+                "duration-low": "3600,/",
+                "duration-full": "3600,/",
                 }
+    
+    VarNames = { "DEFAULT": "value",
+                "duration-low": "seconds",
+                "duration-full": "seconds",
+                }
+    
 
     Extra = { "DEFAULT": "",
               "capacity": "--upper-limit 100 --lower-limit 0 --rigid",
               "charge": "--upper-limit 100 --lower-limit 0 --rigid",
-              "timelow": "--lower-limit 0",
-              "timefull": "--lower-limit 0",
+              "duration-low": "--lower-limit 0",
+              "duration-full": "--lower-limit 0",
               "current": "HRULE:0$COLOR_LINE_SINGLE_SUB$",
               "power_battery": "HRULE:0$COLOR_LINE_SINGLE_SUB$",
               }
@@ -755,6 +762,7 @@ if os.path.exists( "battery-0" ):
         name = re.search( "^battery-0/(.*).rrd", g ).group(1)
         gt, plot, fullname = maketypesplot( "Battery", name, g,
                                             Title = getit("Battery/"+name, Human),
+                                            var_name = getit(name, VarNames),
                                             extra_command = getit(name, Extra),
                                             scale_data=getit(name, Factors) )
 
