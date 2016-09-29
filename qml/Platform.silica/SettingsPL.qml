@@ -109,7 +109,7 @@ Dialog {
                 id: guiGraphHeight
                 text: settings.graph_base_height
                 width: parent.width
-                label: qsTr("Graph height in pixels")
+                label: qsTr("Graphs: height in pixels")
                 validator: IntValidator { bottom: 30 }
                 inputMethodHints: Qt.ImhFormattedNumbersOnly
             }
@@ -150,6 +150,14 @@ Dialog {
                 inputMethodHints: Qt.ImhFormattedNumbersOnly
             }
 
+            TextField {
+                id: guiGraphReportHeight
+                text: settings.graph_report_height
+                width: parent.width
+                label: qsTr("Report: height in pixels")
+                validator: IntValidator { bottom: 30 }
+                inputMethodHints: Qt.ImhFormattedNumbersOnly
+            }
 
             Label { text: " " } // extra separator
 
@@ -268,6 +276,7 @@ Dialog {
         if (guiGraphFSZAxis.acceptableInput) settings.graph_font_size_axis = parseInt(guiGraphFSZAxis.text, 10)
         if (guiGraphFSZUnit.acceptableInput) settings.graph_font_size_unit = parseInt(guiGraphFSZUnit.text, 10)
         if (guiGraphFSZLegend.acceptableInput) settings.graph_font_size_legend = parseInt(guiGraphFSZLegend.text, 10)
+        if (guiGraphReportHeight.acceptableInput) settings.graph_report_height = parseInt(guiGraphReportHeight.text, 10)
 
         if ( guiTrackCollectd.checked && guiEnableCollectd.checked != service.enabled )
             service.setEnable(guiEnableCollectd.checked)

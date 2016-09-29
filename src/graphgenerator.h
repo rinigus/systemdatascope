@@ -68,6 +68,13 @@ public:
     ///
     Q_INVOKABLE void getImage(int caller, QString plot_type, double from, double duration, QSize size, bool full_size, QString current_fname);
 
+    /// \brief Generates report
+    ///
+    /// Initiates the report generation. For each registrated figure type, an image is generated and saved
+    /// under ~/Documents/SystemDataScope/<TimeStamp> folder.
+    ///
+    Q_INVOKABLE void makeReport(double from, double duration, QSize size);
+
 signals:
     void readyChanged();
     void progressChanged();
@@ -94,6 +101,8 @@ protected:
                                // the followin options are an arguments for getImage
                                int caller, QString type, double from, double duration,
                                QSize size, bool full_size);
+
+    void imageReportCallback(QString fname);
 
     void calcProgress();
 

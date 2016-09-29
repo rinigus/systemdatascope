@@ -22,6 +22,7 @@ ApplicationWindow {
     signal appAbout()
     signal appHelp()
     signal appStatus()
+    signal appMakeReport()
 
     //////////////////////////////////////////////////////
     // special properties required by this platform
@@ -140,6 +141,11 @@ ApplicationWindow {
             ToolButton {
                 text: qsTr("Status")
                 onClicked: { appWindowBase.appStatus() }
+            }
+
+            ToolButton {
+                text: qsTr("Make Report")
+                onClicked: { appWindowBase.appMakeReport() }
             }
 
             ToolButton {

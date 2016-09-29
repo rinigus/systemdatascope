@@ -9,6 +9,10 @@
 #include <QJsonObject>
 #include <QJsonValue>
 
+#include <QHashIterator>
+#include <QStandardPaths>
+#include <QDateTime>
+
 #include <iostream>
 #include <algorithm>
 
@@ -197,6 +201,14 @@ void Generator::imageSizeTypeCallback(QString size_key, QString fname,
     m_image_cache[size_key].setImage(fname, size); // to delete as any other cache file
 
     getImage(caller, type, from, duration, size, full_size, "");
+}
+
+
+void Generator::imageReportCallback(QString fname)
+{
+    m_progress_images_done++;
+
+    qDebug() << QTime::currentTime().toString("h:mm:ss") <<  " callback for reporter: " << fname;
 }
 
 
@@ -446,3 +458,69 @@ void Generator::checkCache()
 //}
 
 
+/////////////////////////////////////////////////////////////////////////
+/// Initiate report generation
+///
+void Generator::makeReport(double from, double duration, QSize size)
+{
+    QDateTime now = QDateTime::currentDateTime();
+    QDir dWrite(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) +
+                "/SystemDataScope/" +
+                now.toString("yyyy-mm-dd_hh.mm.ss"));
+    if ( !dWrite.mkpath(".") )
+    {
+        qDebug() << "makeReport: Cannot create directory " << dWrite.absolutePath();
+        emit errorRRDTool( "makeReport: Cannot create directory " + dWrite.absolutePath() );
+        return;
+    }
+
+    qDebug() << dWrite.absolutePath();
+
+    QHashIterator<QString, QString> regTypeIter(m_image_types);
+    while (regTypeIter.hasNext())
+    {
+        regTypeIter.next();
+
+        QString type = regTypeIter.key();
+
+        Command comm;
+        QString timing;
+        timing = "--start " + timestr(from - duration) + " ";
+
+        if ( fabs(from) < 1e-8 ) // check for zero
+            timing += "--end -0D ";
+        else
+            timing += "--end " + timestr(from) + " ";
+
+        comm.is_graph = true;
+        comm.graph_id = type + " " + timing;
+
+        QString type_sane = type;
+        type_sane.replace("/", "_");
+        type_sane.replace(":", "_");
+        type_sane.replace(" ", "_");
+        QString fname( dWrite.filePath(type_sane  + ".png" ));
+        qDebug() << fname;
+
+        comm.command = "graph " + fname + " ";
+
+        comm.command += "--width=" + QString::number(size.width());
+        comm.command += " --height="  + QString::number(size.height()) + " ";
+
+        comm.callback = std::bind(&Generator::imageReportCallback, this, fname);
+
+        comm.command += timing;
+
+        // add font options
+        foreach (QString f, m_font_options.values())
+            comm.command += f + " ";
+
+        comm.command += m_image_types[type];
+
+        // make background white
+        comm.command += " --color BACK#FFFFFF ";
+
+        m_command_queue.add(comm);
+        commandRun();
+    }
+}

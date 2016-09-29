@@ -137,6 +137,13 @@ ColumnLayoutDialog {
             validator: IntValidator { bottom: 4 }
         }
 
+        Label { text: qsTr("Report: height in pixels:") }
+        TextField {
+            id: guiGraphReportHeight
+            text: settings.graph_report_height
+            validator: IntValidator { bottom: 30 }
+        }
+
         Label { text: qsTr("Generate graph definitions using systemdatascope-makeconfig:") }
         Button {
             text: "Generate"
@@ -166,33 +173,6 @@ ColumnLayoutDialog {
 
     }
 
-//    function prop2gui()
-//    {
-//        // keep URL as it was in the dialog, to allow to fix the typos. Same for the directories
-
-//        guiTrackCollectd.checked = trackCollecd
-//        guiUpdateGraphsInterval.text = updateGraphsInterval
-//        guiGraphHeight.text = graphHeight
-//        guiGraphFSZTitle.text = graphFSZTitle
-//        guiGraphFSZAxis.text = graphFSZAxis
-//        guiGraphFSZUnit.text = graphFSZUnit
-//        guiGraphFSZLegend.text = graphFSZLegend
-//    }
-
-//    function gui2props()
-//    {
-//        folderWhileRunning = guiFolderWhileRunning.text
-//        folderWhileStopped = guiFolderWhileStopped.text
-//        trackCollecd = guiTrackCollectd.checkedState
-
-//        if (guiUpdateGraphsInterval.acceptableInput) updateGraphsInterval = parseInt(guiUpdateGraphsInterval.text, 10)
-//        if (guiGraphHeight.acceptableInput) graphHeight = parseInt(guiGraphHeight.text, 10)
-//        if (guiGraphFSZTitle.acceptableInput) graphFSZTitle = parseInt(guiGraphFSZTitle.text, 10)
-//        if (guiGraphFSZAxis.acceptableInput) graphFSZAxis = parseInt(guiGraphFSZAxis.text, 10)
-//        if (guiGraphFSZUnit.acceptableInput) graphFSZUnit = parseInt(guiGraphFSZUnit.text, 10)
-//        if (guiGraphFSZLegend.acceptableInput) graphFSZLegend = parseInt(guiGraphFSZLegend.text, 10)
-//    }
-
     onAccepted:
     {
         settings.workingdir_collectd_running = guiFolderWhileRunning.text
@@ -205,6 +185,7 @@ ColumnLayoutDialog {
         if (guiGraphFSZAxis.acceptableInput) settings.graph_font_size_axis = parseInt(guiGraphFSZAxis.text, 10)
         if (guiGraphFSZUnit.acceptableInput) settings.graph_font_size_unit = parseInt(guiGraphFSZUnit.text, 10)
         if (guiGraphFSZLegend.acceptableInput) settings.graph_font_size_legend = parseInt(guiGraphFSZLegend.text, 10)
+        if (guiGraphReportHeight.acceptableInput) settings.graph_report_height = parseInt(guiGraphReportHeight.text, 10)
 
         if ( guiTrackCollectd.checked && guiEnableCollectd.checked != service.enabled )
             service.setEnable(guiEnableCollectd.checked)

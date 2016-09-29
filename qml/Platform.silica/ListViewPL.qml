@@ -28,6 +28,11 @@ SilicaListView {
         }
 
         MenuItem {
+            text: "Make report"
+            onClicked: { appWindow.appMakeReport() }
+        }
+
+        MenuItem {
             text: "Status"
             onClicked: { appWindow.appStatus() }
         }

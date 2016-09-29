@@ -23,6 +23,7 @@ ApplicationWindow {
     signal appHelp()
     signal appStatus()
     signal appSetConfig()
+    signal appMakeReport()
 
     // Settings
     allowedOrientations : Orientation.All

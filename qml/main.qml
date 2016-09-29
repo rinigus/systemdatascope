@@ -28,6 +28,8 @@ ApplicationWindowPL {
         property int graph_font_size_unit: 10
         property int graph_font_size_legend: 10
 
+        property int graph_report_height: 400
+
         property real timewindow_duration: 24*60*60
         property real timewindow_from: 0
 
@@ -333,4 +335,10 @@ ApplicationWindowPL {
             }
         }
     }
+
+    onAppMakeReport: {
+        grapher.makeReport(settings.timewindow_from, settings.timewindow_duration,
+                           Qt.size(1.61803398875 * settings.graph_report_height, settings.graph_report_height) )
+    }
+
 }
