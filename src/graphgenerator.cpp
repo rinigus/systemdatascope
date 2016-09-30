@@ -517,8 +517,10 @@ void Generator::makeReport(double from, double duration, QSize size)
 
         comm.command += m_image_types[type];
 
-        // make background white
-        comm.command += " --color BACK#FFFFFF ";
+        // make background white and text black
+        comm.command += " --color BACK#FFFFFF --color FONT#000000FF --color AXIS#000000FF --color ARROW#000000FF ";
+
+        qDebug() << comm.command;
 
         m_command_queue.add(comm);
         commandRun();
