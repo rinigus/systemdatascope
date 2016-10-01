@@ -8,6 +8,7 @@
 #include <QSize>
 #include <QHash>
 #include <QColor>
+#include <QTimer>
 
 #include <functional>
 
@@ -32,6 +33,10 @@ class Generator : public QObject
     ///
     Q_PROPERTY(double progress READ progress NOTIFY progressChanged)
 
+    /// Is true when report is generated
+    ///
+    Q_PROPERTY(bool reporting READ reporting NOTIFY reportingChanged)
+
 public:
     explicit Generator(QObject *parent = 0);
     ~Generator();
@@ -39,6 +44,8 @@ public:
     bool ready() { return m_ready; }
 
     double progress() { return m_progress; }
+
+    bool reporting() { return ( m_reporter_todo > 0); }
 
     Q_INVOKABLE void setImageCacheTimeout(double timeout);
 
@@ -78,10 +85,15 @@ public:
 signals:
     void readyChanged();
     void progressChanged();
+    void reportingChanged();
+    void reportingComplete(QString directory);
     void errorRRDTool(QString error_text);
     void newImage( int imageFor, QString fname); ///< Emitted when new image has been generated
 
 public slots:
+
+private slots:
+    void timerReporter();
 
 protected:
     void started(); ///< Called when the RRDTOOL process has started
@@ -90,8 +102,6 @@ protected:
 
     void commandRun(); ///< Execute next command if RRDTOOL is ready
     void readFromProcess();
-
-    virtual void timerEvent(QTimerEvent *event); // used by reporter
 
     /// \brief Called when image is ready as a callback function
     ///
@@ -138,7 +148,8 @@ protected:
     double m_reporter_from;
     double m_reporter_duration;
     QSize m_reporter_size;
-    int m_reporter_timer_id;
+    QTimer m_reporter_timer;
+    int m_reporter_todo = 0;
 };
 
 }

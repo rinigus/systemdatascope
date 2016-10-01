@@ -83,5 +83,6 @@ DISTFILES += \
     qml/AppHelp.qml \
     qml/Platform/MessageErrorPL.qml \
     qml/AppStatus.qml \
-    rpm/systemdatascope.changes
+    rpm/systemdatascope.changes \
+    qml/Platform/MessagePL.qml
 

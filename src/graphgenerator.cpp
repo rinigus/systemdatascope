@@ -48,6 +48,10 @@ Generator::Generator(QObject *parent) :
     m_rrdtool->start(progname, arguments);
 
     setImageCacheTimeout(m_timeout);
+
+    connect(&m_reporter_timer, SIGNAL(timeout()),
+            this, SLOT(timerReporter()));
+    m_reporter_timer.setInterval(5);
 }
 
 
@@ -207,7 +211,19 @@ void Generator::imageReportCallback(QString fname)
 {
     m_progress_images_done++;
 
-    qDebug() << QTime::currentTime().toString("h:mm:ss") <<  " callback for reporter: " << fname;
+    bool cr = reporting();
+
+    --m_reporter_todo;
+
+    if (cr != reporting())
+        emit reportingChanged();
+
+    if (m_reporter_todo <= 0 && m_reporter_offset == 0)
+    {
+        emit reportingComplete(m_reporter_current_dir.path());
+    }
+
+    //qDebug() << QTime::currentTime().toString("h:mm:ss") <<  " callback for reporter: " << fname;
 }
 
 
@@ -461,7 +477,7 @@ void Generator::makeReport(double from, double duration, QSize size)
         m_reporter_duration = duration;
         m_reporter_size = size;
 
-        m_reporter_timer_id = startTimer(0);
+        m_reporter_timer.start();
     }
 
     QHashIterator<QString, QString> regTypeIter(m_image_types);
@@ -516,6 +532,11 @@ void Generator::makeReport(double from, double duration, QSize size)
 
         qDebug() << comm.command;
 
+        const bool cr = reporting();
+        ++m_reporter_todo;
+        if (cr != reporting())
+            emit reportingChanged();
+
         m_command_queue.add(comm);
         commandRun();
     }
@@ -523,14 +544,16 @@ void Generator::makeReport(double from, double duration, QSize size)
     // check if all is submitted
     if ( !regTypeIter.hasNext() )
     {
-        killTimer(m_reporter_timer_id);
-        m_reporter_from = 0;
+        m_reporter_timer.stop();
+        m_reporter_offset = 0;
     }
 }
 
 // used to allow reporter to submit jobs with small chunks
-void Generator::timerEvent(QTimerEvent *)
+void Generator::timerReporter()
 {
     if ( m_reporter_offset > 0 )
         makeReport(m_reporter_from, m_reporter_duration, m_reporter_size);
+    else
+        m_reporter_timer.stop();
 }
