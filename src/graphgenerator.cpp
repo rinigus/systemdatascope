@@ -207,7 +207,7 @@ void Generator::imageSizeTypeCallback(QString size_key, QString fname,
 }
 
 
-void Generator::imageReportCallback(QString fname)
+void Generator::imageReportCallback(QString /*fname*/)
 {
     m_progress_images_done++;
 
