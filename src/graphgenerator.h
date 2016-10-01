@@ -150,6 +150,7 @@ protected:
     QSize m_reporter_size;
     QTimer m_reporter_timer;
     int m_reporter_todo = 0;
+    size_t m_reporter_graph_id = 0;
 };
 
 }

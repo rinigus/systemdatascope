@@ -182,7 +182,7 @@ void Generator::imageCallback(int tocall, QString fname, QSize size, QString id)
 {
     m_progress_images_done++;
 
-    qDebug() << QTime::currentTime().toString("h:mm:ss") <<  " callback for " << tocall << " [" << id << "]: " << fname;
+    //qDebug() << QTime::currentTime().toString("h:mm:ss") <<  " callback for " << tocall << " [" << id << "]: " << fname;
     newImage(tocall, "file://" + fname);
 
     m_image_cache[id].setImage(fname, size);
@@ -199,7 +199,7 @@ void Generator::imageSizeTypeCallback(QString size_key, QString fname,
     QImage im(fname);
     m_image_type_size[size_key] = im.height();
 
-    qDebug() << "Image height for " << size_key << " : " << im.height();
+    //qDebug() << "Image height for " << size_key << " : " << im.height();
 
     m_image_cache[size_key].setImage(fname, size); // to delete as any other cache file
 
@@ -219,11 +219,7 @@ void Generator::imageReportCallback(QString /*fname*/)
         emit reportingChanged();
 
     if (m_reporter_todo <= 0 && m_reporter_offset == 0)
-    {
         emit reportingComplete(m_reporter_current_dir.path());
-    }
-
-    //qDebug() << QTime::currentTime().toString("h:mm:ss") <<  " callback for reporter: " << fname;
 }
 
 
@@ -368,7 +364,7 @@ void Generator::getImage(int caller, QString type, double from, double duration,
         if ( cache_fname == current_fname ) // nothing to do, you have this image already
             return;
 
-        qDebug() << QTime::currentTime().toString("h:mm:ss") <<  " Found in cache: " << comm.graph_id;
+        //qDebug() << QTime::currentTime().toString("h:mm:ss") <<  " Found in cache: " << comm.graph_id;
         newImage(caller, cache_fname );
         return;
     }
@@ -503,14 +499,15 @@ void Generator::makeReport(double from, double duration, QSize size)
             timing += "--end " + timestr(from) + " ";
 
         comm.is_graph = true;
-        comm.graph_id = type + " " + timing;
+        comm.graph_id = "REPORT: " + QString::number(m_reporter_graph_id, 10) + " " + type + " " + timing;
+        ++m_reporter_graph_id; // to ensure that each report graph has unique id among running reports
 
         QString type_sane = type;
         type_sane.replace("/", "_");
         type_sane.replace(":", "_");
         type_sane.replace(" ", "_");
         QString fname( m_reporter_current_dir.filePath(type_sane  + ".png" ));
-        qDebug() << fname;
+        //qDebug() << fname;
 
         comm.command = "graph " + fname + " ";
 
@@ -529,8 +526,6 @@ void Generator::makeReport(double from, double duration, QSize size)
 
         // make background white and text black
         comm.command += " --color BACK#FFFFFF --color FONT#000000FF --color AXIS#000000FF --color ARROW#000000FF ";
-
-        qDebug() << comm.command;
 
         const bool cr = reporting();
         ++m_reporter_todo;
