@@ -28,7 +28,7 @@ ApplicationWindow {
     // special properties required by this platform
 
     // list of "pages" that are actually dialogs
-    property var dialogFileNames: [ "AppAbout.qml", "AppSettings.qml", "MessageErrorPL.qml" ]
+    property var dialogFileNames: [ "AppAbout.qml", "AppSettings.qml", "MessageErrorPL.qml", "MessagePL.qml" ]
 
     // dummy properties/signals to ensure compatibility with Sailfish
     signal applicationActiveChanged()

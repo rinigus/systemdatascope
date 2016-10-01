@@ -22,5 +22,6 @@
         <file>qml/AppStatus.qml</file>
         <file>qml/Platform/StatusPL.qml</file>
         <file>qml/Platform/ListItemGraphPL.qml</file>
+        <file>qml/Platform/MessagePL.qml</file>
     </qresource>
 </RCC>
