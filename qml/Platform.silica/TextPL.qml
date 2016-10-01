@@ -4,6 +4,7 @@ import Sailfish.Silica 1.0
 Label {
     wrapMode: Text.WordWrap
     anchors.margins: Theme.horizontalPageMargin
+    color: Theme.secondaryHighlightColor
     //font.pixelSize: Theme.fontSizeSmall
     //textFormat: Text.RichText
 }

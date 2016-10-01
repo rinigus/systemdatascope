@@ -73,6 +73,7 @@ Dialog {
                     width: parent.width-2*x
                     wrapMode: Text.WordWrap
                     font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.secondaryHighlightColor
                 }
             }
 
@@ -93,6 +94,7 @@ Dialog {
                     width: parent.width-2*x
                     wrapMode: Text.WordWrap
                     font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.secondaryHighlightColor
                 }
             }
 
@@ -172,7 +174,7 @@ Dialog {
                     x: Theme.horizontalPageMargin
                     width: parent.width - x*2
                     font.pixelSize: Theme.fontSizeSmall
-
+                    color: Theme.secondaryHighlightColor
                 }
 
                 Button {
@@ -203,7 +205,7 @@ Dialog {
                     x: Theme.horizontalPageMargin
                     width: parent.width - x*2
                     font.pixelSize: Theme.fontSizeSmall
-
+                    color: Theme.secondaryHighlightColor
                 }
 
                 TextField {

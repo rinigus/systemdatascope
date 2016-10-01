@@ -42,6 +42,7 @@ Page {
                 wrapMode: Text.WordWrap
                 width: column.width
                 textFormat: Text.RichText
+                color: Theme.secondaryHighlightColor
             }
 
             Item { }

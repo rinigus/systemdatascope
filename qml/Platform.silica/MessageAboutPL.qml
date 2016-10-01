@@ -27,6 +27,7 @@ Page {
             Label {
                 text: qsTr("version: ") + programVersion
                 anchors.horizontalCenter: parent.horizontalCenter
+                color: Theme.secondaryHighlightColor
             }
 
             Label {
@@ -34,6 +35,7 @@ Page {
                 wrapMode: Text.WordWrap
                 width: column.width
                 textFormat: Text.RichText
+                color: Theme.secondaryHighlightColor
             }
 
             Label {
@@ -41,6 +43,7 @@ Page {
                 wrapMode: Text.WordWrap
                 width: column.width
                 font.pixelSize: Theme.fontSizeSmall
+                color: Theme.secondaryHighlightColor
                 //textFormat: Text.RichText
             }
         }
