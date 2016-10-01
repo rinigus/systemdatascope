@@ -28,7 +28,7 @@ SilicaListView {
         }
 
         MenuItem {
-            text: "Make report"
+            text: "Report"
             onClicked: { appWindow.appMakeReport() }
         }
 

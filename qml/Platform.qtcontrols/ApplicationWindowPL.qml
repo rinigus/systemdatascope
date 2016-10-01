@@ -144,7 +144,7 @@ ApplicationWindow {
             }
 
             ToolButton {
-                text: qsTr("Make Report")
+                text: qsTr("Report")
                 onClicked: { appWindowBase.appMakeReport() }
             }
 

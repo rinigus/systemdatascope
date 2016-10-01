@@ -47,7 +47,6 @@ Generator::Generator(QObject *parent) :
 
     m_rrdtool->start(progname, arguments);
 
-    // start timer to check cache
     setImageCacheTimeout(m_timeout);
 }
 
@@ -416,9 +415,6 @@ void Generator::getImage(int caller, QString type, double from, double duration,
 void Generator::setImageCacheTimeout(double timeout)
 {
     m_timeout = timeout;
-
-    //    if ( m_timer_id != 0 ) killTimer(m_timer_id);
-    //    m_timer_id = startTimer( m_timeout * 1000 );
 }
 
 void Generator::checkCache()
@@ -439,47 +435,45 @@ void Generator::checkCache()
     }
 }
 
-//void Generator::timerEvent(QTimerEvent *)
-//{
-//    QDateTime now = QDateTime::currentDateTimeUtc();
-//    for (bool erased = true; erased; )
-//    {
-//        erased = false;
-//        for (auto i = m_image_cache.begin(); i != m_image_cache.end(); ++i)
-//        {
-//            if (i.value().secsTo(now) > m_timeout)
-//            {
-//                m_image_cache.erase(i);
-//                erased = true;
-//                break; // get out of inner loop and work through the cache again
-//            }
-//        }
-//    }
-//}
-
 
 /////////////////////////////////////////////////////////////////////////
 /// Initiate report generation
 ///
 void Generator::makeReport(double from, double duration, QSize size)
 {
-    QDateTime now = QDateTime::currentDateTime();
-    QDir dWrite(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) +
-                "/SystemDataScope/" +
-                now.toString("yyyy-mm-dd_hh.mm.ss"));
-    if ( !dWrite.mkpath(".") )
+    if ( m_reporter_offset == 0 ) // called by user, have to setup all variables
     {
-        qDebug() << "makeReport: Cannot create directory " << dWrite.absolutePath();
-        emit errorRRDTool( "makeReport: Cannot create directory " + dWrite.absolutePath() );
-        return;
+        QDateTime now = QDateTime::currentDateTime();
+        QDir dWrite(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) +
+                    "/SystemDataScope/" +
+                    now.toString("yyyy-MM-dd_hh.mm.ss"));
+        if ( !dWrite.mkpath(".") )
+        {
+            qDebug() << "makeReport: Cannot create directory " << dWrite.absolutePath();
+            emit errorRRDTool( "makeReport: Cannot create directory " + dWrite.absolutePath() );
+            return;
+        }
+
+        qDebug() << dWrite.absolutePath();
+
+        m_reporter_current_dir = dWrite;
+        m_reporter_from = from;
+        m_reporter_duration = duration;
+        m_reporter_size = size;
+
+        m_reporter_timer_id = startTimer(0);
     }
 
-    qDebug() << dWrite.absolutePath();
-
     QHashIterator<QString, QString> regTypeIter(m_image_types);
-    while (regTypeIter.hasNext())
+
+    for (size_t i=0; i < m_reporter_offset && regTypeIter.hasNext(); ++i)
+        regTypeIter.next(); // skipping the submitted graphs
+
+    const size_t submit_per_one_run = 5;
+    for (size_t i=0; i < submit_per_one_run && regTypeIter.hasNext(); ++i)
     {
         regTypeIter.next();
+        ++m_reporter_offset;
 
         QString type = regTypeIter.key();
 
@@ -499,7 +493,7 @@ void Generator::makeReport(double from, double duration, QSize size)
         type_sane.replace("/", "_");
         type_sane.replace(":", "_");
         type_sane.replace(" ", "_");
-        QString fname( dWrite.filePath(type_sane  + ".png" ));
+        QString fname( m_reporter_current_dir.filePath(type_sane  + ".png" ));
         qDebug() << fname;
 
         comm.command = "graph " + fname + " ";
@@ -525,4 +519,18 @@ void Generator::makeReport(double from, double duration, QSize size)
         m_command_queue.add(comm);
         commandRun();
     }
+
+    // check if all is submitted
+    if ( !regTypeIter.hasNext() )
+    {
+        killTimer(m_reporter_timer_id);
+        m_reporter_from = 0;
+    }
+}
+
+// used to allow reporter to submit jobs with small chunks
+void Generator::timerEvent(QTimerEvent *)
+{
+    if ( m_reporter_offset > 0 )
+        makeReport(m_reporter_from, m_reporter_duration, m_reporter_size);
 }

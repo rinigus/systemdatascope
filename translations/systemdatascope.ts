@@ -86,6 +86,10 @@
         <source>Status</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Report</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ColumnLayoutDialog</name>
@@ -194,10 +198,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Graph height in pixels</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Graphs: Title font size</source>
         <translation type="unfinished"></translation>
     </message>
@@ -233,6 +233,18 @@
         <source>Load definitions</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Report: height in pixels:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Graphs: height in pixels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Report: height in pixels</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StatusPL</name>
@@ -245,6 +257,70 @@
     <name>TimeControlPL</name>
     <message>
         <source>Time axis control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shift</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time window duration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 hour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4 hours</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8 hours</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>12 hours</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>24 hours</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>3 days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 week</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4 weeks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>100 days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 year</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main graphs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2 hours</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cover graphs</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

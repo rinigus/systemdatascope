@@ -91,7 +91,7 @@ protected:
     void commandRun(); ///< Execute next command if RRDTOOL is ready
     void readFromProcess();
 
-    //virtual void timerEvent(QTimerEvent *event);
+    virtual void timerEvent(QTimerEvent *event); // used by reporter
 
     /// \brief Called when image is ready as a callback function
     ///
@@ -132,6 +132,13 @@ protected:
 
     double m_progress = -1;
     int m_progress_images_done = 0; // has to be int since size in Qt returns int
+
+    size_t m_reporter_offset = 0;
+    QDir m_reporter_current_dir;
+    double m_reporter_from;
+    double m_reporter_duration;
+    QSize m_reporter_size;
+    int m_reporter_timer_id;
 };
 
 }
