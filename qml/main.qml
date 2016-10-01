@@ -368,7 +368,7 @@ ApplicationWindowPL {
         onReportingComplete: {
             appWindow.pushPage(Qt.resolvedUrl("Platform/MessagePL.qml"),
                                { "headerText": "Report",
-                                   "mainText": "Report images have been generated and are stored in " + directory }
+                                   "mainText": "<p>Report images have been generated and are stored in</p><br><code>" + directory + "</code>"}
                                    )
         }
     }
