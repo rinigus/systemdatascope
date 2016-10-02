@@ -16,7 +16,6 @@ ApplicationWindowPL {
     property int nextId: 0
 
     // signals
-    signal updateGraphs()
     signal loadNewConfig(string url)
 
     SettingsStoragePL {

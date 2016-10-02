@@ -24,6 +24,7 @@ ApplicationWindow {
     signal appStatus()
     signal appSetConfig()
     signal appMakeReport()
+    signal updateGraphs()
 
     // Settings
     allowedOrientations : Orientation.All
@@ -87,6 +88,15 @@ ApplicationWindow {
             "COLOR_ARROW": Theme.secondaryColor,
             "COLOR_LINE_SINGLE": Theme.highlightColor,
             "COLOR_LINE_SINGLE_SUB": Theme.secondaryHighlightColor
+        }
+    }
+
+    // Signal handler: updateGraphs
+    onUpdateGraphs: {
+        if (singleLineColorSetByProgram)
+        {
+            grapher.setSingleLineColors(Theme.highlightColor, Theme.secondaryHighlightColor)
+            console.log("set line colors")
         }
     }
 

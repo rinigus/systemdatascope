@@ -23,6 +23,7 @@ ApplicationWindow {
     signal appHelp()
     signal appStatus()
     signal appMakeReport()
+    signal updateGraphs()
 
     //////////////////////////////////////////////////////
     // special properties required by this platform
