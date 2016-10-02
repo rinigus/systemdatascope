@@ -96,7 +96,6 @@ ApplicationWindow {
         if (singleLineColorSetByProgram)
         {
             grapher.setSingleLineColors(Theme.highlightColor, Theme.secondaryHighlightColor)
-            console.log("set line colors")
         }
     }
 
