@@ -22,14 +22,14 @@ ApplicationWindowPL {
         id: settings
 
         property int graph_base_height: 400
-        property int graph_font_size_title: 14
-        property int graph_font_size_axis: 10
-        property int graph_font_size_unit: 10
-        property int graph_font_size_legend: 10
+        property int graph_font_size_title: 26
+        property int graph_font_size_axis: 14
+        property int graph_font_size_unit: 14
+        property int graph_font_size_legend: 18
 
         property int graph_report_height: 400
 
-        property real timewindow_duration: 24*60*60
+        property real timewindow_duration: 8*60*60
         property real timewindow_from: 0
 
         property string graph_definitions: ""
@@ -40,7 +40,7 @@ ApplicationWindowPL {
 
         property bool track_connectd_service: true
 
-        property real updates_period: 30
+        property real updates_period: 150
 
         property real cover_timewindow_duration: 60*60
         property int cover_index: 0
