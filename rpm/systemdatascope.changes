@@ -5,6 +5,12 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Sun Oct 2 2016 Rinigus <rinigus.git@gmail.com> 0.4.0-1
+- Add report generation
+- Add support for changes in Sailfish Ambience
+- Support for merging statefs_battery into battery plugin
+- Redesign of Time dialog
+
 * Tue Aug 30 2016 Rinigus <rinigus.git@gmail.com> 0.3.0-1
 - Support for new variable name in cpusleep, cpuidle, and cpufreq plugins
 - Add progress bar as an indicator for graph generation
