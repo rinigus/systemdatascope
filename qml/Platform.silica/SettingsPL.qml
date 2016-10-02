@@ -73,7 +73,7 @@ Dialog {
                     width: parent.width-2*x
                     wrapMode: Text.WordWrap
                     font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.secondaryHighlightColor
+                    color: Theme.highlightColor
                 }
             }
 
@@ -94,7 +94,7 @@ Dialog {
                     width: parent.width-2*x
                     wrapMode: Text.WordWrap
                     font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.secondaryHighlightColor
+                    color: Theme.highlightColor
                 }
             }
 
@@ -174,7 +174,7 @@ Dialog {
                     x: Theme.horizontalPageMargin
                     width: parent.width - x*2
                     font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.secondaryHighlightColor
+                    color: Theme.highlightColor
                 }
 
                 Button {
@@ -205,7 +205,7 @@ Dialog {
                     x: Theme.horizontalPageMargin
                     width: parent.width - x*2
                     font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.secondaryHighlightColor
+                    color: Theme.highlightColor
                 }
 
                 TextField {
