@@ -341,25 +341,11 @@ ApplicationWindowPL {
                            Qt.size(1.61803398875 * settings.graph_report_height, settings.graph_report_height) )
     }
 
-    // timer is added to ensure that we would not hang on it if the signal did not come
-    Timer {
-        id: reportChecker
-        interval: 1000
-        running: false
-        onTriggered:
-        {
-            var b = grapher.reporting
-            busy.running = b
-            running = b
-        }
-    }
-
     Connections {
         target: grapher
         onReportingChanged: {
             var b = grapher.reporting
             busy.running = b
-            reportChecker.running = b
         }
     }
 
