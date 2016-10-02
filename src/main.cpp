@@ -68,6 +68,11 @@ int main(int argc, char *argv[])
 
     rootContext->setContextProperty("programName", "SystemDataScope");
     rootContext->setContextProperty("programVersion", APP_VERSION);
+#ifdef LINE_COLOR_PROGRAM
+    rootContext->setContextProperty("singleLineColorSetByProgram", true);
+#else
+    rootContext->setContextProperty("singleLineColorSetByProgram", false);
+#endif
 
     // Start the application.
 #ifdef IS_SAILFISH_OS

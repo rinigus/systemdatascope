@@ -1,4 +1,6 @@
 #include "graphgenerator.h"
+#include "global.h"
+#include "configurator.h"
 
 #include <QPointer>
 #include <QDebug>
@@ -298,7 +300,14 @@ void Generator::registerImageType(QString type, QString command_json)
     // qDebug() << "New type registered: " << type << " : " << command.toString();
 
     // Register with some default options
-    m_image_types[type] = command.toString();
+    QString cmd_string = command.toString();
+    bool is_single_line = false;
+#ifdef LINE_COLOR_PROGRAM
+    is_single_line = (cmd_string.contains(VARIABLE_COLOR_SINGLE_LINE_MAIN) ||
+                      cmd_string.contains(VARIABLE_COLOR_SINGLE_LINE_SECONDARY));
+#endif
+
+    m_image_types[type] = ImageCommandType(is_single_line, cmd_string);
 }
 
 
@@ -310,9 +319,10 @@ bool Generator::isTypeRegistered(QString type)
     return true;
 }
 
+
 void Generator::dropAllImageTypes()
 {
-    m_image_types = QHash<QString, QString >();
+    m_image_types = QHash<QString, ImageCommandType >();
     m_image_type_size = QHash<QString, int>();
     m_image_cache = QHash< QString, ImageFile >();
 }
@@ -323,6 +333,22 @@ void Generator::dropAllImageTypes()
 void Generator::setFontSize(QString type, int size)
 {
     m_font_options[ type + " SIZE"] = "--font " + type + ":" + QString::number(size, 10) + ":.";
+}
+
+
+void Generator::setSingleLineColors(QColor main_color, QColor secondary_color)
+{
+    m_color_line_main = qcolor2rrd(main_color);
+    m_color_line_secondary = qcolor2rrd(secondary_color);
+}
+
+void Generator::setSingleLineColors()
+{
+    if (m_color_line_main.isEmpty())
+        m_color_line_main = Configurator::defaultColorLineMain;
+
+    if (m_color_line_secondary.isEmpty())
+        m_color_line_secondary = Configurator::defaultColorLineSecondary;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -412,7 +438,18 @@ void Generator::getImage(int caller, QString type, double from, double duration,
     foreach (QString f, m_font_options.values())
         comm.command += f + " ";
 
-    comm.command += m_image_types[type];
+    const ImageCommandType &imcmd = m_image_types[type];
+    QString cmd_string = imcmd.second;
+#ifdef LINE_COLOR_PROGRAM
+    if ( imcmd.first )
+    {
+        cmd_string.replace( "$" + QString(VARIABLE_COLOR_SINGLE_LINE_MAIN) + "$",
+                            m_color_line_main );
+        cmd_string.replace( "$" + QString(VARIABLE_COLOR_SINGLE_LINE_SECONDARY) + "$",
+                            m_color_line_secondary );
+    }
+#endif
+    comm.command += cmd_string;
 
     m_command_queue.add(comm);
     commandRun();
@@ -476,7 +513,7 @@ void Generator::makeReport(double from, double duration, QSize size)
         m_reporter_timer.start();
     }
 
-    QHashIterator<QString, QString> regTypeIter(m_image_types);
+    QHashIterator<QString, ImageCommandType> regTypeIter(m_image_types);
 
     for (size_t i=0; i < m_reporter_offset && regTypeIter.hasNext(); ++i)
         regTypeIter.next(); // skipping the submitted graphs
@@ -522,7 +559,18 @@ void Generator::makeReport(double from, double duration, QSize size)
         foreach (QString f, m_font_options.values())
             comm.command += f + " ";
 
-        comm.command += m_image_types[type];
+        const ImageCommandType &imcmd = m_image_types[type];
+        QString cmd_string = imcmd.second;
+    #ifdef LINE_COLOR_PROGRAM
+        if ( imcmd.first )
+        {
+            cmd_string.replace( "$" + QString(VARIABLE_COLOR_SINGLE_LINE_MAIN) + "$",
+                                "#0000FFFF" );
+            cmd_string.replace( "$" + QString(VARIABLE_COLOR_SINGLE_LINE_SECONDARY) + "$",
+                                "#0000FF40" );
+        }
+    #endif
+        comm.command += cmd_string;
 
         // make background white and text black
         comm.command += " --color BACK#FFFFFF --color FONT#000000FF --color AXIS#000000FF --color ARROW#000000FF ";

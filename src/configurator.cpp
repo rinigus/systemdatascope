@@ -1,4 +1,5 @@
 #include "configurator.h"
+#include "global.h"
 
 #include <QDebug>
 
@@ -18,6 +19,10 @@
 using namespace Graph;
 
 #define MAKECONFIG_EXE "systemdatascope-makeconfig"
+
+
+QString Configurator::defaultColorLineMain("#0000FFFF");
+QString Configurator::defaultColorLineSecondary("#0000FF80");
 
 Configurator::Configurator(QObject *parent) : QObject(parent)
 {
@@ -102,8 +107,7 @@ void Configurator::setExtraVariable(QString name, QString value)
 
 void Configurator::setExtraVariable(QString name, QColor value)
 {
-    QString v = value.name(QColor::HexArgb);
-    m_extra_variables[ name ] = "#" + v.mid(3) + v.mid(1,2);
+    m_extra_variables[ name ] = qcolor2rrd(value);
 }
 
 
@@ -165,8 +169,21 @@ QString Configurator::parseConfig(QString config)
                 QString varValue = iterVar.value().toString();
 
                 // perform replacement only if the variable is NOT in m_extra_variables
-                if ( !m_extra_variables.contains(varName) )
+                if ( !m_extra_variables.contains(varName)
+     #ifdef LINE_COLOR_PROGRAM
+                     // or if it is single line color
+                     && varName != VARIABLE_COLOR_SINGLE_LINE_MAIN
+                     && varName != VARIABLE_COLOR_SINGLE_LINE_SECONDARY
+     #endif
+                     )
                     curr_str.replace("$" + varName +"$", varValue);
+
+#ifdef LINE_COLOR_PROGRAM
+                if (varName == VARIABLE_COLOR_SINGLE_LINE_MAIN)
+                    defaultColorLineMain = varValue;
+                else if (varName == VARIABLE_COLOR_SINGLE_LINE_SECONDARY)
+                    defaultColorLineSecondary = varValue;
+#endif
             }
 
             QJsonDocument curr_after( QJsonDocument::fromJson( curr_str.toLatin1() ) );
@@ -189,7 +206,25 @@ QString Configurator::parseConfig(QString config)
             while (iter.hasNext())
             {
                 iter.next();
-                curr_str.replace("$" + iter.key() +"$", iter.value());
+
+                QString varName = iter.key();
+                QString varValue = iter.value();
+
+#ifdef LINE_COLOR_PROGRAM
+                // replace if it is not single line color
+                if (
+                    varName != VARIABLE_COLOR_SINGLE_LINE_MAIN &&
+                    varName != VARIABLE_COLOR_SINGLE_LINE_SECONDARY
+                        )
+#endif
+                    curr_str.replace("$" + varName +"$", varValue);
+
+#ifdef LINE_COLOR_PROGRAM
+                if (varName == VARIABLE_COLOR_SINGLE_LINE_MAIN)
+                    defaultColorLineMain = varValue;
+                else if (varName == VARIABLE_COLOR_SINGLE_LINE_SECONDARY)
+                    defaultColorLineSecondary = varValue;
+#endif
             }
 
             QJsonDocument curr_after( QJsonDocument::fromJson( curr_str.toLatin1() ) );
@@ -278,5 +313,3 @@ void Configurator::makeconfig_stateChanged(QProcess::ProcessState newState)
         m_makeconfig = nullptr;
     }
 }
-
-

@@ -57,6 +57,10 @@ public:
     ///
     Q_INVOKABLE void makeConfiguration(QString dirname);
 
+public:
+    static QString defaultColorLineMain;
+    static QString defaultColorLineSecondary;
+
 protected:
     bool checkConfig (QJsonObject &init) const;
 

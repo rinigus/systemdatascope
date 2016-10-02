@@ -172,6 +172,9 @@ ApplicationWindowPL {
         // parse configuration taking into account generators and variables
         var tmps = configurator.parseConfig( settings.graph_definitions )
 
+        // set default colors
+        grapher.setSingleLineColors()
+
         // console.log(tmps)
         try {
             graphConfig = JSON.parse( tmps )

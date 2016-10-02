@@ -9,6 +9,7 @@
 #include <QHash>
 #include <QColor>
 #include <QTimer>
+#include <QPair>
 
 #include <functional>
 
@@ -82,6 +83,15 @@ public:
     ///
     Q_INVOKABLE void makeReport(double from, double duration, QSize size);
 
+    /// \brief Sets colors for single-line plots
+    ///
+    Q_INVOKABLE void setSingleLineColors(QColor main_color, QColor secondary_color);
+
+    /// \brief Sets colors for single-line plots using default values
+    ///
+    /// Color values are set only if they have not been specified earlier
+    Q_INVOKABLE void setSingleLineColors();
+
 signals:
     void readyChanged();
     void progressChanged();
@@ -121,10 +131,14 @@ protected:
     QTemporaryDir m_dir;                            ///< Directory holding images
     QHash< QString, ImageFile > m_image_cache;      ///< Image cache
 
-    QHash< QString, QString > m_image_types;        ///< Image type -> command map
+    typedef QPair<bool, QString> ImageCommandType;
+    QHash< QString,  ImageCommandType > m_image_types;        ///< Image type -> command map
     QHash< QString, int > m_image_type_size;        ///< Keeps full image sizes for each type separately
 
     QHash< QString, QString > m_font_options;       ///< Font options used in the construction of all images
+
+    QString m_color_line_main;
+    QString m_color_line_secondary;
 
     QProcess *m_rrdtool = NULL;    ///< pointer to RRDTOOL process
     bool m_ready = false;

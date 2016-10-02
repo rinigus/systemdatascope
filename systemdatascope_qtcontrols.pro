@@ -8,6 +8,7 @@ CONFIG += c++11
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 DEFINES += IS_QTQUICK
+DEFINES += LINE_COLOR_PROGRAM
 
 SOURCES += \ 
     src/commandqueue.cpp \
@@ -15,7 +16,8 @@ SOURCES += \
     src/imagefile.cpp \
     src/main.cpp \
     src/systemdserviceswitchcmd.cpp \
-    src/configurator.cpp
+    src/configurator.cpp \
+    src/global.cpp
 
 RESOURCES += qml_qtcontrols.qrc
 
@@ -30,4 +32,5 @@ HEADERS += \
     src/graphgenerator.h \
     src/imagefile.h \
     src/systemdserviceswitchcmd.h \
-    src/configurator.h
+    src/configurator.h \
+    src/global.h
