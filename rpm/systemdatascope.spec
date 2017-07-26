@@ -14,7 +14,7 @@ Name:       systemdatascope
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    System Data Scope
 Version:    0.4.0
-Release:    1
+Release:    2
 Group:      Qt/Qt
 License:    MIT
 URL:        http://github.org/rinigus/systemdatascope
