@@ -38,6 +38,7 @@ SystemDataScope is a GUI for visualization of collectd datasets
 %setup -q -n %{name}-%{version}
 
 # >> setup
+(cd qml && ln -s Platform.silica Platform) || true  
 # << setup
 
 %build
