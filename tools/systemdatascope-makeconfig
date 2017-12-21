@@ -31,6 +31,7 @@ Units = { "DEFAULT": "",
           "Context/context_switch": "1/s",
           "Entropy/entropy": "bits",
           "Memory": "bytes",
+          "Swap": "bytes",
           "Network/octets": "bytes/s",
           "NetworkTotal/octets": "B",
           "Network": "1/s",
@@ -69,6 +70,7 @@ Formats = { "DEFAULT": "%5.2lf",
             "Entropy/entropy": "%1.0lf%S",
             "Memory/Overview": "%4.0lf%S",
             "Memory": "%4.0lf%S",
+            "Swap": "%5.2lf%S",
             "Load": "%5.2lf",
             "Network/octets": "%6.0lf%S",
             "Network/packets": "%6.0lf%S",
@@ -810,7 +812,7 @@ if os.path.exists( "battery-0" ):
 ######################################################################################
 # Storage & RAM
 
-if len( glob.glob( "df-*" ) ) > 0 or os.path.exists( "memory" ):
+if len( glob.glob( "df-*" ) ) > 0 or os.path.exists( "memory" ) or os.path.exists( "swap" ):
     Plots = { "type": None, "subplots": { "title": "Memory & Storage", "plots": [ ] } }
 
     ######################################################################################
@@ -858,8 +860,40 @@ if len( glob.glob( "df-*" ) ) > 0 or os.path.exists( "memory" ):
             SubPlots["subplots"]["plots"].append( plot )
 
         Plots["subplots"]["plots"].append( SubPlots )
-    
 
+        
+    if os.path.exists( "swap" ):
+        SubPlots = { "subplots": { "title": "Swap details", "plots": [ ] } }
+
+        # Swap overview
+        s = StackOrLines( cs, "Swap", "Overview", isStack = True, t = "AREA", extra_command="--lower-limit 0"  )
+
+        swap = sorter( "swap/swap-*.rrd", "^swap/.*-(.*).rrd",
+                       ["used"],
+                       ["free"] )
+
+        for g in swap:
+            name = re.search( "^swap/swap-(.*).rrd", g ).group(1)
+            s.add( name, g )
+
+        gt, plot, fullname = s.compose()
+
+        Config["types"][fullname] = gt
+        SubPlots["type"] = fullname
+        SubPlots["subplots"]["plots"].append( plot )
+        if Plots["type"] is None: Plots["type"] = fullname
+
+        # detailed plots
+        swap.reverse()
+        for g in swap:
+            name = re.search( "^swap/swap-(.*).rrd", g ).group(1)
+            gt, plot, fullname = maketypesplot( "Swap", name, g )
+
+            Config["types"][fullname] = gt
+            SubPlots["subplots"]["plots"].append( plot )
+
+        Plots["subplots"]["plots"].append( SubPlots )
+    
     ######################################################################################
     # Storage
     if len( glob.glob( "df-*" ) ) > 0:
