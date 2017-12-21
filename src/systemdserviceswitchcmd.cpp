@@ -2,6 +2,8 @@
 #include <QProcess>
 #include <QDebug>
 
+#include <math.h>
+
 #define SCTL "systemctl"
 
 

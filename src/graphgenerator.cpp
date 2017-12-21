@@ -18,6 +18,8 @@
 #include <iostream>
 #include <algorithm>
 
+#include <math.h>
+
 #define RRDTOOL_EXE "rrdtool"
 
 using namespace Graph;
