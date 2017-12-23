@@ -854,6 +854,52 @@ if len( glob.glob( "df-*" ) ) > 0 or os.path.exists( "memory" ) or os.path.exist
         Config["types"]["Memory/overview/cover"] = gt
         Config["cover"].append( "Memory/overview/cover" )
 
+        # Swap is added as Memory subplot
+        if os.path.exists( "swap" ):
+            SubSubPlots = { "subplots": { "title": "Swap details", "plots": [ ] } }
+
+            # Swap overview
+            s = StackOrLines( cs, "Swap", "Overview", isStack = True, t = "AREA", extra_command="--lower-limit 0"  )
+
+            swap = sorter( "swap/swap-*.rrd", "^swap/.*-(.*).rrd",
+                           ["used"],
+                           ["free"] )
+
+            for g in swap:
+                name = re.search( "^swap/swap-(.*).rrd", g ).group(1)
+                s.add( name, g )
+
+            gt, plot, fullname = s.compose()
+
+            Config["types"][fullname] = gt
+            SubSubPlots["type"] = fullname
+            SubSubPlots["subplots"]["plots"].append( plot )
+
+            # in and out
+            if os.path.exists("swap/swap_io-in.rrd" ) and os.path.exists("swap/swap_io-out.rrd" ):
+                s = StackOrLines( cs, "Swap", "inout", Title="In/Out",
+                                  minmax=True, extra_command='--lower-limit 0' )
+                for var_name in ["in", "out"]:
+                    name = var_name
+                    g = "swap/swap_io-%s.rrd" % var_name
+                    s.add( name, g )
+                
+                gt, plot, fullname = s.compose()        
+
+                Config["types"][fullname] = gt
+                SubSubPlots["subplots"]["plots"].append( plot )
+
+            # detailed plots
+            swap.reverse()
+            for g in swap:
+                name = re.search( "^swap/swap-(.*).rrd", g ).group(1)
+                gt, plot, fullname = maketypesplot( "Swap", name, g )
+
+                Config["types"][fullname] = gt
+                SubSubPlots["subplots"]["plots"].append( plot )
+
+        SubPlots["subplots"]["plots"].append( SubSubPlots )
+    
         # detailed plots
         memory.reverse()
         for g in memory:
@@ -865,53 +911,6 @@ if len( glob.glob( "df-*" ) ) > 0 or os.path.exists( "memory" ) or os.path.exist
 
         Plots["subplots"]["plots"].append( SubPlots )
 
-        
-    if os.path.exists( "swap" ):
-        SubPlots = { "subplots": { "title": "Swap details", "plots": [ ] } }
-
-        # Swap overview
-        s = StackOrLines( cs, "Swap", "Overview", isStack = True, t = "AREA", extra_command="--lower-limit 0"  )
-
-        swap = sorter( "swap/swap-*.rrd", "^swap/.*-(.*).rrd",
-                       ["used"],
-                       ["free"] )
-
-        for g in swap:
-            name = re.search( "^swap/swap-(.*).rrd", g ).group(1)
-            s.add( name, g )
-
-        gt, plot, fullname = s.compose()
-
-        Config["types"][fullname] = gt
-        SubPlots["type"] = fullname
-        SubPlots["subplots"]["plots"].append( plot )
-        if Plots["type"] is None: Plots["type"] = fullname
-
-        # in and out
-        if os.path.exists("swap/swap_io-in.rrd" ) and os.path.exists("swap/swap_io-out.rrd" ):
-            s = StackOrLines( cs, "Swap", "inout", Title="In/Out",
-                              minmax=True, extra_command='--lower-limit 0' )
-            for var_name in ["in", "out"]:
-                name = var_name
-                g = "swap/swap_io-%s.rrd" % var_name
-                s.add( name, g )
-                
-            gt, plot, fullname = s.compose()        
-
-            Config["types"][fullname] = gt
-            SubPlots["subplots"]["plots"].append( plot )
-
-        # detailed plots
-        swap.reverse()
-        for g in swap:
-            name = re.search( "^swap/swap-(.*).rrd", g ).group(1)
-            gt, plot, fullname = maketypesplot( "Swap", name, g )
-
-            Config["types"][fullname] = gt
-            SubPlots["subplots"]["plots"].append( plot )
-
-        Plots["subplots"]["plots"].append( SubPlots )
-    
     ######################################################################################
     # Storage
     if len( glob.glob( "df-*" ) ) > 0:
