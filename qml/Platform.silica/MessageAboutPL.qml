@@ -45,10 +45,9 @@ Page {
                 font.pixelSize: Theme.fontSizeSmall
                 //color: Theme.highlightColor
                 //textFormat: Text.RichText
+                onLinkActivated: Qt.openUrlExternally(link)
             }
         }
     }
-
-
 }
 
