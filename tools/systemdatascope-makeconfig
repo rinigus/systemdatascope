@@ -32,6 +32,7 @@ Units = { "DEFAULT": "",
           "Entropy/entropy": "bits",
           "Memory": "bytes",
           "Swap": "bytes",
+          "Swap/inout": "bytes/s",
           "Network/octets": "bytes/s",
           "NetworkTotal/octets": "B",
           "Network": "1/s",
@@ -71,6 +72,7 @@ Formats = { "DEFAULT": "%5.2lf",
             "Memory/Overview": "%4.0lf%S",
             "Memory": "%4.0lf%S",
             "Swap": "%5.2lf%S",
+            "Swap/inout": "%6.0lf%S",
             "Load": "%5.2lf",
             "Network/octets": "%6.0lf%S",
             "Network/packets": "%6.0lf%S",
@@ -109,6 +111,8 @@ Heads = { "DEFAULT": None,
           "Memory/Overview": 5,
           "Network": 7,
           "Load/load": 5,
+          "Swap": 6,
+          "Swap/inout": 7,
           "Processes/Overview": 5,
           "Processes/cputime": 5,
           "Processes/count": 5,
@@ -882,6 +886,20 @@ if len( glob.glob( "df-*" ) ) > 0 or os.path.exists( "memory" ) or os.path.exist
         SubPlots["type"] = fullname
         SubPlots["subplots"]["plots"].append( plot )
         if Plots["type"] is None: Plots["type"] = fullname
+
+        # in and out
+        if os.path.exists("swap/swap_io-in.rrd" ) and os.path.exists("swap/swap_io-out.rrd" ):
+            s = StackOrLines( cs, "Swap", "inout", Title="In/Out",
+                              minmax=True, extra_command='--lower-limit 0' )
+            for var_name in ["in", "out"]:
+                name = var_name
+                g = "swap/swap_io-%s.rrd" % var_name
+                s.add( name, g )
+                
+            gt, plot, fullname = s.compose()        
+
+            Config["types"][fullname] = gt
+            SubPlots["subplots"]["plots"].append( plot )
 
         # detailed plots
         swap.reverse()
