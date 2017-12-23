@@ -13,8 +13,8 @@ Name:       systemdatascope
 %{!?qtc_make:%define qtc_make make}
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    System Data Scope
-Version:    0.4.0
-Release:    2
+Version:    0.4.1
+Release:    1
 Group:      Qt/Qt
 License:    MIT
 URL:        http://github.org/rinigus/systemdatascope
@@ -38,7 +38,7 @@ SystemDataScope is a GUI for visualization of collectd datasets
 %setup -q -n %{name}-%{version}
 
 # >> setup
-(cd qml && ln -s Platform.silica Platform) || true  
+(cd qml && ln -s Platform.silica Platform) || true
 # << setup
 
 %build

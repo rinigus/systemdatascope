@@ -5,6 +5,9 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Sat Dec 23 2017 Rinigus <rinigus.git@gmail.com> 0.4.1-1
+- Add swap stats
+
 * Sun Oct 2 2016 Rinigus <rinigus.git@gmail.com> 0.4.0-1
 - Add report generation
 - Add support for changes in Sailfish Ambience
