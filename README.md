@@ -1,4 +1,6 @@
 # SystemDataScope
+[![Donate](https://img.shields.io/badge/donate-liberapay-yellow.svg)](https://liberapay.com/rinigus)
+
 SystemDataScope is a GUI for visualization of collectd datasets
 
 SystemDataScope reads the system performance data gathered by <i>collectd</i>. Graphs are generated using RRDtool and shown through provided GUI. If collectd is started by a GUI user through systemd, there is a support for starting/stopping the daemon.

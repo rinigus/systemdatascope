@@ -35,7 +35,7 @@ Page {
                 wrapMode: Text.WordWrap
                 width: column.width
                 textFormat: Text.RichText
-                //color: Theme.highlightColor
+                color: Theme.highlightColor
             }
 
             Label {
@@ -43,7 +43,8 @@ Page {
                 wrapMode: Text.WordWrap
                 width: column.width
                 font.pixelSize: Theme.fontSizeSmall
-                //color: Theme.highlightColor
+                color: Theme.highlightColor
+                linkColor: Theme.primaryColor
                 //textFormat: Text.RichText
                 onLinkActivated: Qt.openUrlExternally(link)
             }
