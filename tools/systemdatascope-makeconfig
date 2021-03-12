@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 
 import json, os, os.path, argparse, glob, re, ast
 
@@ -203,7 +203,7 @@ class Colors:
         if self.last_transparent: k = n-1
         else: k = n
 
-        if self.colorschemes.has_key(k):
+        if k in self.colorschemes:
             self.colors = self.colorschemes[k]
         elif k < min(self.colorschemes.keys()):
             self.colors = self.colorschemes[ min(self.colorschemes.keys()) ]
@@ -280,7 +280,7 @@ class StackOrLines:
         
         command_def = '-t " '
         if Title is not None: command_def += Title
-        elif Human.has_key( self.fullname ): command_def += Human[ self.fullname ]
+        elif self.fullname in Human: command_def += Human[ self.fullname ]
         else: command_def += Type + " " + name
 
         if len(self.u) > 0: command_def += ", " + self.u
@@ -662,7 +662,7 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
 
                     gt, plot, fullname = s.compose()
                     Config["types"][fullname] = gt
-                    if not SubPlots.has_key("type"): SubPlots["type"] = fullname
+                    if "type" not in SubPlots: SubPlots["type"] = fullname
                     SubPlots["subplots"]["plots"].append( plot )
                     
         # single shot measurements
@@ -674,14 +674,14 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
 
             gt, plot, fullname = s.compose()
             Config["types"][fullname] = gt
-            if not SubPlots.has_key("type"): SubPlots["type"] = fullname
+            if "type" not in SubPlots: SubPlots["type"] = fullname
             SubPlots["subplots"]["plots"].append( plot )
 
 
         # add frequency plots
         if len(SubPlots["subplots"]["plots"]) > 1:
             Plots["subplots"]["plots"].append( SubPlots )
-        elif SubPlots.has_key("type"):
+        elif "type" in SubPlots:
             Plots["subplots"]["plots"].append( { "type": SubPlots["type"] } )
 
     ###############################################################################
@@ -724,13 +724,13 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
 
                 gt, plot, fullname = s.compose()
                 Config["types"][fullname] = gt
-                if not SubPlots.has_key("type"): SubPlots["type"] = fullname
+                if "type" not in SubPlots: SubPlots["type"] = fullname
                 SubPlots["subplots"]["plots"].append( plot )
                     
         # add idle plots
         if len(SubPlots["subplots"]["plots"]) > 1:
             Plots["subplots"]["plots"].append( SubPlots )
-        elif SubPlots.has_key("type"):
+        elif "type" in SubPlots:
             Plots["subplots"]["plots"].append( { "type": SubPlots["type"] } )
 
 
@@ -938,7 +938,7 @@ if len( glob.glob( "df-*" ) ) > 0 or os.path.exists( "memory" ) or os.path.exist
 
             Config["types"][fullname] = gt
             SubPlots["subplots"]["plots"].append( plot )
-            if not SubPlots.has_key("type"): SubPlots["type"] = fullname
+            if "type" not in SubPlots: SubPlots["type"] = fullname
             if Plots["type"] is None: Plots["type"] = fullname
 
 
@@ -1144,7 +1144,7 @@ if len( glob.glob("interface-*") ) > 0:
 
         SubPlots["type"] = "Network/" + intname + "/octets"
         Plots["subplots"]["plots"].append( SubPlots )
-        if not Plots.has_key("type"): Plots["type"]  = "Network/" + intname + "/octets"
+        if "type" not in Plots: Plots["type"]  = "Network/" + intname + "/octets"
 
     Config["page"]["plots"].append( Plots )
 
@@ -1376,4 +1376,4 @@ if os.path.exists(g):
 
 
 # Print resulting JSON configuration
-print json.dumps(Config, indent=3)
+print(json.dumps(Config, indent=3))
