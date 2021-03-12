@@ -1,5 +1,5 @@
 # SystemDataScope
-[![Donate](https://img.shields.io/badge/donate-liberapay-yellow.svg)](https://liberapay.com/rinigus)
+[![Donate](https://img.shields.io/badge/donate-rinigus-blue.svg)](https://rinigus.github.io/donate)
 
 SystemDataScope is a GUI for visualization of collectd datasets
 
