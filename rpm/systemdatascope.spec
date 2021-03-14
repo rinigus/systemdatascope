@@ -20,10 +20,13 @@ License:    MIT
 URL:        http://github.org/rinigus/systemdatascope
 Source0:    %{name}-%{version}.tar.bz2
 Source100:  systemdatascope.yaml
+
 Requires:   sailfishsilica-qt5 >= 0.10.9
 Requires:   rrdtool
-Requires:   collectd
-Requires:   python
+Requires:   collectd, collectd-python
+Requires:   python(abi) > 3.0
+Requires:   python3-dbus
+
 BuildRequires:  pkgconfig(sailfishapp) >= 1.0.2
 BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5Qml)

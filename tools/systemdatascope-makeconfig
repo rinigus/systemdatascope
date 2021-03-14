@@ -466,7 +466,11 @@ def gethuman(name):
     n = getit(name, Human)
     if n is None: return name
     return n
-             
+
+def settype(Plot, name):
+    if "type" not in Plot or Plot["type"] is None:
+        Plot["type"] = name
+
 ######################################################################################
 # Start definition of types                
 
@@ -530,7 +534,7 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
         gt, plot, fullname = s.compose()
         Config["types"][fullname] = gt
         SubPlots["type"] = fullname
-        if Plots["type"] is None: Plots["type"] = fullname
+        settype(Plots, fullname)
 
         # CPU overview : cover
         s = StackOrLines( csTr, "CPU", "Overview", Title="CPU", isStack = True, t = "AREA", extra_command = "--upper-limit 100 --lower-limit 0 --rigid", SkipLegend = True )
@@ -567,7 +571,7 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
                                             scale_data = "10,/" )
 
         Config["types"]["CPUstate/" + name] = gt
-        if Plots["type"] is None: Plots["type"] = fullname
+        settype(Plots, fullname)
         CpuSleepPlots = { "type": fullname,
                           "subplots": { "title": "CPU sleep details", "plots": [ {"type": fullname} ] } }
 
@@ -663,7 +667,7 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
 
                     gt, plot, fullname = s.compose()
                     Config["types"][fullname] = gt
-                    if "type" not in SubPlots: SubPlots["type"] = fullname
+                    settype(SubPlots, fullname)
                     SubPlots["subplots"]["plots"].append( plot )
                     
         # single shot measurements
@@ -675,7 +679,7 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
 
             gt, plot, fullname = s.compose()
             Config["types"][fullname] = gt
-            if "type" not in SubPlots: SubPlots["type"] = fullname
+            settype(SubPlots, fullname)
             SubPlots["subplots"]["plots"].append( plot )
 
 
@@ -725,7 +729,7 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
 
                 gt, plot, fullname = s.compose()
                 Config["types"][fullname] = gt
-                if "type" not in SubPlots: SubPlots["type"] = fullname
+                settype(SubPlots, fullname)
                 SubPlots["subplots"]["plots"].append( plot )
                     
         # add idle plots
@@ -790,26 +794,6 @@ if os.path.exists( "battery-0" ):
     Config["cover"].append( "Battery/charge/cover" )
 
 
-# elif os.path.exists( "battery-0" ):
-#     BatteryPlots = { "subplots": { "title": "Battery details", "plots": [ ] } }
-
-#     for g in sorter( "battery-0/*.rrd", "^battery.*/(.*).rrd" ):
-#         name = re.search( "^battery.*/(.*).rrd", g ).group(1)
-#         gt, plot, fullname = maketypesplot( "Battery", name, g )
-
-#         Config["types"][fullname] = gt
-#         BatteryPlots["subplots"]["plots"].append( plot )
-
-#     # Add all Battery plots
-#     BatteryPlots["type"] = "Battery/voltage"
-#     Config["page"]["plots"].append( BatteryPlots )
-
-#     # Cover
-#     gt, plot, fullname = maketypesplot( "Battery", "voltage", "battery-0/voltage.rrd", Title = "Battery", SkipLegend = True )
-#     Config["types"]["Battery/voltage/cover"] = gt
-#     Config["cover"].append( "Battery/voltage/cover" )
-
-
 ######################################################################################
 # CPU states 
 
@@ -839,9 +823,9 @@ if len( glob.glob( "df-*" ) ) > 0 or os.path.exists( "memory" ) or os.path.exist
         gt, plot, fullname = s.compose()
 
         Config["types"][fullname] = gt
-        SubPlots["type"] = fullname
+        settype(SubPlots, fullname)
         SubPlots["subplots"]["plots"].append( plot )
-        if Plots["type"] is None: Plots["type"] = fullname
+        settype(Plots, fullname)
 
         # Memory overview: cover
         s = StackOrLines( cs, "Memory", "Overview", Title = "Memory, B", Unit = "", SkipLegend = True, isStack = True, t = "AREA", extra_command="--lower-limit 0"  )
@@ -873,7 +857,7 @@ if len( glob.glob( "df-*" ) ) > 0 or os.path.exists( "memory" ) or os.path.exist
             gt, plot, fullname = s.compose()
 
             Config["types"][fullname] = gt
-            SubSubPlots["type"] = fullname
+            settype(SubSubPlots, fullname)
             SubSubPlots["subplots"]["plots"].append( plot )
 
             # in and out
@@ -939,8 +923,8 @@ if len( glob.glob( "df-*" ) ) > 0 or os.path.exists( "memory" ) or os.path.exist
 
             Config["types"][fullname] = gt
             SubPlots["subplots"]["plots"].append( plot )
-            if "type" not in SubPlots: SubPlots["type"] = fullname
-            if Plots["type"] is None: Plots["type"] = fullname
+            settype(SubPlots, fullname)
+            settype(Plots, fullname)
 
 
         # disk access rates
@@ -1094,7 +1078,7 @@ if len( glob.glob("interface-*") ) > 0:
 
     Config["types"][fullname] = gt
     Plots["subplots"]["plots"].append( plot )
-    Plots["type"] = fullname
+    settype(Plots, fullname)
 
     # interface one by one
     for CNet in sorter("interface-*/if_octets.rrd", "^interface-(.*)/if_octets.rrd", [], ["lo"]):
@@ -1145,40 +1129,54 @@ if len( glob.glob("interface-*") ) > 0:
 
         SubPlots["type"] = "Network/" + intname + "/octets"
         Plots["subplots"]["plots"].append( SubPlots )
-        if "type" not in Plots: Plots["type"]  = "Network/" + intname + "/octets"
+        settype(Plots, "Network/" + intname + "/octets")
 
     Config["page"]["plots"].append( Plots )
 
 
 ######################################################################################
-if os.path.exists( "statefs_cellular" ):
+if os.path.exists("ofono") or \
+   os.path.exists("connman") or \
+   len( glob.glob("radio-*") ) > 1 or \
+   os.path.exists("statefs_cellular") or \
+   os.path.exists("statefs_internet"):
 
     Plots = { "subplots": { "title": "Radio details", "plots": [ ] } }
 
-    s = StackOrLines( cs, "Radio", "Cellular",
-                      minmax = True,
-                      extra_command = "--upper-limit 100 --lower-limit 0 --rigid" )
-    for g in sorter( "statefs_cellular/signal_strength-*.rrd" ):
-        name = re.search( "^statefs_cellular/signal_strength-(.*).rrd", g ).group(1)
-        s.add( name, g )
-    gt, plot, fullname = s.compose()
-
-    Config["types"][fullname] = gt
-    Plots["subplots"]["plots"].append( plot )
-    Plots["type"] = fullname
-
-    if os.path.exists( "statefs_internet" ):
-
-        s = StackOrLines( cs, "Radio", "Internet",
+    cpath = None
+    if os.path.exists("ofono"): cpath = "ofono"
+    elif os.path.exists("statefs_cellular"): cpath = "statefs_cellular"
+    
+    if cpath is not None:
+        s = StackOrLines( cs, "Radio", "Cellular",
                           minmax = True,
                           extra_command = "--upper-limit 100 --lower-limit 0 --rigid" )
-        for g in sorter( "statefs_internet/signal_strength-*.rrd" ):
-            name = re.search( "^statefs_internet/signal_strength-(.*).rrd", g ).group(1)
+        for g in sorter( cpath + "/signal_strength-*.rrd" ):
+            name = re.search( "^" + cpath + "/signal_strength-(.*).rrd", g ).group(1)
             s.add( name, g )
         gt, plot, fullname = s.compose()
 
         Config["types"][fullname] = gt
         Plots["subplots"]["plots"].append( plot )
+        settype(Plots, fullname)
+
+    cpath = None
+    if os.path.exists("connman"): cpath = "connman"
+    elif os.path.exists("statefs_internet"): cpath = "statefs_internet"
+    
+    if cpath is not None:
+
+        s = StackOrLines( cs, "Radio", "Internet",
+                          minmax = True,
+                          extra_command = "--upper-limit 100 --lower-limit 0 --rigid" )
+        for g in sorter( cpath + "/signal_strength-*.rrd" ):
+            name = re.search( "^" + cpath + "/signal_strength-(.*).rrd", g ).group(1)
+            s.add( name, g )
+        gt, plot, fullname = s.compose()
+
+        Config["types"][fullname] = gt
+        Plots["subplots"]["plots"].append( plot )
+        settype(Plots, fullname)
 
     if len( glob.glob("radio-*") ) > 1:
 
@@ -1200,6 +1198,7 @@ if os.path.exists( "statefs_cellular" ):
 
         Config["types"][fullname] = gt
         Plots["subplots"]["plots"].append( plot )
+        settype(Plots, fullname)
 
     if os.path.exists( "statefs_bluetooth" ):
 
@@ -1216,6 +1215,7 @@ if os.path.exists( "statefs_cellular" ):
 
         Config["types"][fullname] = gt
         Plots["subplots"]["plots"].append( plot )
+        settype(Plots, fullname)
 
     Config["page"]["plots"].append( Plots )
 
@@ -1240,9 +1240,9 @@ if os.path.exists( "processes" ) or os.path.exists( "load" ):
         gt, plot, fullname = s.compose()
 
         Config["types"][fullname] = gt
-        SubPlots["type"] = fullname
+        settype(SubPlots, fullname)
         SubPlots["subplots"]["plots"].append( plot )
-        if Plots["type"] is None: Plots["type"] = fullname
+        settype(Plots, fullname)
 
         # detailed plots
         processes.reverse()
@@ -1280,9 +1280,9 @@ if os.path.exists( "processes" ) or os.path.exists( "load" ):
         gt, plot, fullname = s.compose()
 
         Config["types"][fullname] = gt
-        SubPlots["type"] = fullname
+        settype(SubPlots, fullname)
         SubPlots["subplots"]["plots"].append( plot )
-        if Plots["type"] is None: Plots["type"] = fullname
+        settype(Plots, fullname)
         #### Other Load related graphs
 
         g = "contextswitch/contextswitch.rrd"
