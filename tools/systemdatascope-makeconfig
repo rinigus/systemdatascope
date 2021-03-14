@@ -657,7 +657,8 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
                     srted = sorter( D + "/total_time_in_ms-*.rrd", "^" + D + "/total_time_in_ms-(.*).rrd", useNumericInt = True )
                     srted.reverse()
                     for g in srted:
-                        name = str( int(re.search( "^" + D + "/total_time_in_ms-(.*).rrd", g ).group(1))/1000 ) + "MHz"
+                        freq = int(re.search( "^" + D + "/total_time_in_ms-(.*).rrd", g ).group(1))/1000
+                        name = str( int(round(freq)) ) + "MHz"
                         s.add( name, g, scale_data="0.1,*", Format="%4.0lf%s" )
 
                     gt, plot, fullname = s.compose()
