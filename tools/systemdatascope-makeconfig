@@ -978,6 +978,66 @@ if len( glob.glob( "df-*" ) ) > 0 or os.path.exists( "memory" ) or os.path.exist
                 
         Plots["subplots"]["plots"].append( SubPlots )
 
+    # detailed plots for selected processes
+    ProcStats = { "rss": [ ],
+                  "vm": [ ],
+                  "data": [ ],
+                  "code": [ ],
+                  "stacksize": [ ],
+    }
+
+    ProcScale = { "DEFAULT": None,
+    }
+    for gp in sorter("processes-*"):
+        procname = re.search("^processes-(.*)", gp).group(1)
+        myplots = { "subplots": {"plots": [], "title": "Process " + procname } }
+
+        #for g in sorter("processes-" + procname + "/*rrd"):
+        for g in [
+                "processes-" + procname + "/ps_rss.rrd",
+                "processes-" + procname + "/ps_pagefaults.rrd",
+                "processes-" + procname + "/ps_vm.rrd",
+                "processes-" + procname + "/ps_data.rrd",
+                "processes-" + procname + "/ps_stacksize.rrd",
+                "processes-" + procname + "/ps_code.rrd",
+            ]:
+            name = re.search( "^processes-" + procname + "/ps_(.*).rrd", g )
+            if (name is None):
+                continue
+            else:
+                name = name.group(1)
+
+            title_start = ""
+            if name=="rss": title_start += procname + ': '
+
+            if name in ProcStats.keys():
+                f = getf("Processes/" + name)
+                u = getunit("Processes/" + name)
+
+                s = StackOrLines( cs, "Processes/"+procname, name,
+                                  Title = title_start + gethuman("Processes/"+name),
+                                  HeadSize = gethead("Processes/"+name),
+                                  extra_command = '--lower-limit 0',
+                                  Unit = u,
+                                  minmax=True )
+
+                for li, load_type in  enumerate(ProcStats[ name ]):
+                    s.add( load_type, g, var_name = load_type, Format=f, scale_data=getit(name,ProcScale)  )
+
+                gt, plot, fullname = s.compose()
+
+            else:
+                gt, plot, fullname = maketypesplot( "Processes/" + procname, name, g, 
+                                                    Title = title_start + getit("Processes/"+name, Human),
+                                                    Format = getf("Processes/" + name),
+                                                    Unit = getunit("Processes/" + name),
+                                                    scale_data=getit(name,ProcScale) )
+
+            Config["types"][fullname] = gt
+            myplots["subplots"]["plots"].append( plot )
+        myplots["type"] = "Processes/" + procname + "/rss"
+        Plots["subplots"]["plots"].append( myplots )
+
     Config["page"]["plots"].append( Plots )
 
 
