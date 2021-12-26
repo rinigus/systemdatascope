@@ -17,7 +17,7 @@ Version:    0.5.0
 Release:    1
 Group:      Qt/Qt
 License:    MIT
-URL:        http://github.org/rinigus/systemdatascope
+URL:        https://github.com/rinigus/systemdatascope
 Source0:    %{name}-%{version}.tar.bz2
 Source100:  systemdatascope.yaml
 
@@ -41,7 +41,7 @@ monitoring solution for Sailfish.
 PackageName: SystemDataScope
 Type: desktop-application
 Custom:
-  Repo: http://github.org/rinigus/systemdatascope
+  Repo: https://github.com/rinigus/systemdatascope
 Categories:
   - System
   - Utility
