@@ -34,8 +34,21 @@ BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  desktop-file-utils
 
 %description
-SystemDataScope is a GUI for visualization of collectd datasets
+SystemDataScope is a GUI for visualization of collectd
+datasets. Together with collectd and RRDtool, it provides a system
+monitoring solution for Sailfish.
 
+PackageName: SystemDataScope
+Type: desktop-application
+Custom:
+  Repo: http://github.org/rinigus/systemdatascope
+Categories:
+  - System
+  - Utility
+Icon: https://raw.githubusercontent.com/rinigus/systemdatascope/master/icons/systemdatascope.svg
+Screenshots:
+  - https://raw.githubusercontent.com/rinigus/systemdatascope/master/screenshots/sailfish-overall.png
+  - https://raw.githubusercontent.com/rinigus/systemdatascope/master/screenshots/sailfish-load-details.png
 
 %prep
 %setup -q -n %{name}-%{version}
