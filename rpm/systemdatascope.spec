@@ -49,6 +49,8 @@ Icon: https://raw.githubusercontent.com/rinigus/systemdatascope/master/icons/sys
 Screenshots:
   - https://raw.githubusercontent.com/rinigus/systemdatascope/master/screenshots/sailfish-overall.png
   - https://raw.githubusercontent.com/rinigus/systemdatascope/master/screenshots/sailfish-load-details.png
+Url:
+  Donation: https://rinigus.github.io/donate
 
 %prep
 %setup -q -n %{name}-%{version}
