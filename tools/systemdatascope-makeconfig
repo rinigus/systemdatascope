@@ -1319,7 +1319,11 @@ if os.path.exists( "processes" ) or os.path.exists( "load" ):
         myplots = { "subplots": {"plots": [], "title": "Process " + procname } }
 
         for g in sorter("processes-" + procname + "/*rrd"):
-            name = re.search( "^processes-" + procname + "/ps_(.*).rrd", g ).group(1)
+            name = re.search( "^processes-" + procname + "/ps_(.*).rrd", g )
+            if name is None:
+                continue
+            else:
+                name = name.group(1)
 
             title_start = ""
             if name=="cputime": title_start += procname + ': '
