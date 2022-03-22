@@ -174,7 +174,7 @@ class ColorSingle:
     def get_color(self, i, opacity = 1.0):
         if opacity > 0.9: return self.color
         return self.color_opa
-    
+
 
 class Colors:
     # internally stored as RGBA integers
@@ -197,7 +197,7 @@ class Colors:
             colors = ast.literal_eval( cbrewer )
             for i in colors: i.append(255)
             self.colorschemes[ len(colors) ] = colors
-            
+
     def set_number_of_lines(self, n):
         self.n = n
         if self.last_transparent: k = n-1
@@ -238,7 +238,7 @@ class Colors:
         return self.makestr(c, opacity)
 
 ### Useful color objects
-    
+
 cs = Colors( )
 csTr = Colors( True )
 csSingle = ColorSingle( "$COLOR_LINE_SINGLE$", "$COLOR_LINE_SINGLE_SUB$")
@@ -271,13 +271,13 @@ class StackOrLines:
         self.minmax = minmax
         self.fullname = Type + "/" + name
         self.SkipLegend = SkipLegend
-        
+
         if Unit is None: self.u = getunit(self.fullname)
         else: self.u = Unit
-        
+
         if HeadSize is None: self.HeadSize = gethead(self.fullname)
         else: self.HeadSize = HeadSize
-        
+
         command_def = '-t " '
         if Title is not None: command_def += Title
         elif self.fullname in Human: command_def += Human[ self.fullname ]
@@ -296,7 +296,7 @@ class StackOrLines:
     #                          "makeLine": makeLine,
     #                          "var_name": var_name,
     #     } )
-        
+
     def add(self, name, g, width="$LINE_WIDTH_PRIMARY$", makeLine=False, var_name = "value", labelName = None, Format = None, scale_data = None):
         if Format is None: Format = getf( self.fullname + "/" + name )
         if labelName is None: labelName = name
@@ -309,7 +309,7 @@ class StackOrLines:
                              "scale_data": scale_data,
                              "labelName": labelName,
         } )
-        
+
     def compose(self):
         command_def = self.command_def
         files = []
@@ -318,7 +318,7 @@ class StackOrLines:
         for i in self.lines:
             if i["scale_data"] is None: scale = False
             else: scale = True
-        
+
             if i["g"] not in files:
                 files.append( i["g"] )
 
@@ -335,20 +335,20 @@ class StackOrLines:
                 if self.minmax or not self.SkipLegend:
                     command_def += "CDEF:" + i["name"] + "_min=" + vd + "_min," + i["scale_data"] + " "
                     command_def += "CDEF:" + i["name"] + "_max=" + vd + "_max," + i["scale_data"] + " "
-                    
+
             if self.minmax or not self.SkipLegend:    
                 command_def += "CDEF:" + i["name"] + "_max_min_delta=" + i["name"] + "_max," + i["name"] + "_min,- "
 
         if not self.SkipLegend and self.HeadSize is not None:
             command_def += makeheads( self.HeadSize ) + " "
-                
+
         s = command_def
-        
+
         self.colors.set_number_of_lines(len(self.lines))
         if self.minmax:
             for idx, i in enumerate(self.lines):
                 s += "LINE:" + i["name"] + "_min AREA:" + i["name"] + "_max_min_delta" + self.colors.get_color(idx, 0.5) + "::STACK "
-                
+
         for idx, i in enumerate(self.lines):
             color = self.colors.get_color(idx) 
             s += self.gt
@@ -359,7 +359,7 @@ class StackOrLines:
                     s += '"' + i["labelName"] + '\\l"'
                 else:
                     s += '" \\l"'
-                    
+
             if self.isStack and idx > 0 and not i["makeLine"]: s += ":STACK"
             s += " " #+ i["extra"] + " "
 
@@ -370,13 +370,13 @@ class StackOrLines:
                     s += "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"Avr " + f + "\" GPRINT:"+name+"_min:MIN:\"Min " + f + "\" GPRINT:"+name+"_max:MAX:\"Max " + f + "\" GPRINT:"+name+":LAST:\"Last " + f + "\\r\" "
                 else:
                     s += "COMMENT:\\u GPRINT:"+name+":AVERAGE:\"" + f + "\" GPRINT:"+name+"_min:MIN:\"" + f + "\" GPRINT:"+name+"_max:MAX:\"" + f + "\" GPRINT:"+name+":LAST:\"" + f + "\\r\" "
-                    
+
         gt = { "command": s,
                "files": files }
         plot = { "type": self.fullname }
-        
+
         return gt, plot, self.fullname
-    
+
 ######################################################################################
 # Helper function for a single value plot
 def maketypesplot(Type, name, g, Title = None, Format = None, Unit = None, minmax=True, SkipLegend = False,
@@ -403,14 +403,14 @@ class StackOrLinesOld:
                              "options": options,
                              "extra": extra,
                              "makeLine": makeLine } )
-        
+
     def str(self):
         s = ""
         self.colors.set_number_of_lines(len(self.lines))
         if self.minmax:
             for idx, i in enumerate(self.lines):
                 s += "LINE:" + i["name"] + "_min AREA:" + i["name"] + "_max_min_delta" + self.colors.get_color(idx, 0.5) + "::STACK "
-                
+
         for idx, i in enumerate(self.lines):
             color = self.colors.get_color(idx) 
             s += self.gt
@@ -418,7 +418,7 @@ class StackOrLinesOld:
             s += ":" + i["name"] + color + ":" + i["options"]
             if self.isStack and idx > 0 and not i["makeLine"]: s += ":STACK"
             s += " " + i["extra"] + " "
-            
+
         return s    
 
 
@@ -431,7 +431,7 @@ def sorter(glob_arg, re_search = None, front = [], end = [], useNumericInt = Fal
         else: m = g
 
         if useNumericInt: m = int(m)
-        
+
         added = False
         for k in [ [0,front], [10000,end] ] :
             if m in k[1]:
@@ -445,11 +445,11 @@ def sorter(glob_arg, re_search = None, front = [], end = [], useNumericInt = Fal
     r = []
     for i in a: r.append(i[1])
     return r
-    
+
 
 def getit(name, D):
     if name in D: return D[name]
-    
+
     sname = name.split("/")
     if len(sname) > 1:
         s = ''
@@ -490,7 +490,7 @@ Config["variables"] = {
     }
 
 Config["page"] = {
-    
+
     "title": "Overview",
     "plots": [
     ]
@@ -498,7 +498,7 @@ Config["page"] = {
 
 Config["cover"] = [
     ]
-    
+
 Config["types"] = {}
 
 defColors = "--color BACK$COLOR_BACKGROUND$ --color SHADEA$COLOR_BACKGROUND$ --color SHADEB$COLOR_BACKGROUND$ --color CANVAS$COLOR_CANVAS$  "
@@ -590,7 +590,7 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
             for name in ["fail", "success"]:
                 g = "suspend/attempts-" + name + ".rrd"
                 s.add( name, g )
-            
+
             gt, plot, fullname = s.compose()
             Config["types"][fullname] = gt
 
@@ -606,7 +606,7 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
 
                 Config["types"][fullname] = gt
                 SuspendPlots["subplots"]["plots"].append( plot )
-            
+
             CpuSleepPlots["subplots"]["plots"].append( SuspendPlots )
 
             ##############################################
@@ -636,13 +636,13 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
             CpuSleepPlots["subplots"]["plots"].append( plot )
             # single sleep duration: done
             ##############################################
-        
+
         Plots["subplots"]["plots"].append( CpuSleepPlots )
 
     # CPU frequency
     if len(glob.glob("cpufreq*")) > 0:
         SubPlots = { "subplots": { "title": "CPU frequency details", "plots": [ ] } }
-        
+
         # distributions 
         if len(glob.glob("cpufreq*/total_time_in_ms*.rrd")) > 0:
 
@@ -669,7 +669,7 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
                     Config["types"][fullname] = gt
                     settype(SubPlots, fullname)
                     SubPlots["subplots"]["plots"].append( plot )
-                    
+
         # single shot measurements
         if len(glob.glob("cpufreq/cpufreq-*.rrd")) > 1:
             s = StackOrLines( cs, "CPUfreq", "values", minmax=True, extra_command="--lower-limit 0"  )
@@ -731,7 +731,7 @@ if os.path.exists( "cpu" ) or os.path.exists( "cpusleep" ):
                 Config["types"][fullname] = gt
                 settype(SubPlots, fullname)
                 SubPlots["subplots"]["plots"].append( plot )
-                    
+
         # add idle plots
         if len(SubPlots["subplots"]["plots"]) > 1:
             Plots["subplots"]["plots"].append( SubPlots )
@@ -753,12 +753,12 @@ if os.path.exists( "battery-0" ):
                 "duration-low": "3600,/",
                 "duration-full": "3600,/",
                 }
-    
+
     VarNames = { "DEFAULT": "value",
                 "duration-low": "seconds",
                 "duration-full": "seconds",
                 }
-    
+
 
     Extra = { "DEFAULT": "",
               "capacity": "--upper-limit 100 --lower-limit 0 --rigid",
@@ -868,7 +868,7 @@ if len( glob.glob( "df-*" ) ) > 0 or os.path.exists( "memory" ) or os.path.exist
                     name = var_name
                     g = "swap/swap_io-%s.rrd" % var_name
                     s.add( name, g )
-                
+
                 gt, plot, fullname = s.compose()        
 
                 Config["types"][fullname] = gt
@@ -884,7 +884,7 @@ if len( glob.glob( "df-*" ) ) > 0 or os.path.exists( "memory" ) or os.path.exist
                 SubSubPlots["subplots"]["plots"].append( plot )
 
         SubPlots["subplots"]["plots"].append( SubSubPlots )
-    
+
         # detailed plots
         memory.reverse()
         for g in memory:
@@ -975,7 +975,7 @@ if len( glob.glob( "df-*" ) ) > 0 or os.path.exists( "memory" ) or os.path.exist
 
                 Config["types"][fullname] = gt
                 SubPlots["subplots"]["plots"].append( plot )
-                
+
         Plots["subplots"]["plots"].append( SubPlots )
 
     Config["page"]["plots"].append( Plots )
@@ -1021,15 +1021,15 @@ class Interface2Human:
 
     def str(self, i):
         return self.translate[i]
-        
+
 
 if len( glob.glob("interface-*") ) > 0:
 
     Plots = { "subplots": { "title": "Network details", "plots": [ ] } }
     int2hum = Interface2Human()
-    
+
     # overall traffic
-    
+
     command_def = '-t "Network traffic, bytes" ' + defColors #+ makeheads(7)
     command_line = ""
     command_extra = ""
@@ -1039,7 +1039,7 @@ if len( glob.glob("interface-*") ) > 0:
         data_type = DT[0]            
         humandt = { "tx": "outgoing", "rx": "incoming" }[data_type]
         first = True
-        
+
         for g in sorter("interface-*/if_octets.rrd", "^interface-(.*)/if_octets.rrd", [], ["lo"]):
             intname = re.search( "^interface-(.*)/if_octets.rrd", g ).group(1)
             intname = intname.replace("-", "_")
@@ -1056,7 +1056,7 @@ if len( glob.glob("interface-*") ) > 0:
             command_def += "VDEF:" + intname + data_type + "_total=" + intname + data_type + "_data,TOTAL "
 
             makeLine = first
-            
+
             DT[1].add( intname + data_type, "$LINE_WIDTH_PRIMARY$", '"' + int2hum.str(intname) + " " + humandt + '\\l"',
                        "COMMENT:\\u GPRINT:"+ intname + data_type+"_data:AVERAGE:\"Avr " + f +
                        "\" GPRINT:"+ intname + data_type+"_data:LAST:\"Last " + f + "\\r\" " + " ",
@@ -1065,7 +1065,7 @@ if len( glob.glob("interface-*") ) > 0:
             command_extra += 'GPRINT:' + intname + data_type + '_total:"' + \
                              int2hum.str(intname) + " " + humandt + ' Total %8.0lf%s' + getunit("NetworkTotal/" + name) + '\\r" ' \
                              + "HRULE:0$COLOR_LINE_SINGLE_SUB$ "
-            
+
 
             first = False
 
@@ -1084,7 +1084,7 @@ if len( glob.glob("interface-*") ) > 0:
     for CNet in sorter("interface-*/if_octets.rrd", "^interface-(.*)/if_octets.rrd", [], ["lo"]):
         intname = re.search( "^interface-(.*)/if_octets.rrd", CNet ).group(1)
         intname = intname.replace("-", "_")
-        
+
         SubPlots = { "subplots": { "title": "Network details: " + int2hum.str(intname), "plots": [ ] } }
 
         for g in glob.glob("interface-" + intname + "/if_*.rrd"):
@@ -1146,7 +1146,7 @@ if os.path.exists("ofono") or \
     cpath = None
     if os.path.exists("ofono"): cpath = "ofono"
     elif os.path.exists("statefs_cellular"): cpath = "statefs_cellular"
-    
+
     if cpath is not None:
         s = StackOrLines( cs, "Radio", "Cellular",
                           minmax = True,
@@ -1163,7 +1163,7 @@ if os.path.exists("ofono") or \
     cpath = None
     if os.path.exists("connman"): cpath = "connman"
     elif os.path.exists("statefs_internet"): cpath = "statefs_internet"
-    
+
     if cpath is not None:
 
         s = StackOrLines( cs, "Radio", "Internet",
@@ -1184,7 +1184,7 @@ if os.path.exists("ofono") or \
                           minmax = False,
                           isStack = True,                          
                           t = "AREA" )
-        
+
         for dtype in sorter( "radio-*" ):
             names = sorter( dtype + "/" + "active-*.rrd" )
             simple = ( len(names) == 1 )
@@ -1192,7 +1192,7 @@ if os.path.exists("ofono") or \
                 name = re.search( "^radio-(.*)", dtype ).group(1)
                 if not simple:
                     name += "_" +  re.search( "^" + dtype + "/active-(.*).rrd", g).group(1)
-            
+
                 s.add( name, g )
         gt, plot, fullname = s.compose()
 
@@ -1228,7 +1228,7 @@ if os.path.exists( "processes" ) or os.path.exists( "load" ):
     if os.path.exists( "processes" ):
 
         SubPlots = { "type": None, "subplots": { "title": "Processes details", "plots": [ ] } }
-        
+
         # Processes overview
         s = StackOrLines( cs, "Processes", "Overview", isStack = True, t = "AREA", extra_command = '--lower-limit 0' )
         processes = sorter( "processes/ps_state-*.rrd", "^processes/ps_state-(.*).rrd",
@@ -1252,9 +1252,9 @@ if os.path.exists( "processes" ) or os.path.exists( "load" ):
 
             Config["types"][fullname] = gt
             SubPlots["subplots"]["plots"].append( plot )
-            
+
         Plots["subplots"]["plots"].append( SubPlots )
-        
+
         # fork rate goes directly to Plot
         g = "processes/fork_rate.rrd"
         name = "fork_rate"
@@ -1301,7 +1301,7 @@ if os.path.exists( "processes" ) or os.path.exists( "load" ):
 
         Plots["subplots"]["plots"].append( SubPlots )
 
-        
+
     # detailed plots for selected processes
     ProcStats = { "cputime": [ "user", "syst" ],
                   "pagefaults": [ "minflt", "majflt" ],
@@ -1323,7 +1323,7 @@ if os.path.exists( "processes" ) or os.path.exists( "load" ):
 
             title_start = ""
             if name=="cputime": title_start += procname + ': '
-                
+
             if name in ProcStats.keys():
                 f = getf("Processes/" + name)
                 u = getunit("Processes/" + name)
