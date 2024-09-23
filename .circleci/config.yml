@@ -20,6 +20,12 @@ jobs:
       # Checkout the code as the first step.
       - checkout
       - run:
+          name: "PWD"
+          command: "pwd"
+      - run:
+          name: "List"
+          command: "ls -l"
+      - run:
           name: "Build"
           command: "buildrpm"
 
