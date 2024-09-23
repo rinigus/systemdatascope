@@ -21,12 +21,6 @@ jobs:
       - checkout:
           path: "/source"
       - run:
-          name: "PWD"
-          command: "pwd"
-      - run:
-          name: "List"
-          command: "ls -l"
-      - run:
           name: "Build"
           command: "buildrpm"
 
